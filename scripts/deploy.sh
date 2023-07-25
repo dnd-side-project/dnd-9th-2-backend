@@ -15,7 +15,7 @@ if [ -z $IS_GREEN_EXIST ];then
   sleep 3
   REQUEST=$(curl http://127.0.0.1:8082)
     if [ -n "$REQUEST" ]; then
-      echo ">>>🍃 health check success !"
+      echo ">>> 🍃 health check success !"
       break;
     fi
   done;
