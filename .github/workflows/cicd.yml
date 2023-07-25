@@ -9,7 +9,7 @@ name: Baggle Server CI/CD with Docker
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
 
