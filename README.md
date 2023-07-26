@@ -31,31 +31,29 @@
 📂 src
 ┣ 📂 java.org.baggle
 ┃  ┣ 📂 domain
-┃  ┃  ┣ 📂 User
-┃  ┃  ┃  ┣ 📂 controller
-┃  ┃  ┃  ┣ 📂 dto
-┃  ┃  ┃  ┃  ┣ 📂 request
-┃  ┃  ┃  ┃  ┣ 📂 response
-┃  ┃  ┃  ┣ 📂 service
-┃  ┃  ┃  ┣ 📂 entity
-┃  ┃  ┃  ┣ 📂 repository
-┃  ┃  ┃  ┣ 📂 exception
+┃  ┃  ┣ 📂 sample
+┃  ┃     ┣ 📂 controller
+┃  ┃     ┣ 📂 dto
+┃  ┃     ┃  ┣ 📂 request
+┃  ┃     ┃  ┣ 📂 response
+┃  ┃     ┣ 📂 service
+┃  ┃     ┣ 📂 entity
+┃  ┃     ┣ 📂 repository
+┃  ┃     ┣ 📂 exception
 ┃  ┣ 📂 global
 ┃  ┃  ┣ 📂 common
-┃  ┃  ┣ 📂 config
-┃  ┃  ┃  ┣ WebConfig.class
-┃  ┃  ┣ 📂 dto
 ┃  ┃  ┃  ┣ BaseResponse.class
 ┃  ┃  ┃  ┣ SuccessCode.class
+┃  ┃  ┃  ┣ BaseEntity.class
+┃  ┃  ┣ 📂 config
+┃  ┃  ┃  ┣ JpaConfig.class
 ┃  ┃  ┣ 📂 error
-┃  ┃  ┃  ┣ 📂 dto
-┃  ┃  ┃  ┃  ┣ ErrorBaseResponse.class
-┃  ┃  ┃  ┣ 📂 exception
-┃  ┃  ┃  ┃  ┣ BusinessException.class
-┃  ┃  ┃  ┣ 📂 handler
-┃  ┃  ┃     ┣ GlobalExceptionHandler.class
-┃  ┃  ┣ 📂 entity
-┃  ┃     ┣ BaseEntity.class
+┃  ┃     ┣ 📂 dto
+┃  ┃     ┃  ┣ ErrorBaseResponse.class
+┃  ┃     ┣ 📂 exception
+┃  ┃     ┃  ┣ BusinessException.class
+┃  ┃     ┣ 📂 handler
+┃  ┃        ┣ GlobalExceptionHandler.class
 ┃  ┣ 📂 infra
 ┣ 📂 resources
 ┃  ┣ 📂 static
