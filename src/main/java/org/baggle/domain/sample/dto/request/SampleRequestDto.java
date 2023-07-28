@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.baggle.domain.sample.entity.Sample;
 
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class SampleRequestDto {

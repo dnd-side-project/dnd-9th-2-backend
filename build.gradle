@@ -35,6 +35,11 @@ dependencies {
 
     // redis 의존성 추가
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.3.1.RELEASE'
+
+    // flyway 의존성 추가
+    implementation "org.flywaydb:flyway-core"
+    // flyway와 mysql 버전 8과 맞추기 위해 사용
+    implementation ("org.flywaydb:flyway-mysql")
 }
 
 tasks.named('test') {
