@@ -29,6 +29,17 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // aws 의존성 추가
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.1.RELEASE'
+
+    // redis 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.3.1.RELEASE'
+
+    // flyway 의존성 추가
+    implementation "org.flywaydb:flyway-core"
+    // flyway와 mysql 버전 8과 맞추기 위해 사용
+    implementation ("org.flywaydb:flyway-mysql")
 }
 
 tasks.named('test') {

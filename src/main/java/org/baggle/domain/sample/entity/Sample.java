@@ -6,9 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Entity
 public class Sample {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
