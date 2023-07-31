@@ -1,4 +1,4 @@
-package org.baggle.global.config;
+package org.baggle.infra.s3;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -19,13 +19,14 @@ public class S3Config {
     // S3 서버가 위한 지역을 가져옵니다.
     @Value("${cloud.aws.region.static}")
     private String region;
+
     /**
      * S3에 접근 권한이 주워진 객체를 Spring Bean에 등록합니다.
      * param: none
      * return: S3에 접근 권한이 주워진 객체를 return 합니다.
      */
     @Bean
-    public AmazonS3Client amazonS3Client(){
+    public AmazonS3Client amazonS3Client() {
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(iamAccessKey, iamSecretKey);
         return (AmazonS3Client) AmazonS3ClientBuilder.standard()
                 .withRegion(region).enablePathStyleAccess()

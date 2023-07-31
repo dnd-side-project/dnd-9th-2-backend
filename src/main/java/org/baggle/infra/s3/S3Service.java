@@ -1,4 +1,4 @@
-package org.baggle.global.common;
+package org.baggle.infra.s3;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
@@ -29,9 +29,9 @@ public class S3Service {
     private String defaultUrl;
 
     /**
-     *  S3에 이미지 파일을 업로드하는 메서드입니다.
-     *  param: 이미지 파일, user idx, 이미지 타입(ex. profile or post ...)
-     *  return: S3에 저장된 파일 이름 (db 저장 용도)
+     * S3에 이미지 파일을 업로드하는 메서드입니다.
+     * param: 이미지 파일, user idx, 이미지 타입(ex. profile or post ...)
+     * return: S3에 저장된 파일 이름 (db 저장 용도)
      */
     public String uploadFile(MultipartFile multipartFile, Long userId, String imageType) {
         if (multipartFile == null) return null;
