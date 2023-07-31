@@ -2,7 +2,7 @@ package org.baggle.domain.sample.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.baggle.domain.sample.entity.Sample;
+import org.baggle.domain.sample.domain.Sample;
 
 
 @Getter
