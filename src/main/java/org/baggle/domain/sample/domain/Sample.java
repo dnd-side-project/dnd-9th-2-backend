@@ -1,4 +1,4 @@
-package org.baggle.domain.sample.entity;
+package org.baggle.domain.sample.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
