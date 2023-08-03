@@ -8,7 +8,7 @@ import org.baggle.global.common.BaseTimeEntity;
 @AllArgsConstructor
 @Builder
 @Getter
-@Table(name = "Users")
+@Table(name = "users")
 @Entity
 public class User extends BaseTimeEntity {
     @Id
