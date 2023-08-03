@@ -22,8 +22,10 @@ public class Participation extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meeting_id")
     private Meeting meeting;
-    @OneToOne(mappedBy = "participation")
+    @OneToOne(mappedBy = "participation", fetch = FetchType.LAZY)
     private Feed feed;
+    @OneToOne(mappedBy = "participation", fetch = FetchType.LAZY)
+    private Report report;
     @Enumerated(value = EnumType.STRING)
     private MeetingAuthority meetingAuthority;
     @Enumerated(value = EnumType.STRING)
