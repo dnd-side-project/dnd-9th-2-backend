@@ -10,6 +10,7 @@ import org.baggle.domain.fcm.dto.response.UpdateFCMTokenResponseDto;
 import org.baggle.domain.fcm.repository.FCMRepository;
 import org.baggle.domain.user.domain.User;
 import org.baggle.global.error.exception.BusinessException;
+import org.baggle.global.error.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,10 +40,9 @@ public class FCMService {
 
     public UpdateFCMTokenResponseDto updateFcmToken(UpdateFCMTokenRequestDto requestDto){
         FCMToken fcmToken = fcmRepository.findByFcmToken(requestDto.getBeforeFCMToken())
-                .orElseThrow(() -> new BusinessException(FCM_TOKEN_NOT_FOUND));
-        fcmToken.update(requestDto.getUpdateFCMToken());
+                .orElseThrow(() -> new EntityNotFoundException(FCM_TOKEN_NOT_FOUND));
+        fcmToken.updateFcmToken(requestDto.getUpdateFCMToken());
 
-        //save 안해줘도 ㄱㅊ나???
         return new UpdateFCMTokenResponseDto(requestDto.getUpdateFCMToken());
     }
 
