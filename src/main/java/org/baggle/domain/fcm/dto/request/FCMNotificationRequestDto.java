@@ -1,5 +1,6 @@
 package org.baggle.domain.fcm.dto.request;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import org.baggle.domain.user.domain.User;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FCMNotificationRequestDto {
     private List<Long> targetUserIdList;
     private String title;
