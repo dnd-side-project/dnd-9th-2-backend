@@ -2,6 +2,7 @@ package org.baggle.domain.user.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.baggle.domain.fcm.domain.FCMToken;
 import org.baggle.global.common.BaseTimeEntity;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,4 +19,6 @@ public class User extends BaseTimeEntity {
     private String profileImageUrl;
     @Column(nullable = false)
     private String nickname;
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private FCMToken fcmToken;
 }
