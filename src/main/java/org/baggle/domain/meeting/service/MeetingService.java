@@ -26,7 +26,6 @@ public class MeetingService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime fromDateTime = now.plusMinutes(from);
         LocalDateTime toDateTime = now.plusMinutes(to);
-        System.out.println(fromDateTime.toLocalDate().toString() + "/" + fromDateTime.toLocalTime().toString());
 
         return meetingRepository.findMeetingsStartingSoon(
                 fromDateTime.toLocalTime(),

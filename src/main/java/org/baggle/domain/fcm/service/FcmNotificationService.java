@@ -15,9 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
-@Slf4j
 public class FcmNotificationService {
     private final FirebaseMessaging firebaseMessaging;
     private final FcmRepository fcmRepository;
