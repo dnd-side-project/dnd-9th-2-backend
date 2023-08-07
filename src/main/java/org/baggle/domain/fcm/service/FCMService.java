@@ -24,15 +24,18 @@ import static org.baggle.global.error.exception.ErrorCode.FCM_TOKEN_NOT_FOUND;
 public class FCMService {
     private final FCMRepository fcmRepository;
 
-    public GetFCMTokenResponseDto getFcmTokens(User user){
+    public GetFCMTokenResponseDto findFcmTokens(User user){
         FCMToken fcmToken = fcmRepository.findByUser(user);
         String result = fcmToken.getFcmToken();
 
         return new GetFCMTokenResponseDto(result);
     }
 
-    public AddFCMTokenResponseDto addFcmToken(AddFCMTokenRequestDto requestDto, User user){
-        FCMToken newFcmToken = new FCMToken(requestDto.getFcmToken(), user);
+    public AddFCMTokenResponseDto createFcmToken(AddFCMTokenRequestDto requestDto, User user){
+        FCMToken newFcmToken = FCMToken.builder()
+                .fcmToken(requestDto.getFcmToken())
+                .user(user)
+                .build();
         fcmRepository.save(newFcmToken);
 
         return new AddFCMTokenResponseDto(newFcmToken.getFcmToken());
