@@ -2,8 +2,12 @@ package org.baggle.domain.user.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.baggle.domain.fcm.domain.FCMToken;
+import org.baggle.domain.fcm.domain.FcmToken;
+import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.global.common.BaseTimeEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -19,6 +23,8 @@ public class User extends BaseTimeEntity {
     private String profileImageUrl;
     @Column(nullable = false)
     private String nickname;
+    @OneToMany(mappedBy = "user")
+    private List<Participation> participations = new ArrayList<>();
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private FCMToken fcmToken;
+    private FcmToken fcmToken;
 }
