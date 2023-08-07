@@ -10,7 +10,7 @@ import org.baggle.global.common.BaseTimeEntity;
 @AllArgsConstructor
 @Builder
 @Entity
-public class FCMToken extends BaseTimeEntity {
+public class FcmToken extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "fcm_id")
@@ -24,12 +24,12 @@ public class FCMToken extends BaseTimeEntity {
     private User user;
 
     @Builder
-    public FCMToken(String fcmToken, User user) {
+    public FcmToken(String fcmToken, User user) {
         this.fcmToken = fcmToken;
         this.user = user;
     }
 
-    public void updateFcmToken(String fcmToken){
+    public void updateFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
     }
 }
