@@ -24,7 +24,7 @@ public class ExpirationListener implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         String[] parts = message.toString().split(":");
         if (!parts[0].equals("fcmNotification")) return;
-        List<FcmToken> fcmTokens = fcmNotificationService.findFCMTokens(Long.parseLong(parts[1]));
+        List<FcmToken> fcmTokens = fcmNotificationService.findFcmTokens(Long.parseLong(parts[1]));
         System.out.println(fcmTokens);
         //            fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(fcmTokens, "", ""));
         System.out.println("########## onMessage pattern " + new String(pattern) + " | " + message.toString());
