@@ -21,17 +21,18 @@ import static org.baggle.global.error.exception.ErrorCode.FCM_TOKEN_NOT_FOUND;
 public class FcmService {
     private final FcmRepository fcmRepository;
 
-    public GetFcmTokenResponseDto findFcmTokens(User user) {
+    public GetFcmTokenResponseDto getFcmTokens(User user) {
         FcmToken fcmToken = fcmRepository.findByUser(user);
+        String result = fcmToken.getFcmToken();
 
-        return GetFcmTokenResponseDto.of(fcmToken);
+        return new GetFcmTokenResponseDto(result);
     }
 
-    public AddFcmTokenResponseDto createFcmToken(AddFcmTokenRequestDto requestDto, User user) {
-        FcmToken fcmToken = requestDto.toEntity(user);
-        fcmRepository.save(fcmToken);
+    public AddFcmTokenResponseDto addFcmToken(AddFcmTokenRequestDto requestDto, User user) {
+        FcmToken newFcmToken = requestDto.toEntity(user);
+        fcmRepository.save(newFcmToken);
 
-        return AddFcmTokenResponseDto.of(fcmToken);
+        return new AddFcmTokenResponseDto(newFcmToken.getFcmToken());
     }
 
     public UpdateFcmTokenResponseDto updateFcmToken(UpdateFcmTokenRequestDto requestDto) {
@@ -39,7 +40,6 @@ public class FcmService {
                 .orElseThrow(() -> new EntityNotFoundException(FCM_TOKEN_NOT_FOUND));
         fcmToken.updateFcmToken(requestDto.getUpdateFCMToken());
 
-        return UpdateFcmTokenResponseDto.of(fcmToken);
+        return new UpdateFcmTokenResponseDto(requestDto.getUpdateFCMToken());
     }
-
 }

@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
                        create_date TIMESTAMP(6),
                        last_modified_date TIMESTAMP(6),
                        user_id BIGINT AUTO_INCREMENT,
@@ -7,34 +7,32 @@ CREATE TABLE users (
                        PRIMARY KEY (user_id)
 );
 
-CREATE TABLE meeting (
+CREATE TABLE IF NOT EXISTS meeting (
                          date DATE,
                          time TIME(6),
                          create_date TIMESTAMP(6),
                          last_modified_date TIMESTAMP(6),
                          meeting_id BIGINT AUTO_INCREMENT,
-                         button_status VARCHAR(255) CHECK (button_status IN ('ready', 'confirm', 'progress', 'completed')),
-                         link VARCHAR(255),
-                         meeting_status VARCHAR(255) CHECK (meeting_status IN ('prepare', 'ready', 'start', 'end')),
+                         meeting_status VARCHAR(255) CHECK (meeting_status IN ('', '', '', '')),
                          memo VARCHAR(255),
                          place VARCHAR(255) NOT NULL,
                          title VARCHAR(255) NOT NULL,
                          PRIMARY KEY (meeting_id)
 );
 
-CREATE TABLE participation (
+CREATE TABLE IF NOT EXISTS participation (
                                create_date TIMESTAMP(6),
                                last_modified_date TIMESTAMP(6),
                                meeting_id BIGINT,
                                participation_id BIGINT AUTO_INCREMENT,
                                user_id BIGINT,
-                               button_authority VARCHAR(255) CHECK (button_authority IN ('True', 'False')),
-                               meeting_authority VARCHAR(255) CHECK (meeting_authority IN ('True', 'False')),
-                               participation_meeting_status VARCHAR(255) CHECK (participation_meeting_status IN ('participation', 'withdrawal')),
+                               button_authority VARCHAR(255) CHECK (button_authority IN ('', '')),
+                               meeting_authority VARCHAR(255) CHECK (meeting_authority IN ('', '')),
+                               participation_meeting_status VARCHAR(255) CHECK (participation_meeting_status IN ('', '')),
                                PRIMARY KEY (participation_id)
 );
 
-CREATE TABLE feed (
+CREATE TABLE IF NOT EXISTS feed (
                       create_date TIMESTAMP(6),
                       feed_id BIGINT AUTO_INCREMENT,
                       last_modified_date TIMESTAMP(6),
@@ -43,7 +41,7 @@ CREATE TABLE feed (
                       PRIMARY KEY (feed_id)
 );
 
-CREATE TABLE report (
+CREATE TABLE IF NOT EXISTS report (
                         create_date TIMESTAMP(6),
                         feed_id BIGINT,
                         last_modified_date TIMESTAMP(6),
@@ -52,11 +50,11 @@ CREATE TABLE report (
                         PRIMARY KEY (report_id)
 );
 
-CREATE TABLE fcmtoken (
+CREATE TABLE IF NOT EXISTS fcm (
                           create_date TIMESTAMP(6),
                           last_modified_date TIMESTAMP(6),
                           fcm_id BIGINT AUTO_INCREMENT,
-                          user_id BIGINT UNIQUE,
+                          user_id BIGINT,
                           fcm_token VARCHAR(255) NOT NULL,
                           PRIMARY KEY (fcm_id)
 );
