@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.service.FcmNotificationService;
+import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.service.MeetingService;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -38,11 +39,14 @@ public class NotificationScheduler {
     public void notificationScheduleTask() throws FirebaseMessagingException {
         List<Meeting> notificationMeeting = meetingService.findMeetingsInRange(59, 60);
         for (Meeting m : notificationMeeting) {
-            if (fcmNotificationService.hasFCMNotification(m.getId())) continue;
+            if (fcmNotificationService.hasFcmNotification(m.getId())) continue;
 
-            List<FcmToken> fcmTokens = fcmNotificationService.findFCMTokens(m.getId());
-//            fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(fcmTokens, "", ""));
-            fcmNotificationService.createFCMNotification(m.getId());
+            List<FcmToken> ownerFcmTokens = fcmNotificationService.findFcmTokensByButtonAuthority(m, ButtonAuthority.OWNER);
+            List<FcmToken> nonOwnerFcmTokens = fcmNotificationService.findFcmTokensByButtonAuthority(m, ButtonAuthority.NON_OWNER);
+
+//            fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(ownerFcmTokens, "", ""));
+//            fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(nonOwnerFcmTokens, "", ""));
+            fcmNotificationService.createFcmNotification(m.getId());
             log.info("meeting information - ID {}, date {}, time {}", m.getId(), m.getDate(), m.getTime());
         }
     }

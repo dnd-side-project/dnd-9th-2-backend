@@ -11,20 +11,20 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FcmNotificationRequestDto {
-    private List<FcmToken> targetUserIdList;
+    private List<FcmToken> targetTokenList;
     private String title;
     private String body;
 
     @Builder
-    public FcmNotificationRequestDto(List<FcmToken> targetUserIdList, String title, String body) {
-        this.targetUserIdList = targetUserIdList;
+    public FcmNotificationRequestDto(List<FcmToken> targetTokenList, String title, String body) {
+        this.targetTokenList = targetTokenList;
         this.title = title;
         this.body = body;
     }
 
-    public static FcmNotificationRequestDto of(List<FcmToken> targetUserIdList, String title, String body) {
+    public static FcmNotificationRequestDto of(List<FcmToken> targetTokenList, String title, String body) {
         return FcmNotificationRequestDto.builder()
-                .targetUserIdList(targetUserIdList)
+                .targetTokenList(targetTokenList)
                 .title(title)
                 .body(body)
                 .build();

@@ -11,9 +11,12 @@ import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
 import org.baggle.domain.fcm.repository.FcmNotificationRepository;
 import org.baggle.domain.fcm.repository.FcmRepository;
+import org.baggle.domain.meeting.domain.ButtonAuthority;
+import org.baggle.domain.meeting.domain.Meeting;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ public class FcmNotificationService {
     /**
      * TODO: Create 예외 처리
      */
-    public void createFCMNotification(Long key) {
+    public void createFcmNotification(Long key) {
         FcmNotification fcmNotification = FcmNotification.builder()
                 .id(key)
                 .isNotified(Boolean.TRUE)
@@ -37,20 +40,26 @@ public class FcmNotificationService {
     /**
      * TODO: 데이터 조회 예외 처리
      */
-    public Boolean hasFCMNotification(Long key) {
+    public Boolean hasFcmNotification(Long key) {
         return fcmNotificationRepository.existsById(key);
     }
 
-    public List<FcmToken> findFCMTokens(Long meetingId) {
+    public List<FcmToken> findFcmTokens(Long meetingId) {
         return fcmRepository.findByUserParticipationsMeetingId(meetingId);
+    }
+
+    public List<FcmToken> findFcmTokensByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
+        return meeting.getParticipations().stream()
+                .filter(participation -> participation.getButtonAuthority() == buttonAuthority)
+                .map(participation -> participation.getUser().getFcmToken())
+                .collect(Collectors.toList());
     }
 
     /**
      * 알람 내용을 firebase 서버에 전달하는 method입니다.
      */
     public void sendNotificationByToken(FcmNotificationRequestDto fcmNotificationRequestDto) throws FirebaseMessagingException {
-
-        for (FcmToken fcmToken : fcmNotificationRequestDto.getTargetUserIdList()) {
+        for (FcmToken fcmToken : fcmNotificationRequestDto.getTargetTokenList()) {
             Notification notification = Notification.builder()
                     .setTitle(fcmNotificationRequestDto.getTitle())
                     .setBody(fcmNotificationRequestDto.getBody())
