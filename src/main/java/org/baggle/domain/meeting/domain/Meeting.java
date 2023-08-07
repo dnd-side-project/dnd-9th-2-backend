@@ -30,7 +30,4 @@ public class Meeting extends BaseTimeEntity {
     private String memo;
     @Enumerated(value = EnumType.STRING)
     private MeetingStatus meetingStatus;
-    @Enumerated(value = EnumType.STRING)
-    private ButtonStatus buttonStatus;
-    private String link;
 }
