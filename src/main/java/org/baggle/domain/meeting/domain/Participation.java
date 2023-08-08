@@ -32,4 +32,9 @@ public class Participation extends BaseTimeEntity {
     private ParticipationMeetingStatus participationMeetingStatus;
     @Enumerated(value = EnumType.STRING)
     private ButtonAuthority buttonAuthority;
+
+    public Long findUserId(){
+        return user.getId();
+    }
+
 }
