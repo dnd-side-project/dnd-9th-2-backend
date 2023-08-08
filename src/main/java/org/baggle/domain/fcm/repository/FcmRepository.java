@@ -16,4 +16,5 @@ public interface FcmRepository extends JpaRepository<FcmToken, Long> {
     Optional<FcmToken> findByFcmToken(String fcmToken);
 
     List<FcmToken> findByUserParticipationsMeetingId(Long meetingId);
+
 }

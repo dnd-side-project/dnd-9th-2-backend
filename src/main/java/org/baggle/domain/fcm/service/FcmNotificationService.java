@@ -4,6 +4,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmNotification;
@@ -13,10 +14,10 @@ import org.baggle.domain.fcm.repository.FcmNotificationRepository;
 import org.baggle.domain.fcm.repository.FcmRepository;
 import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
+import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class FcmNotificationService {
     private final FirebaseMessaging firebaseMessaging;
     private final FcmRepository fcmRepository;
     private final FcmNotificationRepository fcmNotificationRepository;
+    private final ParticipationRepository participationRepository;
 
     /**
      * TODO: Create 예외 처리
@@ -38,6 +40,13 @@ public class FcmNotificationService {
     }
 
     /**
+     * TODO: 데이터 없을 시 예외 처리
+     */
+    public void deleteFcmNotification(Long key){
+        fcmNotificationRepository.deleteById(key);
+    }
+
+    /**
      * TODO: 데이터 조회 예외 처리
      */
     public Boolean hasFcmNotification(Long key) {
@@ -48,11 +57,9 @@ public class FcmNotificationService {
         return fcmRepository.findByUserParticipationsMeetingId(meetingId);
     }
 
+    @Transactional
     public List<FcmToken> findFcmTokensByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
-        return meeting.getParticipations().stream()
-                .filter(participation -> participation.getButtonAuthority() == buttonAuthority)
-                .map(participation -> participation.getUser().getFcmToken())
-                .collect(Collectors.toList());
+        return participationRepository.findFcmTokensByMeetingAndButtonAuthority(meeting, buttonAuthority);
     }
 
     /**
