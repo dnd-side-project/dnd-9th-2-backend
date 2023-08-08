@@ -14,7 +14,7 @@ import java.io.InputStream;
 @Configuration
 public class FcmConfig {
     @Bean
-    FirebaseApp firebaseApp() throws IOException{
+    FirebaseApp firebaseApp() throws IOException {
         ClassPathResource resource = new ClassPathResource("firebase/ssang-1a9ab-firebase-adminsdk-7nen2-2c1210a093.json");
         InputStream refreshToken = resource.getInputStream();
         FirebaseOptions options = FirebaseOptions.builder()
@@ -34,8 +34,9 @@ public class FcmConfig {
 //                }
         return FirebaseApp.initializeApp(options);
     }
+
     @Bean
-    FirebaseMessaging firebaseMessaging() throws IOException{
+    FirebaseMessaging firebaseMessaging() throws IOException {
         return FirebaseMessaging.getInstance(firebaseApp());
     }
 }

@@ -1,7 +1,6 @@
 package org.baggle.domain.meeting.service;
 
 import lombok.RequiredArgsConstructor;
-import org.baggle.domain.fcm.domain.FcmNotification;
 import org.baggle.domain.fcm.domain.FcmTimer;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.feed.repository.FeedRepository;
@@ -16,9 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
-import static org.baggle.global.error.exception.ErrorCode.MEETING_NOT_FOUNT;
+import static org.baggle.global.error.exception.ErrorCode.MEETING_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Transactional
@@ -30,7 +28,7 @@ public class MeetingService {
 
 
     public MeetingDetailResponseDto findMeetingDetail(Long requestId) {
-        Meeting meeting = meetingRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUNT));
+        Meeting meeting = meetingRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
         FcmTimer certificationTime = fcmTimerRepository.findById(requestId).orElse(new FcmTimer(null, null));
         List<Participation> participations = meeting.getParticipations();
         List<ParticipationDetailResponseDto> participationDetails = participations.stream()

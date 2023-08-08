@@ -27,8 +27,8 @@ public class ExpirationListener implements MessageListener {
         String[] parts = message.toString().split(":");
         String title = "긴급 소집이 종료되었습니다!!";
         String body = "";
-        if (!(parts[0].equals("fcmNotification" ) || parts[0].equals("fcmTimer"))) return;
-        if (parts[0].equals("fcmNotification")){
+        if (!(parts[0].equals("fcmNotification") || parts[0].equals("fcmTimer"))) return;
+        if (parts[0].equals("fcmNotification")) {
             fcmNotificationService.createFcmTimer(Long.parseLong(parts[1]));
             title = "긴급 소집!!";
         }

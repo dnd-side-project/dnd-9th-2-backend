@@ -25,13 +25,13 @@ public class ParticipationDetailResponseDto {
         this.memberId = memberId;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
-        this.meetingAuthority = (meetingAuthority == MeetingAuthority.HOST)? Boolean.TRUE : Boolean.FALSE;
-        this.buttonAuthority = (buttonAuthority == ButtonAuthority.OWNER)? Boolean.TRUE : Boolean.FALSE;
+        this.meetingAuthority = (meetingAuthority == MeetingAuthority.HOST) ? Boolean.TRUE : Boolean.FALSE;
+        this.buttonAuthority = (buttonAuthority == ButtonAuthority.OWNER) ? Boolean.TRUE : Boolean.FALSE;
         this.feedId = Objects.isNull(feed) ? null : feed.getId();
         this.feedImageUrl = Objects.isNull(feed) ? "" : feed.getFeedImageUrl();
     }
 
-    public static ParticipationDetailResponseDto of(Participation participation, User user, Feed feed){
+    public static ParticipationDetailResponseDto of(Participation participation, User user, Feed feed) {
         return ParticipationDetailResponseDto.builder()
                 .memberId(participation.getId())
                 .nickname(user.getNickname())

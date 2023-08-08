@@ -12,7 +12,7 @@ public class ParticipationResponseDto {
         this.participationId = participationId;
     }
 
-    public static ParticipationResponseDto of(Long participationId){
+    public static ParticipationResponseDto of(Long participationId) {
         return ParticipationResponseDto.builder()
                 .participationId(participationId)
                 .build();

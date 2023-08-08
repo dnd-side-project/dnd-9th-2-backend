@@ -27,7 +27,7 @@ public class ParticipationAvailabilityResponseDto {
         this.memo = memo;
     }
 
-    public static ParticipationAvailabilityResponseDto of(Meeting meeting){
+    public static ParticipationAvailabilityResponseDto of(Meeting meeting) {
         return ParticipationAvailabilityResponseDto.builder()
                 .meetingId(meeting.getId())
                 .title(meeting.getTitle())
