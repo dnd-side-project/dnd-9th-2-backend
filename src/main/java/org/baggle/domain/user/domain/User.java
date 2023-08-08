@@ -21,10 +21,12 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long id;
     private String profileImageUrl;
-    @Column(nullable = false)
     private String nickname;
     @OneToMany(mappedBy = "user")
     private List<Participation> participations = new ArrayList<>();
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private FcmToken fcmToken;
+    private String platformId;
+    private String refreshToken;
+    private Platform platform;
 }
