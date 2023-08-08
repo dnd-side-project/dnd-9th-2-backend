@@ -28,5 +28,6 @@ public class User extends BaseTimeEntity {
     private FcmToken fcmToken;
     private String platformId;
     private String refreshToken;
+    @Enumerated(value = EnumType.STRING)
     private Platform platform;
 }
