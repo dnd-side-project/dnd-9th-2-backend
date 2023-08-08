@@ -8,15 +8,18 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmNotification;
+import org.baggle.domain.fcm.domain.FcmTimer;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
 import org.baggle.domain.fcm.repository.FcmNotificationRepository;
 import org.baggle.domain.fcm.repository.FcmRepository;
+import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -26,6 +29,7 @@ public class FcmNotificationService {
     private final FirebaseMessaging firebaseMessaging;
     private final FcmRepository fcmRepository;
     private final FcmNotificationRepository fcmNotificationRepository;
+    private final FcmTimerRepository fcmTimerRepository;
     private final ParticipationRepository participationRepository;
 
     /**
@@ -80,6 +84,15 @@ public class FcmNotificationService {
 
             firebaseMessaging.send(message);
         }
+    }
+
+    public void createFcmTimer(Long key){
+        LocalDateTime startTime = LocalDateTime.now();
+        FcmTimer fcmTimer = FcmTimer.builder()
+                .id(key)
+                .startTime(startTime)
+                .build();
+        fcmTimerRepository.save(fcmTimer);
     }
 
 }

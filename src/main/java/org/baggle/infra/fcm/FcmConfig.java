@@ -10,10 +10,9 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 @Configuration
-public class FCMConfig {
+public class FcmConfig {
     @Bean
     FirebaseApp firebaseApp() throws IOException{
         ClassPathResource resource = new ClassPathResource("firebase/ssang-1a9ab-firebase-adminsdk-7nen2-2c1210a093.json");

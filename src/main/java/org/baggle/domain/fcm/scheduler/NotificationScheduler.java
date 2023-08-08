@@ -3,7 +3,9 @@ package org.baggle.domain.fcm.scheduler;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.baggle.domain.fcm.domain.FcmTimer;
 import org.baggle.domain.fcm.domain.FcmToken;
+import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
@@ -29,6 +31,7 @@ import java.util.List;
 public class NotificationScheduler {
     private final MeetingService meetingService;
     private final FcmNotificationService fcmNotificationService;
+    private final FcmTimerRepository fcmTimerRepository;
 
     /**
      * 시작 1시간 전 모임을 찾아 알람을 전송하는 메서드
@@ -37,6 +40,8 @@ public class NotificationScheduler {
      */
     @Scheduled(cron = "0 * * * * *")
     public void notificationScheduleTask() throws FirebaseMessagingException {
+        FcmTimer certificationTime = fcmTimerRepository.findById(1L).orElse(new FcmTimer(null, null));
+        System.out.println(certificationTime.getStartTime());
         List<Meeting> notificationMeeting = meetingService.findMeetingsInRange(59, 60);
         for (Meeting m : notificationMeeting) {
             if (fcmNotificationService.hasFcmNotification(m.getId())) continue;
