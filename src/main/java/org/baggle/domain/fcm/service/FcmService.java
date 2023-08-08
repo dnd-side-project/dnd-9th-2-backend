@@ -23,16 +23,15 @@ public class FcmService {
 
     public GetFcmTokenResponseDto getFcmTokens(User user) {
         FcmToken fcmToken = fcmRepository.findByUser(user);
-        String result = fcmToken.getFcmToken();
 
-        return new GetFcmTokenResponseDto(result);
+        return GetFcmTokenResponseDto.of(fcmToken);
     }
 
     public AddFcmTokenResponseDto addFcmToken(AddFcmTokenRequestDto requestDto, User user) {
         FcmToken newFcmToken = requestDto.toEntity(user);
         fcmRepository.save(newFcmToken);
 
-        return new AddFcmTokenResponseDto(newFcmToken.getFcmToken());
+        return AddFcmTokenResponseDto.of(newFcmToken);
     }
 
     public UpdateFcmTokenResponseDto updateFcmToken(UpdateFcmTokenRequestDto requestDto) {
@@ -40,6 +39,6 @@ public class FcmService {
                 .orElseThrow(() -> new EntityNotFoundException(FCM_TOKEN_NOT_FOUND));
         fcmToken.updateFcmToken(requestDto.getUpdateFCMToken());
 
-        return new UpdateFcmTokenResponseDto(requestDto.getUpdateFCMToken());
+        return UpdateFcmTokenResponseDto.of(fcmToken);
     }
 }
