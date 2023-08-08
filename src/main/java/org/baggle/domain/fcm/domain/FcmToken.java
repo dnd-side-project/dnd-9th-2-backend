@@ -22,12 +22,6 @@ public class FcmToken extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Builder
-    public FcmToken(String fcmToken, User user) {
-        this.fcmToken = fcmToken;
-        this.user = user;
-    }
-
     public void updateFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
     }
