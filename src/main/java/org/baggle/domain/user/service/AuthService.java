@@ -16,12 +16,12 @@ public class AuthService {
 
     // TODO
     public UserAuthResponseDto signin(String token) {
-        return new UserAuthResponseDto();
+        return null;
     }
 
     // TODO
     public UserAuthResponseDto signup(String token, MultipartFile image, String nickname, String platform) {
-        return new UserAuthResponseDto();
+        return null;
     }
 
     // TODO

@@ -21,6 +21,9 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 엑세스 토큰입니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
     NOT_MATCH_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "일치하지 않는 리프레시 토큰입니다."),
+    INVALID_IDENTITY_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 아이덴터티 토큰입니다."),
+    APPLE_PUBLIC_KEY_EXCEPTION(HttpStatus.UNAUTHORIZED, "애플 로그인 중 퍼블릭 키 생성에 문제가 발생했습니다."),
+
 
     /**
      * 403 Forbidden
@@ -35,7 +38,7 @@ public enum ErrorCode {
     MEETING_NOT_FOUNT(HttpStatus.BAD_REQUEST, "모임 정보를 찾을 수 없습니다."),
 
     /**
-     * 405 METHOD NOT ALLOWED
+     * 405 Method Not Allowed
      */
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "잘못된 HTTP method 요청입니다."),
 
