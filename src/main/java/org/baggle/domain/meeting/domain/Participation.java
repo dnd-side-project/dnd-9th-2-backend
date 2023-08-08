@@ -33,8 +33,4 @@ public class Participation extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private ButtonAuthority buttonAuthority;
 
-    public Long findUserId(){
-        return user.getId();
-    }
-
 }
