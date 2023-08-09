@@ -12,6 +12,9 @@ public enum ErrorCode {
      * 400 Bad Request
      */
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+    INVALID_MULTIPART_FILE(HttpStatus.BAD_REQUEST, "유효하지 않은 파일입니다."),
+    INVALID_FILE_UPLOAD(HttpStatus.BAD_REQUEST, "s3 파일 업로드에 실패했습니다."),
+    INVALID_PLATFORM_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 플랫폼 타입입니다."),
 
     /**
      * 401 Unauthorized
@@ -22,8 +25,7 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
     NOT_MATCH_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "일치하지 않는 리프레시 토큰입니다."),
     INVALID_IDENTITY_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 아이덴터티 토큰입니다."),
-    APPLE_PUBLIC_KEY_EXCEPTION(HttpStatus.UNAUTHORIZED, "애플 로그인 중 퍼블릭 키 생성에 문제가 발생했습니다."),
-
+    UNABLE_TO_CREATE_APPLE_PUBLIC_KEY(HttpStatus.UNAUTHORIZED, "애플 로그인 중 퍼블릭 키 생성에 문제가 발생했습니다."),
 
     /**
      * 403 Forbidden
@@ -46,6 +48,7 @@ public enum ErrorCode {
      * 409 Conflict
      */
     CONFLICT(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),
+    DUPLICATE_USER(HttpStatus.CONFLICT, "이미 존재하는 회원입니다."),
 
     /**
      * 500 Internal Server Error

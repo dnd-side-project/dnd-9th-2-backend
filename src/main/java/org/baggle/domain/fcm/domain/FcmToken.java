@@ -25,4 +25,9 @@ public class FcmToken extends BaseTimeEntity {
     public void updateFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
     }
+
+    public void changeUser(User user) {
+        this.user = user;
+        user.changeFcmToken(this);
+    }
 }

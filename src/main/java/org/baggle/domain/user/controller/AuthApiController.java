@@ -1,9 +1,12 @@
 package org.baggle.domain.user.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.baggle.domain.user.dto.request.UserSignInRequestDto;
+import org.baggle.domain.user.dto.response.UserAuthResponseDto;
 import org.baggle.domain.user.service.AuthService;
 import org.baggle.global.common.BaseResponse;
 import org.baggle.global.common.SuccessCode;
+import org.baggle.global.config.jwt.Token;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -16,20 +19,25 @@ public class AuthApiController {
     private final AuthService authService;
 
     @PostMapping("/signin")
-    public ResponseEntity<BaseResponse<?>> signIn(@RequestHeader("Authorization") final String token) {
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, authService.signin(token)));
+    public ResponseEntity<BaseResponse<?>> signIn(@RequestHeader("Authorization") final String token,
+                                                  @RequestBody final UserSignInRequestDto userSignInRequestDto) {
+        final UserAuthResponseDto userAuthResponseDto = authService.signin(token, userSignInRequestDto);
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, userAuthResponseDto));
     }
 
     @PostMapping("/signup")
     public ResponseEntity<BaseResponse<?>> signUp(@RequestHeader("Authorization") final String token,
-                                                  @RequestParam("image") final MultipartFile image,
+                                                  @RequestParam("file") final MultipartFile image,
                                                   @RequestParam final String nickname,
-                                                  @RequestParam final String platform) {
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, authService.signup(token, image, nickname, platform)));
+                                                  @RequestParam final String platform,
+                                                  @RequestParam final String fcmToken) {
+        final UserAuthResponseDto userAuthResponseDto = authService.signup(token, image, nickname, platform, fcmToken);
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, userAuthResponseDto));
     }
 
     @GetMapping("/reissue")
     public ResponseEntity<BaseResponse<?>> signUp(@RequestHeader("Authorization") final String refreshToken) {
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, authService.reissue(refreshToken)));
+        final Token reissuedToken = authService.reissue(refreshToken);
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, reissuedToken));
     }
 }

@@ -26,7 +26,7 @@ public class PublicKeyGenerator {
             KeyFactory keyFactory = KeyFactory.getInstance(applePublicKey.getKty());
             return keyFactory.generatePublic(rsaPublicKeySpec);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new UnauthorizedException(ErrorCode.APPLE_PUBLIC_KEY_EXCEPTION);
+            throw new UnauthorizedException(ErrorCode.UNABLE_TO_CREATE_APPLE_PUBLIC_KEY);
         }
     }
 }
