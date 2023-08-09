@@ -38,6 +38,7 @@ public enum ErrorCode {
     ENTITY_NOT_FOUND(HttpStatus.BAD_REQUEST, "엔티티를 찾을 수 없습니다."),
     FCM_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "FCM 토큰을 찾을 수 없습니다."),
     MEETING_NOT_FOUND(HttpStatus.BAD_REQUEST, "모임 정보를 찾을 수 없습니다."),
+    PARTICIPATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "모임 참가자를 찾을 수 없습니다."),
 
     /**
      * 405 Method Not Allowed
