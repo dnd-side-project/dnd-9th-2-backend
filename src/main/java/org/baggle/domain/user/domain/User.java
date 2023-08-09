@@ -30,4 +30,26 @@ public class User extends BaseTimeEntity {
     private String refreshToken;
     @Enumerated(value = EnumType.STRING)
     private Platform platform;
+
+    public static User createUserWithFcmToken(String profileImageUrl, String nickname, String fcmToken, String platformId, Platform platform) {
+        User user = User.builder()
+                .profileImageUrl(profileImageUrl)
+                .nickname(nickname)
+                .platformId(platformId)
+                .platform(platform)
+                .build();
+        FcmToken token = FcmToken.builder()
+                .fcmToken(fcmToken)
+                .build();
+        token.changeUser(user);
+        return user;
+    }
+
+    public void changeFcmToken(FcmToken fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 }
