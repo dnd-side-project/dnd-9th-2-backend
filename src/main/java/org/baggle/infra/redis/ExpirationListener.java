@@ -9,6 +9,7 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -29,7 +30,8 @@ public class ExpirationListener implements MessageListener {
         String body = "";
         if (!(parts[0].equals("fcmNotification") || parts[0].equals("fcmTimer"))) return;
         if (parts[0].equals("fcmNotification")) {
-            fcmNotificationService.createFcmTimer(Long.parseLong(parts[1]));
+            LocalDateTime startTime = LocalDateTime.now();
+            fcmNotificationService.createFcmTimer(Long.parseLong(parts[1]), startTime);
             title = "긴급 소집!!";
         }
 
