@@ -17,6 +17,8 @@ import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
+import org.baggle.global.error.exception.ErrorCode;
+import org.baggle.global.error.exception.InvalidValueException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -69,7 +71,7 @@ public class FcmNotificationService {
     /**
      * 알람 내용을 firebase 서버에 전달하는 method입니다.
      */
-    public void sendNotificationByToken(FcmNotificationRequestDto fcmNotificationRequestDto) throws FirebaseMessagingException {
+    public void sendNotificationByToken(FcmNotificationRequestDto fcmNotificationRequestDto) {
         for (FcmToken fcmToken : fcmNotificationRequestDto.getTargetTokenList()) {
             Notification notification = Notification.builder()
                     .setTitle(fcmNotificationRequestDto.getTitle())
@@ -82,12 +84,16 @@ public class FcmNotificationService {
                     .setNotification(notification)
                     .build();
 
-            firebaseMessaging.send(message);
+            try {
+                firebaseMessaging.send(message);
+            }catch (FirebaseMessagingException e){
+                log.error("Failed to send Notification", e);
+                throw new InvalidValueException(ErrorCode.INVALID_FCM_UPLOAD);
+            }
         }
     }
 
-    public void createFcmTimer(Long key){
-        LocalDateTime startTime = LocalDateTime.now();
+    public void createFcmTimer(Long key, LocalDateTime startTime){
         FcmTimer fcmTimer = FcmTimer.builder()
                 .id(key)
                 .startTime(startTime)

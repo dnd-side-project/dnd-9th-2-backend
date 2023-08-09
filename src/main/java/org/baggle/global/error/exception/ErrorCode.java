@@ -15,6 +15,7 @@ public enum ErrorCode {
     INVALID_MULTIPART_FILE(HttpStatus.BAD_REQUEST, "유효하지 않은 파일입니다."),
     INVALID_FILE_UPLOAD(HttpStatus.BAD_REQUEST, "s3 파일 업로드에 실패했습니다."),
     INVALID_PLATFORM_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 플랫폼 타입입니다."),
+    INVALID_FCM_UPLOAD(HttpStatus.BAD_REQUEST, "firebase 알람 전송에 실패했습니다."),
 
     /**
      * 401 Unauthorized
@@ -38,6 +39,7 @@ public enum ErrorCode {
     ENTITY_NOT_FOUND(HttpStatus.BAD_REQUEST, "엔티티를 찾을 수 없습니다."),
     FCM_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "FCM 토큰을 찾을 수 없습니다."),
     MEETING_NOT_FOUND(HttpStatus.BAD_REQUEST, "모임 정보를 찾을 수 없습니다."),
+    PARTICIPATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "모임 참가자를 찾을 수 없습니다."),
 
     /**
      * 405 Method Not Allowed

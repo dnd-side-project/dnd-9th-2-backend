@@ -20,4 +20,11 @@ public class Feed extends BaseTimeEntity {
     private Participation participation;
     @Column(nullable = false)
     private String feedImageUrl;
+
+    public static Feed createParticipationWithFeedImg(Participation participation, String feedImageUrl) {
+        return Feed.builder()
+                .participation(participation)
+                .feedImageUrl(feedImageUrl)
+                .build();
+    }
 }
