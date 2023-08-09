@@ -11,7 +11,7 @@ import org.baggle.global.common.BaseTimeEntity;
 @Getter
 @Table(name = "fcm")
 @Entity
-public class FCMToken extends BaseTimeEntity {
+public class FcmToken extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "fcm_id")

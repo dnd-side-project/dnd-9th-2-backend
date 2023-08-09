@@ -32,4 +32,5 @@ public class Participation extends BaseTimeEntity {
     private ParticipationMeetingStatus participationMeetingStatus;
     @Enumerated(value = EnumType.STRING)
     private ButtonAuthority buttonAuthority;
+
 }
