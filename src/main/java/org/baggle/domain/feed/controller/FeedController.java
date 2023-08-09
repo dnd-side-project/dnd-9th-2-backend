@@ -17,7 +17,7 @@ public class FeedController {
 //    public ResponseEntity<BaseResponse<?>> createFeedUpload(-----------------------,
 //                                                            @RequestBody FeedUploadRequestDto requestDto,
 //                                                            @RequestPart MultipartFile feedImage){
-//        FeedUploadResponseDto responseDto = feedService.createFeedUpload(user, requestDto, feedImage);
+//        FeedUploadResponseDto responseDto = feedService.feedUpload(requestDto, feedImage);
 //        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
 //    }
 

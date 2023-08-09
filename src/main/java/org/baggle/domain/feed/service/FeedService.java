@@ -1,6 +1,5 @@
 package org.baggle.domain.feed.service;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.RequiredArgsConstructor;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
@@ -13,7 +12,6 @@ import org.baggle.domain.feed.dto.response.FeedUploadResponseDto;
 import org.baggle.domain.feed.repository.FeedRepository;
 import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
-import org.baggle.domain.user.domain.User;
 import org.baggle.global.common.ImageType;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.infra.s3.S3Service;
@@ -36,7 +34,7 @@ public class FeedService {
     private final FcmNotificationService fcmNotificationService;
     private final FcmRepository fcmRepository;
 
-    public FeedUploadResponseDto createFeedUpload(User user, FeedUploadRequestDto requestDto, MultipartFile feedImage) {
+    public FeedUploadResponseDto feedUpload(FeedUploadRequestDto requestDto, MultipartFile feedImage) {
         Participation participation = participationRepository.findById(requestDto.getParticipationId()).orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
         String imgUrl = s3Service.uploadFile(feedImage, ImageType.FEED.getImageType());
         Feed feed = Feed.createParticipationWithFeedImg(participation, imgUrl);
