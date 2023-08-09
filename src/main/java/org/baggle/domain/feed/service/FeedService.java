@@ -44,7 +44,7 @@ public class FeedService {
         return FeedUploadResponseDto.of(feed.getId());
     }
 
-    public FeedNotificationResponseDto uploadNotification(Long requestId) throws FirebaseMessagingException {
+    public FeedNotificationResponseDto uploadNotification(Long requestId){
         Participation participation = participationRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
         // 알람을 broadcast 하는 code 입니다.
         List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(participation.getMeeting().getId());
