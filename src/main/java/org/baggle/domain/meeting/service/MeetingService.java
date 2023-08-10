@@ -10,6 +10,7 @@ import org.baggle.domain.meeting.dto.reponse.MeetingDetailResponseDto;
 import org.baggle.domain.meeting.dto.reponse.ParticipationDetailResponseDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.global.error.exception.EntityNotFoundException;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,11 +44,11 @@ public class MeetingService {
      * 서버 시간 기준 a ~ b분 사이에 모임을 조회하는 메서드입니다.
      * using:
      * NotificationScheduler - 1시간 전 모임 조회
+     * ParticipationService - 모임 전 후 2시간이내 모임 체크
      */
-    public List<Meeting> findMeetingsInRange(int from, int to) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime fromDateTime = now.plusMinutes(from);
-        LocalDateTime toDateTime = now.plusMinutes(to);
+    public List<Meeting> findMeetingsInRange(LocalDateTime localDateTime, int from, int to) {
+        LocalDateTime fromDateTime = localDateTime.plusMinutes(from);
+        LocalDateTime toDateTime = localDateTime.plusMinutes(to);
 
         return meetingRepository.findMeetingsStartingSoon(
                 fromDateTime.toLocalTime(),
