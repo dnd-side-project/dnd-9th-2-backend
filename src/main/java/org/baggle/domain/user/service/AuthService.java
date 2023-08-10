@@ -32,11 +32,12 @@ public class AuthService {
     private final AppleOAuthProvider appleOAuthProvider;
 
     // TODO
-    public UserAuthResponseDto signin(String token, UserSignInRequestDto userSignInRequestDto) {
+    public UserAuthResponseDto signIn(String token, UserSignInRequestDto userSignInRequestDto) {
         return null;
     }
 
-    public UserAuthResponseDto signup(String token, MultipartFile image, String nickname, String platform, String fcmToken) {
+    public UserAuthResponseDto signUp(String token, MultipartFile image, String nickname, String platform, String fcmToken) {
+        validateDuplicateNickname(nickname);
         Platform enumPlatform = getEnumPlatformFromStringPlatform(platform);
         String platformId = getPlatformIdFromToken(token, enumPlatform);
         validateDuplicateUser(enumPlatform, platformId);
@@ -51,6 +52,13 @@ public class AuthService {
     // TODO
     public Token reissue(String refreshToken) {
         return null;
+    }
+
+    private void validateDuplicateNickname(String nickname) {
+        List<User> findUsers = userRepository.findUsersByNickname(nickname);
+        if (!findUsers.isEmpty()) {
+            throw new ConflictException(ErrorCode.DUPLICATE_NICKNAME);
+        }
     }
 
     private Platform getEnumPlatformFromStringPlatform(String platform) {
