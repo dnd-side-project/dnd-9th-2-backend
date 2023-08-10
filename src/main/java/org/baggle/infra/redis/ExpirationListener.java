@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.fcm.service.FcmNotificationService;
+import org.baggle.domain.fcm.service.FcmService;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.util.List;
 @Component
 public class ExpirationListener implements MessageListener {
     private final FcmNotificationService fcmNotificationService;
+    private final FcmService fcmService;
     private final FcmTimerRepository fcmTimerRepository;
 
     /**
@@ -35,7 +37,7 @@ public class ExpirationListener implements MessageListener {
             title = "긴급 소집!!";
         }
 
-        List<FcmToken> fcmTokens = fcmNotificationService.findFcmTokens(Long.parseLong(parts[1]));
+        List<FcmToken> fcmTokens = fcmService.findFcmTokens(Long.parseLong(parts[1]));
         // fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(fcmTokens, title, body));
 
         System.out.println("########## onMessage message " + message.toString());

@@ -59,10 +59,6 @@ public class FcmNotificationService {
         return fcmNotificationRepository.existsById(key);
     }
 
-    public List<FcmToken> findFcmTokens(Long meetingId) {
-        return fcmRepository.findByUserParticipationsMeetingId(meetingId);
-    }
-
     @Transactional
     public List<FcmToken> findFcmTokensByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
         return participationRepository.findFcmTokensByMeetingAndButtonAuthority(meeting, buttonAuthority);

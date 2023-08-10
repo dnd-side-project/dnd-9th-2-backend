@@ -13,6 +13,8 @@ import org.baggle.global.error.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.baggle.global.error.exception.ErrorCode.FCM_TOKEN_NOT_FOUND;
 
 @RequiredArgsConstructor
@@ -40,5 +42,9 @@ public class FcmService {
         fcmToken.updateFcmToken(requestDto.getUpdateFCMToken());
 
         return UpdateFcmTokenResponseDto.of(fcmToken);
+    }
+
+    public List<FcmToken> findFcmTokens(Long meetingId) {
+        return fcmRepository.findByUserParticipationsMeetingId(meetingId);
     }
 }

@@ -34,7 +34,7 @@ public class ParticipationService {
      */
     public ParticipationAvailabilityResponseDto findParticipationAvailability(Long requestId) {
         Meeting meeting = meetingRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        if(!meetingService.isMeetingInDeadline(meeting) || meetingService.isValidTime(meeting)) throw new InvalidValueException(INVALID_MEETING_TIME);
+        if(!meetingService.isMeetingInDeadline(meeting) || !meetingService.isValidTime(meeting)) throw new InvalidValueException(INVALID_MEETING_TIME);
         List<Participation> participations = meeting.getParticipations();
         if (hasUser(participations, requestId)) return null;
         return ParticipationAvailabilityResponseDto.of(meeting);
@@ -47,7 +47,7 @@ public class ParticipationService {
      */
     public ParticipationResponseDto createParticipation(User user, ParticipationReqeustDto reqeustDto) {
         Meeting meeting = meetingRepository.findById(reqeustDto.getMeetingId()).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        if(!meetingService.isMeetingInDeadline(meeting) || meetingService.isValidTime(meeting)) throw new InvalidValueException(INVALID_MEETING_TIME);
+        if(!meetingService.isMeetingInDeadline(meeting) || !meetingService.isValidTime(meeting)) throw new InvalidValueException(INVALID_MEETING_TIME);
         Participation participation = reqeustDto.toEntity(user, meeting, MeetingAuthority.PARTICIPATION, ParticipationMeetingStatus.PARTICIPATING, ButtonAuthority.NON_OWNER);
         participationRepository.save(participation);
         return ParticipationResponseDto.of(participation.getId());
