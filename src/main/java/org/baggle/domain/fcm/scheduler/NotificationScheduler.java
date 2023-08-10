@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -42,7 +43,8 @@ public class NotificationScheduler {
     public void notificationScheduleTask() throws FirebaseMessagingException {
         FcmTimer certificationTime = fcmTimerRepository.findById(1L).orElse(new FcmTimer(null, null));
         System.out.println(certificationTime.getStartTime());
-        List<Meeting> notificationMeeting = meetingService.findMeetingsInRange(59, 60);
+        LocalDateTime now = LocalDateTime.now();
+        List<Meeting> notificationMeeting = meetingService.findMeetingsInRange(now, 59, 60);
         for (Meeting m : notificationMeeting) {
             if (fcmNotificationService.hasFcmNotification(m.getId())) continue;
 
