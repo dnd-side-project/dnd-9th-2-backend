@@ -46,7 +46,7 @@ public class FeedService {
      * throw 모임이 확정되지 않은 경우
      * throw 긴급소집 이벤트가 진행 중이 아닌 경우
      */
-    public FeedUploadResponseDto feedUpload(FeedUploadRequestDto requestDto, MultipartFile feedImage) throws InvalidValueException {
+    public FeedUploadResponseDto feedUpload(FeedUploadRequestDto requestDto, MultipartFile feedImage) {
         Participation participation = participationRepository.findById(requestDto.getParticipationId()).orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
         if (!meetingService.isValidTime(participation.getMeeting()))
             throw new InvalidValueException(INVALID_MEETING_TIME);
