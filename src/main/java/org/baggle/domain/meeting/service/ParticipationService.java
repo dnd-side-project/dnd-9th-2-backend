@@ -8,13 +8,11 @@ import org.baggle.domain.meeting.dto.request.ParticipationReqeustDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.baggle.domain.user.domain.User;
-import org.baggle.domain.user.repository.UserRepository;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.InvalidValueException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 

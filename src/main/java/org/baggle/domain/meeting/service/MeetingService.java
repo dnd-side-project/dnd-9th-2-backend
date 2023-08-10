@@ -10,7 +10,6 @@ import org.baggle.domain.meeting.dto.reponse.MeetingDetailResponseDto;
 import org.baggle.domain.meeting.dto.reponse.ParticipationDetailResponseDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.global.error.exception.EntityNotFoundException;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,7 +60,7 @@ public class MeetingService {
      * 2시간 전,후 모임 여부를 확인하는 메서드
      * return: 모임이 있을 경우 True, else False
      */
-    public Boolean isMeetingInDeadline(Meeting meeting){
+    public Boolean isMeetingInDeadline(Meeting meeting) {
         LocalDateTime criteriaTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
         List<Meeting> meetings = this.findMeetingsInRange(criteriaTime, -120, 120);
         return meetings.size() != 0;
@@ -71,7 +70,7 @@ public class MeetingService {
      * 모임 시간까지 남은 시간을 확인하는 메서드
      * return: 1시간 이상 True, else False
      */
-    public Boolean isValidTime(Meeting meeting){
+    public Boolean isValidTime(Meeting meeting) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
         Duration duration = Duration.between(now, meetingTime);

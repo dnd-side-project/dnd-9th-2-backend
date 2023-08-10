@@ -44,7 +44,7 @@ public class NotificationScheduler {
         FcmTimer certificationTime = fcmTimerRepository.findById(1L).orElse(new FcmTimer(null, null));
         System.out.println(certificationTime.getStartTime());
         LocalDateTime now = LocalDateTime.now();
-        List<Meeting> notificationMeeting = meetingService.findMeetingsInRange(now,59, 60);
+        List<Meeting> notificationMeeting = meetingService.findMeetingsInRange(now, 59, 60);
         for (Meeting m : notificationMeeting) {
             if (fcmNotificationService.hasFcmNotification(m.getId())) continue;
 
