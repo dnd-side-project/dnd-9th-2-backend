@@ -21,7 +21,7 @@ public class AuthApiController {
     @PostMapping("/signin")
     public ResponseEntity<BaseResponse<?>> signIn(@RequestHeader("Authorization") final String token,
                                                   @RequestBody final UserSignInRequestDto userSignInRequestDto) {
-        final UserAuthResponseDto userAuthResponseDto = authService.signin(token, userSignInRequestDto);
+        final UserAuthResponseDto userAuthResponseDto = authService.signIn(token, userSignInRequestDto);
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, userAuthResponseDto));
     }
 
@@ -31,12 +31,12 @@ public class AuthApiController {
                                                   @RequestParam final String nickname,
                                                   @RequestParam final String platform,
                                                   @RequestParam final String fcmToken) {
-        final UserAuthResponseDto userAuthResponseDto = authService.signup(token, image, nickname, platform, fcmToken);
+        final UserAuthResponseDto userAuthResponseDto = authService.signUp(token, image, nickname, platform, fcmToken);
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, userAuthResponseDto));
     }
 
     @GetMapping("/reissue")
-    public ResponseEntity<BaseResponse<?>> signUp(@RequestHeader("Authorization") final String refreshToken) {
+    public ResponseEntity<BaseResponse<?>> reissue(@RequestHeader("Authorization") final String refreshToken) {
         final Token reissuedToken = authService.reissue(refreshToken);
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, reissuedToken));
     }
