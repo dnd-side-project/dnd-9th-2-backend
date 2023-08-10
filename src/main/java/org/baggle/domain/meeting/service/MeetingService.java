@@ -24,18 +24,17 @@ import static org.baggle.global.error.exception.ErrorCode.MEETING_NOT_FOUND;
 @Service
 public class MeetingService {
     private final MeetingRepository meetingRepository;
-    private final FeedRepository feedRepository;
     private final FcmTimerRepository fcmTimerRepository;
 
 
+    /**
+     * throw 모임이 존재하지 않는 경우
+     */
     public MeetingDetailResponseDto findMeetingDetail(Long requestId) {
         Meeting meeting = meetingRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
         FcmTimer certificationTime = fcmTimerRepository.findById(requestId).orElse(new FcmTimer(null, null));
         List<Participation> participations = meeting.getParticipations();
-        List<ParticipationDetailResponseDto> participationDetails = participations.stream()
-                .map(participation ->
-                        ParticipationDetailResponseDto.of(participation, participation.getUser(), participation.getFeed()))
-                .toList();
+        List<ParticipationDetailResponseDto> participationDetails = participations.stream().map(participation -> ParticipationDetailResponseDto.of(participation, participation.getUser(), participation.getFeed())).toList();
         return MeetingDetailResponseDto.of(meeting, certificationTime.getStartTime(), participationDetails);
     }
 
