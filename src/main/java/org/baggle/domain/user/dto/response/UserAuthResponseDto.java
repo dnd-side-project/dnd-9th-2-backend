@@ -10,6 +10,7 @@ import org.baggle.global.config.jwt.Token;
 public class UserAuthResponseDto {
     private String accessToken;
     private String refreshToken;
+    private Long userId;
     private String platform;
     private String profileImageUrl;
     private String nickname;
@@ -18,6 +19,7 @@ public class UserAuthResponseDto {
         return UserAuthResponseDto.builder()
                 .accessToken(token.getAccessToken())
                 .refreshToken(token.getAccessToken())
+                .userId(user.getId())
                 .platform(user.getPlatform().getStringPlatform())
                 .profileImageUrl(user.getProfileImageUrl())
                 .nickname(user.getNickname())
