@@ -28,7 +28,7 @@ public class AppleOAuthProvider {
 
     private void validateClaims(Claims claims) {
         if (!identityTokenValidator.isValidIdentityToken(claims)) {
-            throw new UnauthorizedException(ErrorCode.INVALID_IDENTITY_TOKEN);
+            throw new UnauthorizedException(ErrorCode.INVALID_IDENTITY_TOKEN_CLAIMS);
         }
     }
 }
