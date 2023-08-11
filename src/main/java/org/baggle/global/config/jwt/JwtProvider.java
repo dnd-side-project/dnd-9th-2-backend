@@ -1,7 +1,6 @@
 package org.baggle.global.config.jwt;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import org.baggle.global.error.exception.ErrorCode;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 
 @Getter
@@ -29,7 +29,7 @@ public class JwtProvider {
 
     private String generateToken(Long userId, boolean isAccessToken) {
         final Date now = new Date();
-        final Date expiration = new Date(now.getTime() + ((isAccessToken) ? ACCESS_TOKEN_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME));
+        final Date expiration = new Date(now.getTime() + (isAccessToken ? ACCESS_TOKEN_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME));
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .setSubject(String.valueOf(userId))
@@ -41,7 +41,7 @@ public class JwtProvider {
 
     public void validateAccessToken(String accessToken) {
         try {
-            getJwtParser().parseClaimsJwt(accessToken);
+            getJwtParser().parseClaimsJws(accessToken);
         } catch (JwtException e) {
             throw new UnauthorizedException(ErrorCode.INVALID_ACCESS_TOKEN);
         } catch (IllegalArgumentException ee) {
@@ -51,7 +51,7 @@ public class JwtProvider {
 
     public void validateRefreshToken(String refreshToken) {
         try {
-            getJwtParser().parseClaimsJwt(refreshToken);
+            getJwtParser().parseClaimsJws(refreshToken);
         } catch (JwtException e) {
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
         } catch (IllegalArgumentException ee) {
@@ -60,7 +60,7 @@ public class JwtProvider {
     }
 
     public Long getSubject(String token) {
-        return Long.valueOf(getJwtParser().parseClaimsJwt(token)
+        return Long.valueOf(getJwtParser().parseClaimsJws(token)
                 .getBody()
                 .getSubject());
     }
@@ -72,7 +72,7 @@ public class JwtProvider {
     }
 
     public Key getSigningKey() {
-        byte[] secretKeyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(secretKeyBytes);
+        String encoded = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        return Keys.hmacShaKeyFor(encoded.getBytes());
     }
 }
