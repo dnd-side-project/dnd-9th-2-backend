@@ -33,7 +33,7 @@ public class Participation extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private ButtonAuthority buttonAuthority;
 
-    public static Participation createParticipationWithoutFeed(User user, Meeting meeting, ParticipationMeetingStatus participationMeetingStatus, ButtonAuthority buttonAuthority, MeetingAuthority meetingAuthority){
+    public static Participation createParticipationWithoutFeed(User user, Meeting meeting, MeetingAuthority meetingAuthority, ParticipationMeetingStatus participationMeetingStatus, ButtonAuthority buttonAuthority){
         return Participation.builder()
                 .user(user)
                 .meeting(meeting)
