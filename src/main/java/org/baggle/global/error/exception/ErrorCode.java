@@ -18,6 +18,7 @@ public enum ErrorCode {
     INVALID_FCM_UPLOAD(HttpStatus.BAD_REQUEST, "firebase 알람 전송에 실패했습니다."),
     INVALID_MEETING_TIME(HttpStatus.BAD_REQUEST, "유효하지 않은 모임 시간입니다."),
     INVALID_CERTIFICATION_TIME(HttpStatus.BAD_REQUEST, "유효하지 않은 인증 시간입니다."),
+    INVALID_MEETING_PARTICIPATION(HttpStatus.BAD_REQUEST, "잘못된 모임 참가자 입니다."),
 
 
     /**
