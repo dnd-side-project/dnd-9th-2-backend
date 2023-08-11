@@ -24,7 +24,7 @@ public class User extends BaseTimeEntity {
     private String nickname;
     @OneToMany(mappedBy = "user")
     private List<Participation> participations = new ArrayList<>();
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private FcmToken fcmToken;
     private String platformId;
     private String refreshToken;
@@ -33,7 +33,7 @@ public class User extends BaseTimeEntity {
 
     public static User createUserWithFcmToken(String profileImageUrl, String nickname, String fcmToken, String platformId, Platform platform) {
         User user = User.builder()
-                .profileImageUrl(profileImageUrl)
+                .profileImageUrl(!profileImageUrl.isEmpty() ? profileImageUrl : null)
                 .nickname(nickname)
                 .platformId(platformId)
                 .platform(platform)

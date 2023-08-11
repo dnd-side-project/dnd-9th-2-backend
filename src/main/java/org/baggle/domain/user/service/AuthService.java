@@ -41,7 +41,7 @@ public class AuthService {
         Platform enumPlatform = getEnumPlatformFromStringPlatform(platform);
         String platformId = getPlatformIdFromToken(token, enumPlatform);
         validateDuplicateUser(enumPlatform, platformId);
-        String profileImageUrl = uploadProfileImageToS3AndGetProfileImageUrl(image, ImageType.PROFILE);
+        String profileImageUrl = hasMultipartFile(image) ? uploadProfileImageToS3AndGetProfileImageUrl(image, ImageType.PROFILE) : "";
         User user = User.createUserWithFcmToken(profileImageUrl, nickname, fcmToken, platformId, enumPlatform);
         User savedUser = userRepository.save(user);
         Token issuedToken = jwtProvider.issueToken(savedUser.getId());
@@ -78,6 +78,10 @@ public class AuthService {
         if (!findUsers.isEmpty()) {
             throw new ConflictException(ErrorCode.DUPLICATE_USER);
         }
+    }
+
+    private boolean hasMultipartFile(MultipartFile multipartFile) {
+        return multipartFile != null && !multipartFile.isEmpty();
     }
 
     private void updateRefreshToken(User user, String refreshToken) {
