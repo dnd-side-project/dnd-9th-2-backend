@@ -18,7 +18,7 @@ public class UserAuthResponseDto {
     public static UserAuthResponseDto of(Token token, User user) {
         return UserAuthResponseDto.builder()
                 .accessToken(token.getAccessToken())
-                .refreshToken(token.getAccessToken())
+                .refreshToken(token.getRefreshToken())
                 .userId(user.getId())
                 .platform(user.getPlatform().getStringPlatform())
                 .profileImageUrl(user.getProfileImageUrl())
