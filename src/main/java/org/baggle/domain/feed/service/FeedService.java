@@ -63,7 +63,7 @@ public class FeedService {
      * throw 모임에 참가자가 없는 경우
      * throw 모임이 확정되지 않은 경우
      */
-    public FeedNotificationResponseDto uploadNotification(Long requestId, LocalDateTime time) {
+    public FeedNotificationResponseDto uploadNotification(Long requestId) {
         Participation participation = participationRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
         if (!meetingService.isValidTime(participation.getMeeting()))
             throw new InvalidValueException(INVALID_MEETING_TIME);
@@ -72,8 +72,9 @@ public class FeedService {
         FcmNotificationRequestDto fcmNotificationRequestDto = FcmNotificationRequestDto.of(fcmTokens, "", "");
         fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto);
         // 이벤트 로직 5분 타이머를 시작하는 code 입니다.
-        fcmNotificationService.createFcmTimer(participation.getMeeting().getId(), time);
-        return FeedNotificationResponseDto.of(participation.getMeeting(), time);
+        LocalDateTime startTime = LocalDateTime.now();
+        fcmNotificationService.createFcmTimer(participation.getMeeting().getId(), startTime);
+        return FeedNotificationResponseDto.of(participation.getMeeting(), startTime);
     }
 
     /**
