@@ -2,9 +2,9 @@ package org.baggle.global.config.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.Getter;
 import org.baggle.global.error.exception.ErrorCode;
-import org.baggle.global.error.exception.InvalidValueException;
 import org.baggle.global.error.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -42,20 +42,20 @@ public class JwtProvider {
     public void validateAccessToken(String accessToken) {
         try {
             getJwtParser().parseClaimsJws(accessToken);
-        } catch (JwtException e) {
-            throw new UnauthorizedException(ErrorCode.INVALID_ACCESS_TOKEN);
-        } catch (IllegalArgumentException ee) {
-            throw new InvalidValueException(ErrorCode.BAD_REQUEST);
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException(ErrorCode.EXPIRED_ACCESS_TOKEN);
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            throw new UnauthorizedException(ErrorCode.INVALID_ACCESS_TOKEN_VALUE);
         }
     }
 
     public void validateRefreshToken(String refreshToken) {
         try {
             getJwtParser().parseClaimsJws(refreshToken);
-        } catch (JwtException e) {
-            throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
-        } catch (IllegalArgumentException ee) {
-            throw new InvalidValueException(ErrorCode.BAD_REQUEST);
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN_VALUE);
         }
     }
 
