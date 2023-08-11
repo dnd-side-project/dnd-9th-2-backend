@@ -73,6 +73,7 @@ public class MeetingService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
         Duration duration = Duration.between(now, meetingTime);
-        return Math.abs(duration.toMinutes()) > 60;
+        System.out.println(duration.toMinutes());
+        return duration.toMinutes() > 60;
     }
 }
