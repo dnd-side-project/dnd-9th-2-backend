@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 import org.baggle.global.error.exception.ErrorCode;
 import org.baggle.global.error.exception.UnauthorizedException;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class IdentityTokenParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -35,6 +37,9 @@ public class IdentityTokenParser {
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException(ErrorCode.EXPIRED_IDENTITY_TOKEN);
         } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            log.info("identity token parser: ", e);
+            log.info("identity token: {}", identityToken);
+            log.info("public key: {}", publicKey);
             throw new UnauthorizedException(ErrorCode.INVALID_IDENTITY_TOKEN_VALUE);
         }
     }
