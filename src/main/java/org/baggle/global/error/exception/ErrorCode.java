@@ -27,7 +27,10 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 엑세스 토큰입니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
     NOT_MATCH_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "일치하지 않는 리프레시 토큰입니다."),
-    INVALID_IDENTITY_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 아이덴터티 토큰입니다."),
+    INVALID_IDENTITY_TOKEN(HttpStatus.UNAUTHORIZED, "애플 아이덴터티 토큰의 형식이 올바르지 않습니다."),
+    INVALID_IDENTITY_TOKEN_VALUE(HttpStatus.UNAUTHORIZED, "애플 아이덴터티 토큰의 값이 올바르지 않습니다."),
+    EXPIRED_IDENTITY_TOKEN(HttpStatus.UNAUTHORIZED, "애플 아이덴터티 토큰의 유효 기간이 만료되었습니다."),
+    INVALID_IDENTITY_TOKEN_CLAIMS(HttpStatus.UNAUTHORIZED, "애플 아이덴터티 토큰의 클레임 값이 올바르지 않습니다."),
     UNABLE_TO_CREATE_APPLE_PUBLIC_KEY(HttpStatus.UNAUTHORIZED, "애플 로그인 중 퍼블릭 키 생성에 문제가 발생했습니다."),
 
     /**

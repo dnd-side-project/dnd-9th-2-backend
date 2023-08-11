@@ -2,12 +2,9 @@ package org.baggle.domain.user.auth.apple;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 import org.baggle.global.error.exception.ErrorCode;
-import org.baggle.global.error.exception.InvalidValueException;
 import org.baggle.global.error.exception.UnauthorizedException;
 import org.springframework.stereotype.Component;
 
@@ -35,10 +32,10 @@ public class IdentityTokenParser {
             return getJwtParser(publicKey)
                     .parseClaimsJwt(identityToken)
                     .getBody();
-        } catch (JwtException e) {
-            throw new UnauthorizedException(ErrorCode.INVALID_IDENTITY_TOKEN);
-        } catch (IllegalArgumentException ee) {
-            throw new InvalidValueException(ErrorCode.BAD_REQUEST);
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException(ErrorCode.EXPIRED_IDENTITY_TOKEN);
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            throw new UnauthorizedException(ErrorCode.INVALID_IDENTITY_TOKEN_VALUE);
         }
     }
 
