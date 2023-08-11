@@ -13,19 +13,18 @@ public class ParticipationController {
     private final AuthService authService;
     private final ParticipationService participationService;
 
-/*    @GetMapping("/{meeting_id}")
-    public ResponseEntity<BaseResponse<?>> findMeetingAvailability(@RequestHeader("Authorization") final ________,
-                                                                                                      @PathVariable("meeting_id") final Long requestId) {
-        ParticipationAvailabilityResponseDto responseDto = participationService.findParticipationAvailability(requestId);
-        if (Objects.isNull(responseDto))
-            return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, null));
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
-    }
-
-    @PostMapping("")
-    public ResponseEntity<BaseResponse<?>> createParticipation(@RequestHeader("Authorization") final ________,
-                                                                                      @RequestBody final ParticipationReqeustDto requestDto) {
-        ParticipationResponseDto responseDto = participationService.createParticipation(, requestDto);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
-    }*/
+//    @GetMapping()
+//    public ResponseEntity<BaseResponse<?>> findMeetingAvailability(@RequestParam final Long meetingId) {
+//        final ParticipationAvailabilityResponseDto responseDto = participationService.findParticipationAvailability(, meetingId);
+//        if (Objects.isNull(responseDto))
+//            return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, null));
+//        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
+//    }
+//
+//    @PostMapping()
+//    public ResponseEntity<BaseResponse<?>> createParticipation(@RequestBody final ParticipationReqeustDto requestDto) {
+//        System.out.println(requestDto);
+//        final ParticipationResponseDto responseDto = participationService.createParticipation(, requestDto);
+//        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
+//    }
 }

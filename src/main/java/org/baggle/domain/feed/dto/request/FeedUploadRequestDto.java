@@ -10,5 +10,5 @@ import java.time.LocalDateTime;
 @Getter
 public class FeedUploadRequestDto {
     private Long participationId;
-    private LocalDateTime time;
+    private LocalDateTime authorizationTime;
 }

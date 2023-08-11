@@ -13,10 +13,10 @@ public class MeetingController {
     private final AuthService authService;
     private final MeetingService meetingService;
 
-//    public ResponseEntity<BaseResponse<?>> findMeetingDetail(@RequestHeader("Authorization") final ________,
-//                                                             @PathVariable("meeting_id") final Long requestId){
+//    @GetMapping("/detail")
+//    public ResponseEntity<BaseResponse<?>> findMeetingDetail(@RequestParam final Long meetingId){
 //
-//        MeetingDetailResponseDto responseDto = meetingService.findMeetingDetail(requestId);
+//        MeetingDetailResponseDto responseDto = meetingService.findMeetingDetail(, meetingId);
 //        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
 //    }
 
