@@ -16,7 +16,7 @@ public class MeetingController {
 //    @GetMapping("/detail")
 //    public ResponseEntity<BaseResponse<?>> findMeetingDetail(@RequestParam final Long meetingId){
 //
-//        MeetingDetailResponseDto responseDto = meetingService.findMeetingDetail(meetingId);
+//        MeetingDetailResponseDto responseDto = meetingService.findMeetingDetail(, meetingId);
 //        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
 //    }
 

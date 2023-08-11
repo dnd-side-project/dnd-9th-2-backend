@@ -8,7 +8,9 @@ import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.domain.meeting.dto.reponse.MeetingDetailResponseDto;
 import org.baggle.domain.meeting.dto.reponse.ParticipationDetailResponseDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
+import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.baggle.global.error.exception.EntityNotFoundException;
+import org.baggle.global.error.exception.InvalidValueException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.baggle.global.error.exception.ErrorCode.INVALID_MEETING_PARTICIPATION;
 import static org.baggle.global.error.exception.ErrorCode.MEETING_NOT_FOUND;
 
 @RequiredArgsConstructor
@@ -23,14 +26,18 @@ import static org.baggle.global.error.exception.ErrorCode.MEETING_NOT_FOUND;
 @Service
 public class MeetingService {
     private final MeetingRepository meetingRepository;
+    private final ParticipationRepository participationRepository;
     private final FcmTimerRepository fcmTimerRepository;
 
 
     /**
      * throw 모임이 존재하지 않는 경우
+     * throw 모임 참가자가 아닌 경우
      */
-    public MeetingDetailResponseDto findMeetingDetail(Long requestId) {
+    public MeetingDetailResponseDto findMeetingDetail(Long userId, Long requestId) {
         Meeting meeting = meetingRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
+        if (!validateParticition(meeting, userId))
+            throw new InvalidValueException(INVALID_MEETING_PARTICIPATION);
         FcmTimer certificationTime = fcmTimerRepository.findById(requestId).orElse(new FcmTimer(null, null));
         List<Participation> participations = meeting.getParticipations();
         List<ParticipationDetailResponseDto> participationDetails = participations.stream().map(participation -> ParticipationDetailResponseDto.of(participation, participation.getUser(), participation.getFeed())).toList();
@@ -72,6 +79,12 @@ public class MeetingService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
         Duration duration = Duration.between(now, meetingTime);
-        return duration.toMinutes() > 60;
+        return duration.toSeconds() > 3600;
+    }
+
+    private Boolean validateParticition(Meeting meeting, Long userId) {
+        return meeting.getParticipations()
+                .stream()
+                .anyMatch(participation -> participation.getUser().getId() == userId);
     }
 }
