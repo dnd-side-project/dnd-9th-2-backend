@@ -32,7 +32,7 @@ public class IdentityTokenParser {
     public Claims parseWithPublicKeyAndGetClaims(String identityToken, PublicKey publicKey) {
         try {
             return getJwtParser(publicKey)
-                    .parseClaimsJwt(identityToken)
+                    .parseClaimsJws(identityToken)
                     .getBody();
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException(ErrorCode.EXPIRED_IDENTITY_TOKEN);
