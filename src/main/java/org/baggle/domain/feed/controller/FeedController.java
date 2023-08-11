@@ -14,17 +14,16 @@ public class FeedController {
     private final FeedService feedService;
 
 //    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public ResponseEntity<BaseResponse<?>> createFeedUpload(-----------------------,
-//                                                            @RequestBody FeedUploadRequestDto requestDto,
-//                                                            @RequestPart MultipartFile feedImage){
-//        FeedUploadResponseDto responseDto = feedService.feedUpload(requestDto, feedImage);
+//    public ResponseEntity<BaseResponse<?>> createFeedUpload(@RequestPart final FeedUploadRequestDto uploadInfo,
+//                                                            @RequestPart final MultipartFile feedImage) {
+//        final FeedUploadResponseDto responseDto = feedService.feedUpload(uploadInfo, feedImage);
 //        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
 //    }
-
-//    @GetMapping("/{member_id}")
-//    public ResponseEntity<BaseResponse<?>> uploadNotification(________________,
-//                                                              @PathVariable("member_id") Long memberId){
 //
+//    @GetMapping()
+//    public ResponseEntity<BaseResponse<?>> uploadNotification(@RequestParam final Long memberId,
+//                                                              @RequestParam final LocalDateTime authorizationTime) {
+//        final FeedNotificationResponseDto responseDto = feedService.uploadNotification(memberId, authorizationTime);
 //        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
 //    }
 
