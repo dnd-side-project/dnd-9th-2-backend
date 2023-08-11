@@ -48,7 +48,7 @@ public class FcmNotificationService {
     /**
      * TODO: 데이터 없을 시 예외 처리
      */
-    public void deleteFcmNotification(Long key){
+    public void deleteFcmNotification(Long key) {
         fcmNotificationRepository.deleteById(key);
     }
 
@@ -82,14 +82,14 @@ public class FcmNotificationService {
 
             try {
                 firebaseMessaging.send(message);
-            }catch (FirebaseMessagingException e){
+            } catch (FirebaseMessagingException e) {
                 log.error("Failed to send Notification", e);
                 throw new InvalidValueException(ErrorCode.INVALID_FCM_UPLOAD);
             }
         }
     }
 
-    public void createFcmTimer(Long key, LocalDateTime startTime){
+    public void createFcmTimer(Long key, LocalDateTime startTime) {
         FcmTimer fcmTimer = FcmTimer.builder()
                 .id(key)
                 .startTime(startTime)

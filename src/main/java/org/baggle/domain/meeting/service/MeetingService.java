@@ -3,7 +3,6 @@ package org.baggle.domain.meeting.service;
 import lombok.RequiredArgsConstructor;
 import org.baggle.domain.fcm.domain.FcmTimer;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
-import org.baggle.domain.feed.repository.FeedRepository;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.domain.meeting.dto.reponse.MeetingDetailResponseDto;
@@ -73,7 +72,6 @@ public class MeetingService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
         Duration duration = Duration.between(now, meetingTime);
-        System.out.println(duration.toMinutes());
         return duration.toMinutes() > 60;
     }
 }

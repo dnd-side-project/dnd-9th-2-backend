@@ -35,7 +35,8 @@ public class ParticipationService {
      */
     public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long requestId) {
         Meeting meeting = meetingRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        if(!meetingService.isMeetingInDeadline(meeting) || !meetingService.isValidTime(meeting)) throw new InvalidValueException(INVALID_MEETING_TIME);
+        if (!meetingService.isMeetingInDeadline(meeting) || !meetingService.isValidTime(meeting))
+            throw new InvalidValueException(INVALID_MEETING_TIME);
         List<Participation> participations = meeting.getParticipations();
         if (duplicateParticipation(participations, userId)) return null;
         return ParticipationAvailabilityResponseDto.of(meeting);
@@ -50,8 +51,10 @@ public class ParticipationService {
     public ParticipationResponseDto createParticipation(Long userId, ParticipationReqeustDto reqeustDto) {
         Meeting meeting = meetingRepository.findById(reqeustDto.getMeetingId()).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        if(!meetingService.isMeetingInDeadline(meeting) || !meetingService.isValidTime(meeting)) throw new InvalidValueException(INVALID_MEETING_TIME);
-        if (duplicateParticipation(meeting.getParticipations(), userId)) throw new InvalidValueException(DUPLICATE_PARTICIPATION);
+        if (!meetingService.isMeetingInDeadline(meeting) || !meetingService.isValidTime(meeting))
+            throw new InvalidValueException(INVALID_MEETING_TIME);
+        if (duplicateParticipation(meeting.getParticipations(), userId))
+            throw new InvalidValueException(DUPLICATE_PARTICIPATION);
         Participation participation = Participation.createParticipationWithoutFeed(user, meeting, MeetingAuthority.PARTICIPATION, ParticipationMeetingStatus.PARTICIPATING, ButtonAuthority.NON_OWNER);
         participationRepository.save(participation);
         return ParticipationResponseDto.of(participation.getId());
@@ -61,7 +64,6 @@ public class ParticipationService {
         return participations.stream()
                 .anyMatch(participation -> Objects.equals(participation.getUser().getId(), userId));
     }
-
 
 
 }

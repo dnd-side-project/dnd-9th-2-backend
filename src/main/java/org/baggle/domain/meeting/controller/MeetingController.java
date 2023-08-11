@@ -1,17 +1,10 @@
 package org.baggle.domain.meeting.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.baggle.domain.meeting.dto.reponse.MeetingDetailResponseDto;
 import org.baggle.domain.meeting.service.MeetingService;
 import org.baggle.domain.user.service.AuthService;
-import org.baggle.global.common.BaseResponse;
-import org.baggle.global.common.SuccessCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/meeting")
