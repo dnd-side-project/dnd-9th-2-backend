@@ -31,12 +31,9 @@ public class ParticipationService {
     /**
      * 현재 모임에 참여 여부를 판단하는 메서드.
      * throw: 모임이 존재하지 않을 경우
-     * throw: 2시간 내 모임이 존재하는 경우 or 모임시작 시간 < 1시간
      */
     public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long requestId) {
         Meeting meeting = meetingRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        if (!meetingService.isMeetingInDeadline(meeting) || !meetingService.isValidTime(meeting))
-            throw new InvalidValueException(INVALID_MEETING_TIME);
         List<Participation> participations = meeting.getParticipations();
         if (duplicateParticipation(participations, userId)) return null;
         return ParticipationAvailabilityResponseDto.of(meeting);
@@ -47,6 +44,7 @@ public class ParticipationService {
      * throw: 모임이 존재하지 않을 경우
      * throw: 2시간 내 모임이 존재하는 경우 or 모임시작 시간 < 1시간
      * throw: 이미 모임에 참여한 경우
+     * throw: 모임이 다 찼을 경우
      */
     public ParticipationResponseDto createParticipation(Long userId, ParticipationReqeustDto reqeustDto) {
         Meeting meeting = meetingRepository.findById(reqeustDto.getMeetingId()).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
