@@ -53,6 +53,8 @@ public class ParticipationService {
             throw new InvalidValueException(INVALID_MEETING_TIME);
         if (duplicateParticipation(meeting.getParticipations(), userId))
             throw new InvalidValueException(DUPLICATE_PARTICIPATION);
+        if (!validateMeetingCapacity(meeting))
+            throw new InvalidValueException(INVALID_MEETING_CAPACITY);
         Participation participation = Participation.createParticipationWithoutFeed(user, meeting, MeetingAuthority.PARTICIPATION, ParticipationMeetingStatus.PARTICIPATING, ButtonAuthority.NON_OWNER);
         participationRepository.save(participation);
         return ParticipationResponseDto.of(participation.getId());
@@ -61,6 +63,10 @@ public class ParticipationService {
     private Boolean duplicateParticipation(List<Participation> participations, Long userId) {
         return participations.stream()
                 .anyMatch(participation -> Objects.equals(participation.getUser().getId(), userId));
+    }
+
+    private Boolean validateMeetingCapacity(Meeting meeting) {
+        return !(meeting.getParticipations().size() == 6);
     }
 
 
