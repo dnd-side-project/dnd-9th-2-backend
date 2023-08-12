@@ -14,6 +14,7 @@ import org.baggle.domain.feed.dto.response.FeedNotificationResponseDto;
 import org.baggle.domain.feed.dto.response.FeedUploadResponseDto;
 import org.baggle.domain.feed.repository.FeedRepository;
 import org.baggle.domain.meeting.domain.Meeting;
+import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.baggle.domain.meeting.service.MeetingService;
@@ -67,7 +68,7 @@ public class FeedService {
      */
     public FeedNotificationResponseDto uploadNotification(Long requestId, LocalDateTime authorizationTime) {
         Participation participation = participationRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
-        if (!meetingService.isValidTime(participation.getMeeting()))
+        if (participation.getMeeting().getMeetingStatus() != MeetingStatus.SCHEDULED)
             throw new InvalidValueException(INVALID_MEETING_TIME);
         if (!validateNotificationTime(participation.getMeeting(), authorizationTime))
             throw new InvalidValueException(INVALID_CERTIFICATION_TIME);

@@ -48,8 +48,8 @@ public class ParticipationService {
      */
     public ParticipationResponseDto createParticipation(Long userId, ParticipationReqeustDto reqeustDto) {
         Meeting meeting = meetingRepository.findById(reqeustDto.getMeetingId()).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        if (!meetingService.isMeetingInDeadline(meeting) || !meetingService.isValidTime(meeting))
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+        if (!meetingService.isMeetingInDeadline(userId, meeting) || meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
             throw new InvalidValueException(INVALID_MEETING_TIME);
         if (duplicateParticipation(meeting.getParticipations(), userId))
             throw new InvalidValueException(DUPLICATE_PARTICIPATION);
