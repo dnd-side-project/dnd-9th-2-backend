@@ -116,7 +116,7 @@ public class MeetingService {
     /**
      * 모임 시간까지 남은 시간을 확인하는 메서드
      */
-    public Long getTimeUntilMeeting(Meeting meeting) {
+    private Long getTimeUntilMeeting(Meeting meeting) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
         Duration duration = Duration.between(now, meetingTime);
@@ -141,8 +141,6 @@ public class MeetingService {
                     .stream()
                     .filter(m -> m.getId() != meeting.getId())
                     .toList();
-            System.out.println(meetings.size());
-            System.out.println(meetings.isEmpty());
             if (!meetings.isEmpty())
                 return Boolean.FALSE;
         }

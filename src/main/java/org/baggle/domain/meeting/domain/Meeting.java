@@ -31,7 +31,7 @@ public class Meeting extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private MeetingStatus meetingStatus;
 
-    public void updateTitleAndPlaceAndDateAndTimeAndMemo(String title, String place, LocalDate date, LocalTime time, String memo){
+    public void updateTitleAndPlaceAndDateAndTimeAndMemo(String title, String place, LocalDate date, LocalTime time, String memo) {
         this.title = (title != null) ? title : this.title;
         this.place = (place != null) ? place : this.place;
         this.date = (date != null) ? date : this.date;

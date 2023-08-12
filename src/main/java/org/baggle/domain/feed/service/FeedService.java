@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.baggle.domain.fcm.domain.FcmTimer;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
-import org.baggle.domain.fcm.repository.FcmNotificationRepository;
 import org.baggle.domain.fcm.repository.FcmRepository;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.fcm.service.FcmNotificationService;
@@ -17,7 +16,6 @@ import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
-import org.baggle.domain.meeting.service.MeetingService;
 import org.baggle.global.common.ImageType;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.InvalidValueException;
@@ -40,11 +38,9 @@ public class FeedService {
     private final ParticipationRepository participationRepository;
     private final FeedRepository feedRepository;
     private final S3Service s3Service;
-    private final FcmNotificationRepository fcmNotificationRepository;
     private final FcmNotificationService fcmNotificationService;
     private final FcmTimerRepository fcmTimerRepository;
     private final FcmRepository fcmRepository;
-    private final MeetingService meetingService;
 
     /**
      * 피드를 업로드하는 메서드입니다.
