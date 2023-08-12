@@ -13,6 +13,7 @@ import org.baggle.global.common.ImageType;
 import org.baggle.global.config.jwt.JwtProvider;
 import org.baggle.global.config.jwt.Token;
 import org.baggle.global.error.exception.ConflictException;
+import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.ErrorCode;
 import org.baggle.infra.s3.S3Service;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,13 @@ public class AuthService {
         Token issuedToken = jwtProvider.issueToken(savedUser.getId());
         updateRefreshToken(savedUser, issuedToken.getRefreshToken());
         return UserAuthResponseDto.of(issuedToken, savedUser);
+    }
+
+    public void withdraw(Long userId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+        findUser.withdrawUser();
+        refreshTokenRepository.deleteById(userId);
     }
 
     // TODO

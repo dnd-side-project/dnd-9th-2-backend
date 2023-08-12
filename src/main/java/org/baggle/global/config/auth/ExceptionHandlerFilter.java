@@ -23,16 +23,14 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (UnauthorizedException | InvalidValueException e) {
-            log.error("filter exception: ", e);
-            handleJwtException(response, e);
+        } catch (UnauthorizedException e) {
+            handleUnauthorizedException(response, e);
         } catch (Exception ee) {
-            log.error("filter exception: ", ee);
             handleException(response);
         }
     }
 
-    private void handleJwtException(HttpServletResponse response, Exception e) throws IOException {
+    private void handleUnauthorizedException(HttpServletResponse response, Exception e) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
         if (e instanceof UnauthorizedException ue) {

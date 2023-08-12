@@ -6,6 +6,7 @@ import org.baggle.domain.user.dto.response.UserAuthResponseDto;
 import org.baggle.domain.user.service.AuthService;
 import org.baggle.global.common.BaseResponse;
 import org.baggle.global.common.SuccessCode;
+import org.baggle.global.config.auth.UserId;
 import org.baggle.global.config.jwt.Token;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,12 @@ public class AuthApiController {
                                                   @RequestParam final String fcmToken) {
         final UserAuthResponseDto userAuthResponseDto = authService.signUp(token, image, nickname, platform, fcmToken);
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, userAuthResponseDto));
+    }
+
+    @PatchMapping("/withdraw")
+    public ResponseEntity<BaseResponse<?>> withdraw(@UserId final Long userId) {
+        authService.withdraw(userId);
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, null));
     }
 
     @GetMapping("/reissue")

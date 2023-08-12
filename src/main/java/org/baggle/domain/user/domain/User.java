@@ -45,6 +45,15 @@ public class User extends BaseTimeEntity {
         return user;
     }
 
+    public void withdrawUser() {
+        this.profileImageUrl = null;
+        this.nickname = null;
+        this.fcmToken.updateFcmToken(null);
+        this.platformId = null;
+        this.refreshToken = null;
+        this.platform = Platform.WITHDRAW;
+    }
+
     public void changeFcmToken(FcmToken fcmToken) {
         this.fcmToken = fcmToken;
     }
