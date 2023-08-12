@@ -19,6 +19,7 @@ public enum ErrorCode {
     INVALID_MEETING_TIME(HttpStatus.BAD_REQUEST, "유효하지 않은 모임 시간입니다."),
     INVALID_CERTIFICATION_TIME(HttpStatus.BAD_REQUEST, "유효하지 않은 인증 시간입니다."),
     INVALID_MEETING_PARTICIPATION(HttpStatus.BAD_REQUEST, "잘못된 모임 참가자 입니다."),
+    INVALID_MEETING_CAPACITY(HttpStatus.BAD_REQUEST, "모임 인원이 초과됐습니다."),
 
     /**
      * 401 Unauthorized
