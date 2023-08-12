@@ -43,7 +43,7 @@ public class AuthService {
     }
 
     public UserAuthResponseDto signUp(String token, MultipartFile image, String nickname, String platform, String fcmToken) {
-        User savedUser = validateUserAndSaveUser(token, image, nickname, platform, fcmToken);
+        User savedUser = validateAndSaveUser(token, image, nickname, platform, fcmToken);
         Token issuedToken = issueAccessTokenAndRefreshToken(savedUser);
         updateRefreshToken(savedUser, issuedToken.getRefreshToken());
         return UserAuthResponseDto.of(issuedToken, savedUser);
@@ -79,7 +79,7 @@ public class AuthService {
         findFcmToken.updateFcmToken(fcmToken);
     }
 
-    private User validateUserAndSaveUser(String token, MultipartFile image, String nickname, String platform, String fcmToken) {
+    private User validateAndSaveUser(String token, MultipartFile image, String nickname, String platform, String fcmToken) {
         validateDuplicateNickname(nickname);
         Platform enumPlatform = getEnumPlatformFromStringPlatform(platform);
         String platformId = getPlatformIdFromToken(token, enumPlatform);
