@@ -16,4 +16,6 @@ public interface ParticipationRepository extends JpaRepository<Participation, Lo
             "JOIN u.fcmToken fcm " +
             "WHERE p.buttonAuthority = :buttonAuthority AND m = :meeting")
     List<FcmToken> findFcmTokensByMeetingAndButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority);
+
+    Participation findFirstByUserIdAndMeetingId(Long userId, Long meetingId);
 }
