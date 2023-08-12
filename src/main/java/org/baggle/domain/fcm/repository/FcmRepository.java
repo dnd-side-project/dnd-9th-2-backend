@@ -8,13 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FcmRepository extends JpaRepository<FcmToken, Long> {
-
     FcmToken findByUser(User user);
 
-    FcmToken findByUserId(Long userId);
+    Optional<FcmToken> findByUserId(Long userId);
 
     Optional<FcmToken> findByFcmToken(String fcmToken);
 
     List<FcmToken> findByUserParticipationsMeetingId(Long meetingId);
-
 }

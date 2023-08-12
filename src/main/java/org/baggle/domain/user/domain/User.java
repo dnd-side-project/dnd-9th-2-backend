@@ -54,7 +54,7 @@ public class User extends BaseTimeEntity {
         this.platform = Platform.WITHDRAW;
     }
 
-    public void changeFcmToken(FcmToken fcmToken) {
+    public void updateFcmToken(FcmToken fcmToken) {
         this.fcmToken = fcmToken;
     }
 
