@@ -39,7 +39,7 @@ public class AuthApiController {
     @PatchMapping("/withdraw")
     public ResponseEntity<BaseResponse<?>> withdraw(@UserId final Long userId) {
         authService.withdraw(userId);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, null));
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, true));
     }
 
     @GetMapping("/reissue")
