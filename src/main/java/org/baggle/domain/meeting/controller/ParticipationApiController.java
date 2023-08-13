@@ -5,7 +5,6 @@ import org.baggle.domain.meeting.dto.response.ParticipationAvailabilityResponseD
 import org.baggle.domain.meeting.dto.response.ParticipationResponseDto;
 import org.baggle.domain.meeting.dto.request.ParticipationReqeustDto;
 import org.baggle.domain.meeting.service.ParticipationService;
-import org.baggle.domain.user.service.AuthService;
 import org.baggle.global.common.BaseResponse;
 import org.baggle.global.common.SuccessCode;
 import org.baggle.global.config.auth.UserId;
@@ -18,7 +17,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
 @Controller
-public class ParticipationController {
+public class ParticipationApiController {
     private final ParticipationService participationService;
 
     @GetMapping

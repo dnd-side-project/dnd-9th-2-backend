@@ -5,7 +5,6 @@ import org.baggle.domain.meeting.dto.response.MeetingDetailResponseDto;
 import org.baggle.domain.meeting.dto.response.UpdateMeetingInfoResponseDto;
 import org.baggle.domain.meeting.dto.request.UpdateMeetingInfoRequestDto;
 import org.baggle.domain.meeting.service.MeetingService;
-import org.baggle.domain.user.service.AuthService;
 import org.baggle.global.common.BaseResponse;
 import org.baggle.global.common.SuccessCode;
 import org.baggle.global.config.auth.UserId;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/meeting")
 @Controller
-public class MeetingController {
+public class MeetingApiController {
     private final MeetingService meetingService;
 
     @GetMapping("/detail")
