@@ -157,6 +157,6 @@ public class MeetingService {
 
     private FcmTimer getFcmTimer(Long fcmTimerId) {
         return fcmTimerRepository.findById(fcmTimerId)
-                .orElse(FcmTimer.getFcmTimerWithNull());
+                .orElse(FcmTimer.createFcmTimerWithNull());
     }
 }
