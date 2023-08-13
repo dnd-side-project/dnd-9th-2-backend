@@ -8,6 +8,7 @@ import org.baggle.domain.meeting.domain.MeetingAuthority;
 import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.domain.user.domain.User;
 
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -40,5 +41,15 @@ public class ParticipationDetailResponseDto {
                 .buttonAuthority(participation.getButtonAuthority())
                 .feed(feed)
                 .build();
+    }
+
+    public static List<ParticipationDetailResponseDto> listOf(List<Participation> participations) {
+        return participations.stream()
+                .map(participation ->
+                        ParticipationDetailResponseDto.of(
+                                participation,
+                                participation.getUser(),
+                                participation.getFeed()))
+                .toList();
     }
 }

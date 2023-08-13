@@ -40,12 +40,11 @@ public class MeetingService {
      * throw 모임 참가자가 아닌 경우
      */
     public MeetingDetailResponseDto findMeetingDetail(Long userId, Long requestId) {
-        Meeting meeting = meetingRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        if (!validateParticition(meeting, userId))
-            throw new InvalidValueException(INVALID_MEETING_PARTICIPATION);
-        FcmTimer certificationTime = fcmTimerRepository.findById(requestId).orElse(new FcmTimer(null, null));
+        Meeting meeting = getMeeting(requestId);
+        validateParticition(meeting, userId);
+        FcmTimer certificationTime = getFcmTimer(requestId);
         List<Participation> participations = meeting.getParticipations();
-        List<ParticipationDetailResponseDto> participationDetails = participations.stream().map(participation -> ParticipationDetailResponseDto.of(participation, participation.getUser(), participation.getFeed())).toList();
+        List<ParticipationDetailResponseDto> participationDetails = ParticipationDetailResponseDto.listOf(participations);
         return MeetingDetailResponseDto.of(meeting, certificationTime.getStartTime(), participationDetails);
     }
 
@@ -56,26 +55,17 @@ public class MeetingService {
      * throw: 모임이 확정된 경우.
      */
     public UpdateMeetingInfoResponseDto updateMeetingInfo(Long userId, UpdateMeetingInfoRequestDto requestDto) {
-        Meeting meeting = meetingRepository.findById(requestDto.getMeetingId())
-                .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-
-        if (validateMeetingHost(meeting.getId(), userId))
-            throw new ForbiddenException(INVALID_MEETING_AUTHORITY);
-        if (meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
-            throw new ForbiddenException(INVALID_MODIFY_TIME);
-
-        if (requestDto.getDate() != null || requestDto.getTime() != null) {
-            LocalDate date = (requestDto.getDate() == null) ? meeting.getDate() : requestDto.getDate();
-            LocalTime time = (requestDto.getTime() == null) ? meeting.getTime() : requestDto.getTime();
-
-            if (getTimeUntilMeeting(meeting) <= 7200)
-                throw new ForbiddenException(INVALID_MODIFY_TIME);
-            if (!validateMeetingTime(meeting, date, time))
-                throw new InvalidValueException(UNAVAILABLE_MEETING_TIME);
-        }
-
+        Meeting meeting = getMeeting(requestDto.getMeetingId());
+        validateMeetingHost(meeting.getId(), userId);
+        validateMeetingStatus(meeting);
+        validateMeetingDateTime(meeting, requestDto.getDate(), requestDto.getTime());
         meeting.updateTitleAndPlaceAndDateAndTimeAndMemo(requestDto.getTitle(), requestDto.getPlace(), requestDto.getDate(), requestDto.getTime(), requestDto.getMemo());
         return UpdateMeetingInfoResponseDto.of(meeting.getId(), meeting.getTitle(), meeting.getPlace(), meeting.getDate(), meeting.getTime(), meeting.getMemo());
+    }
+
+    private Meeting getMeeting(Long meetingId) {
+        return meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
     }
 
     /**
@@ -123,18 +113,37 @@ public class MeetingService {
         return duration.toSeconds();
     }
 
-    private Boolean validateParticition(Meeting meeting, Long userId) {
-        return meeting.getParticipations()
-                .stream()
-                .anyMatch(participation -> participation.getUser().getId() == userId);
+    private void validateParticition(Meeting meeting, Long userId) {
+        boolean isvalidParticipation = meeting.getParticipations().stream().anyMatch(participation -> participation.getUser().getId() == userId);
+        if (!isvalidParticipation)
+            throw new InvalidValueException(INVALID_MEETING_PARTICIPATION);
     }
 
-    private Boolean validateMeetingHost(Long meetingId, Long userId) {
+    private void validateMeetingHost(Long meetingId, Long userId) {
         Participation participation = participationRepository.findFirstByUserIdAndMeetingId(userId, meetingId);
-        return participation.getMeetingAuthority() != MeetingAuthority.HOST;
+        if (participation.getMeetingAuthority() != MeetingAuthority.HOST)
+            throw new ForbiddenException(INVALID_MEETING_AUTHORITY);
     }
 
-    private Boolean validateMeetingTime(Meeting meeting, LocalDate date, LocalTime time) {
+    private void validateMeetingStatus(Meeting meeting) {
+        if (meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
+            throw new ForbiddenException(INVALID_MODIFY_TIME);
+    }
+
+    private void validateMeetingDateTime(Meeting meeting, LocalDate requestDate, LocalTime requestTime) {
+        if (requestDate == null && requestTime == null) return;
+        LocalDate date = (requestDate == null) ? meeting.getDate() : requestDate;
+        LocalTime time = (requestTime == null) ? meeting.getTime() : requestTime;
+        validateModifyTimeWithRemainTime(meeting);
+        validateMeetingTime(meeting, date, time);
+    }
+
+    private void validateModifyTimeWithRemainTime(Meeting meeting) {
+        if (getTimeUntilMeeting(meeting) <= 7200)
+            throw new ForbiddenException(INVALID_MODIFY_TIME);
+    }
+
+    private void validateMeetingTime(Meeting meeting, LocalDate date, LocalTime time) {
         LocalDateTime meetingTime = LocalDateTime.of(date, time);
         for (Participation participation : meeting.getParticipations()) {
             List<Meeting> meetings = findMeetingsInRangeForUser(participation.getUser().getId(), meetingTime, -120, 120)
@@ -142,10 +151,11 @@ public class MeetingService {
                     .filter(m -> m.getId() != meeting.getId())
                     .toList();
             if (!meetings.isEmpty())
-                return Boolean.FALSE;
+                throw new InvalidValueException(UNAVAILABLE_MEETING_TIME);
         }
-        return Boolean.TRUE;
     }
 
-
+    private FcmTimer getFcmTimer(Long fcmTimerId) {
+        return fcmTimerRepository.findById(fcmTimerId).orElse(new FcmTimer(null, null));
+    }
 }
