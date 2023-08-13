@@ -22,7 +22,7 @@ public class ParticipationController {
     private final AuthService authService;
     private final ParticipationService participationService;
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<BaseResponse<?>> findMeetingAvailability(@UserId final Long userId,
                                                                    @RequestParam final Long meetingId) {
         final ParticipationAvailabilityResponseDto responseDto = participationService.findParticipationAvailability(userId, meetingId);
@@ -31,7 +31,7 @@ public class ParticipationController {
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<BaseResponse<?>> createParticipation(@UserId final Long userId,
                                                                @RequestBody final ParticipationReqeustDto requestDto) {
         final ParticipationResponseDto responseDto = participationService.createParticipation(userId, requestDto);

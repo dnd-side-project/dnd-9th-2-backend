@@ -30,7 +30,7 @@ public class FeedController {
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<BaseResponse<?>> uploadNotification(@RequestParam final Long memberId,
                                                               @RequestParam final LocalDateTime authorizationTime) {
         final FeedNotificationResponseDto responseDto = feedService.uploadNotification(memberId, authorizationTime);
