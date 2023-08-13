@@ -42,4 +42,10 @@ public class Meeting extends BaseTimeEntity {
     public void updateMeetingStatusIntoConfirmation(){
         this.meetingStatus = MeetingStatus.CONFIRMATION;
     }
+    public void updateMeetingStatusIntoOngoing(){
+        this.meetingStatus = MeetingStatus.ONGOING;
+    }
+    public void updateMeetingStatusIntoTermination(){
+        this.meetingStatus = MeetingStatus.TERMINATION;
+    }
 }
