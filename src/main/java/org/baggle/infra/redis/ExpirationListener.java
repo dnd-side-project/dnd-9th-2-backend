@@ -32,19 +32,12 @@ public class ExpirationListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         String[] parts = message.toString().split(":");
-        String title = "긴급 소집이 종료되었습니다!!";
-        String body = "";
-        if (!(parts[0].equals("fcmNotification") || parts[0].equals("fcmTimer"))) return;
-        Meeting meeting = getMeeting(Long.parseLong(parts[1]));
-        if (parts[0].equals("fcmNotification")) {
-            LocalDateTime startTime = LocalDateTime.now();
-            fcmNotificationService.createFcmTimer(Long.parseLong(parts[1]), startTime);
-            meeting.updateMeetingStatusIntoOngoing();
-            title = "긴급 소집!!";
-        }
-        if (parts[0].equals("fcmNotification"))
-            meeting.updateMeetingStatusIntoTermination();
-        List<FcmToken> fcmTokens = fcmService.findFcmTokens(Long.parseLong(parts[1]));
+        if (!validateRedisDataType(parts[0])) return;
+        createEmergencyTimerWithRedisDataAndMeetingId(parts[0], Long.parseLong(parts[1]));
+        updateMeetingStatus(Long.parseLong(parts[1]), parts[0]);
+        String title = getNotificationTitle(parts[0]);
+        String body = getNotificationBody(parts[0]);
+        List<FcmToken> fcmTokens = getFcmTokens(Long.parseLong(parts[1]));
         // fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(fcmTokens, title, body));
         log.info("########## onMessage message " + message.toString());
     }
@@ -53,4 +46,44 @@ public class ExpirationListener implements MessageListener {
         return meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEETING_NOT_FOUND));
     }
+    private List<FcmToken> getFcmTokens(Long meetingId){
+        return fcmService.findFcmTokens(meetingId);
+    }
+    private boolean validateRedisDataType(String dataType){
+        if(!(getRedisDataType(dataType) == RedisDataType.FCM_TIMER ||
+                getRedisDataType(dataType) == RedisDataType.FCM_NOTIFICATION))
+            return false;
+        return true;
+    }
+    private void createEmergencyTimerWithRedisDataAndMeetingId(String dataType, Long meetingId){
+        if (getRedisDataType(dataType) == RedisDataType.FCM_NOTIFICATION)
+            createFcmTimer(meetingId);
+    }
+    private RedisDataType getRedisDataType(String dataType){
+        return RedisDataType.getEnumRedisDataTypeFromString(dataType);
+    }
+
+    private void createFcmTimer(Long meetingId){
+        LocalDateTime startTime = LocalDateTime.now();
+        fcmNotificationService.createFcmTimer(meetingId, startTime);
+    }
+
+    private void updateMeetingStatus(Long meetingId, String dateType){
+        Meeting meeting = getMeeting(meetingId);
+        if(getRedisDataType(dateType) == RedisDataType.FCM_NOTIFICATION)
+            meeting.updateMeetingStatusIntoOngoing();
+        else if (getRedisDataType(dateType) == RedisDataType.FCM_TIMER)
+            meeting.updateMeetingStatusIntoTermination();
+    }
+    private String getNotificationTitle(String dateType){
+        if(getRedisDataType(dateType) == RedisDataType.FCM_NOTIFICATION)
+            return "긴급소집!!";
+        return "긴급소집 종료";
+    }
+    private String getNotificationBody(String dateType){
+        if(getRedisDataType(dateType) == RedisDataType.FCM_NOTIFICATION)
+            return "지금 당장 사진을 인증하세요!!";
+        return "긴급 소집이 종료되었습니다. 사진을 확인하세요!";
+    }
+
 }
