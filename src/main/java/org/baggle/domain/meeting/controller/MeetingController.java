@@ -27,7 +27,7 @@ public class MeetingController {
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
     }
 
-    @PatchMapping("")
+    @PatchMapping()
     public ResponseEntity<BaseResponse<?>> updateMeetingInfo(@UserId final Long userId,
                                                              @RequestBody final UpdateMeetingInfoRequestDto requestDto) {
         final UpdateMeetingInfoResponseDto responseDto = meetingService.updateMeetingInfo(userId, requestDto);
