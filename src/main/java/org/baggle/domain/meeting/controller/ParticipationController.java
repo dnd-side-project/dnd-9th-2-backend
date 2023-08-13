@@ -1,8 +1,8 @@
 package org.baggle.domain.meeting.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.baggle.domain.meeting.dto.reponse.ParticipationAvailabilityResponseDto;
-import org.baggle.domain.meeting.dto.reponse.ParticipationResponseDto;
+import org.baggle.domain.meeting.dto.response.ParticipationAvailabilityResponseDto;
+import org.baggle.domain.meeting.dto.response.ParticipationResponseDto;
 import org.baggle.domain.meeting.dto.request.ParticipationReqeustDto;
 import org.baggle.domain.meeting.service.ParticipationService;
 import org.baggle.domain.user.service.AuthService;
@@ -19,7 +19,6 @@ import java.util.Objects;
 @RequestMapping("/api/member")
 @Controller
 public class ParticipationController {
-    private final AuthService authService;
     private final ParticipationService participationService;
 
     @GetMapping

@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/feed")
 @Controller
 public class FeedController {
-    private final AuthService authService;
     private final FeedService feedService;
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
