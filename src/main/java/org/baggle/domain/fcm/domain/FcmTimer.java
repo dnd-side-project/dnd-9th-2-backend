@@ -16,4 +16,11 @@ public class FcmTimer {
     @Id
     private Long id;
     private LocalDateTime startTime;
+
+    public static FcmTimer getFcmTimerWithNull(){
+        return FcmTimer.builder()
+                .id(null)
+                .startTime(null)
+                .build();
+    }
 }
