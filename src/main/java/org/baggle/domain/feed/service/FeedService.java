@@ -20,7 +20,7 @@ import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.baggle.global.common.ImageType;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.InvalidValueException;
-import org.baggle.infra.s3.S3Service;
+import org.baggle.infra.s3.S3Provider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,7 +38,7 @@ import static org.baggle.global.error.exception.ErrorCode.*;
 public class FeedService {
     private final ParticipationRepository participationRepository;
     private final FeedRepository feedRepository;
-    private final S3Service s3Service;
+    private final S3Provider s3Provider;
     private final FcmNotificationService fcmNotificationService;
     private final FcmTimerRepository fcmTimerRepository;
     private final FcmRepository fcmRepository;
@@ -53,7 +53,7 @@ public class FeedService {
         Participation participation = participationRepository.findById(requestDto.getParticipationId()).orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
         if (!validateCertificationTime(participation.getMeeting(), requestDto.getAuthorizationTime()))
             throw new InvalidValueException(INVALID_CERTIFICATION_TIME);
-        String imgUrl = s3Service.uploadFile(feedImage, ImageType.FEED.getImageType());
+        String imgUrl = s3Provider.uploadFile(feedImage, ImageType.FEED.getImageType());
         Feed feed = Feed.createParticipationWithFeedImg(participation, imgUrl);
         feedRepository.save(feed);
         return FeedUploadResponseDto.of(feed.getId());
