@@ -2,8 +2,8 @@ package org.baggle.domain.meeting.service;
 
 import lombok.RequiredArgsConstructor;
 import org.baggle.domain.meeting.domain.*;
-import org.baggle.domain.meeting.dto.reponse.ParticipationAvailabilityResponseDto;
-import org.baggle.domain.meeting.dto.reponse.ParticipationResponseDto;
+import org.baggle.domain.meeting.dto.response.ParticipationAvailabilityResponseDto;
+import org.baggle.domain.meeting.dto.response.ParticipationResponseDto;
 import org.baggle.domain.meeting.dto.request.ParticipationReqeustDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
@@ -48,8 +48,8 @@ public class ParticipationService {
      */
     public ParticipationResponseDto createParticipation(Long userId, ParticipationReqeustDto reqeustDto) {
         Meeting meeting = meetingRepository.findById(reqeustDto.getMeetingId()).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        if (!meetingService.isMeetingInDeadline(meeting) || !meetingService.isValidTime(meeting))
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+        if (!meetingService.isMeetingInDeadline(userId, meeting) || meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
             throw new InvalidValueException(INVALID_MEETING_TIME);
         if (duplicateParticipation(meeting.getParticipations(), userId))
             throw new InvalidValueException(DUPLICATE_PARTICIPATION);

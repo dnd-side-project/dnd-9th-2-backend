@@ -1,4 +1,4 @@
-package org.baggle.domain.meeting.dto.reponse;
+package org.baggle.domain.meeting.dto.response;
 
 
 import lombok.Builder;
