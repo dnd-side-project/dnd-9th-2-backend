@@ -40,7 +40,6 @@ public class ParticipationService {
      */
     public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long requestId) {
         Meeting meeting = meetingRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        List<Participation> participations = meeting.getParticipations();
         validateMeetingTime(userId, meeting);
         duplicateParticipation(meeting.getParticipations(), userId);
         validateMeetingCapacity(meeting);
