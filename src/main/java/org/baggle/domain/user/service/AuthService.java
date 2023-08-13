@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.repository.FcmRepository;
 import org.baggle.domain.user.auth.apple.AppleOAuthProvider;
+import org.baggle.domain.user.auth.kakao.KakaoOAuthProvider;
 import org.baggle.domain.user.domain.Platform;
 import org.baggle.domain.user.domain.RefreshToken;
 import org.baggle.domain.user.domain.User;
@@ -17,7 +18,7 @@ import org.baggle.global.config.jwt.Token;
 import org.baggle.global.error.exception.ConflictException;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.ErrorCode;
-import org.baggle.infra.s3.S3Service;
+import org.baggle.infra.s3.S3Provider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,9 +32,10 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final FcmRepository fcmRepository;
-    private final S3Service s3Service;
+    private final S3Provider s3Provider;
     private final JwtProvider jwtProvider;
     private final AppleOAuthProvider appleOAuthProvider;
+    private final KakaoOAuthProvider kakaoOAuthProvider;
 
     public UserAuthResponseDto signIn(String token, UserSignInRequestDto userSignInRequestDto) {
         User findUser = getUser(token, userSignInRequestDto);
@@ -67,7 +69,7 @@ public class AuthService {
     }
 
     private User getUser(Long userId) {
-        return getUserById(userId);
+        return getUserByUserId(userId);
     }
 
     private void deleteRefreshToken(Long userId) {
@@ -104,8 +106,7 @@ public class AuthService {
 
     private String getPlatformIdFromToken(String token, Platform platform) {
         if (platform == Platform.KAKAO) {
-            // TODO
-            return null;
+            return kakaoOAuthProvider.getKakaoPlatformId(token);
         }
         return appleOAuthProvider.getApplePlatformId(token);
     }
@@ -115,7 +116,7 @@ public class AuthService {
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
-    private User getUserById(Long userId) {
+    private User getUserByUserId(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
@@ -144,6 +145,6 @@ public class AuthService {
     }
 
     private String uploadProfileImageToS3AndGetProfileImageUrl(MultipartFile image, ImageType imageType) {
-        return s3Service.uploadFile(image, imageType.getImageType());
+        return s3Provider.uploadFile(image, imageType.getImageType());
     }
 }

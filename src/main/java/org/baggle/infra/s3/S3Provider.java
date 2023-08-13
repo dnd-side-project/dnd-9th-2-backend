@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.baggle.global.error.exception.ErrorCode;
 import org.baggle.global.error.exception.InvalidValueException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -17,8 +17,8 @@ import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service
-public class S3Service {
+@Component
+public class S3Provider {
     // S3Config에 등록된 S3 접근 권한 객체입니다.
     private final AmazonS3Client amazonS3Client;
 
