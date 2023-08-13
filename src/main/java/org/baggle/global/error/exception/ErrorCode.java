@@ -15,6 +15,7 @@ public enum ErrorCode {
     INVALID_MULTIPART_FILE(HttpStatus.BAD_REQUEST, "유효하지 않은 파일입니다."),
     INVALID_FILE_UPLOAD(HttpStatus.BAD_REQUEST, "s3 파일 업로드에 실패했습니다."),
     INVALID_PLATFORM_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 플랫폼 타입입니다."),
+    INVALID_REDIS_DATA_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 레디스 테이터 타입입니다."),
     INVALID_FCM_UPLOAD(HttpStatus.BAD_REQUEST, "firebase 알람 전송에 실패했습니다."),
     INVALID_MEETING_TIME(HttpStatus.BAD_REQUEST, "유효하지 않은 모임 시간입니다."),
     INVALID_CERTIFICATION_TIME(HttpStatus.BAD_REQUEST, "유효하지 않은 인증 시간입니다."),
