@@ -20,6 +20,8 @@ public enum ErrorCode {
     INVALID_CERTIFICATION_TIME(HttpStatus.BAD_REQUEST, "유효하지 않은 인증 시간입니다."),
     INVALID_MEETING_PARTICIPATION(HttpStatus.BAD_REQUEST, "잘못된 모임 참가자 입니다."),
     INVALID_MEETING_CAPACITY(HttpStatus.BAD_REQUEST, "모임 인원이 초과됐습니다."),
+    UNAVAILABLE_MEETING_TIME(HttpStatus.BAD_REQUEST, "해당 시간에 모임이 존재하는 참가자가 있습니다."),
+
 
     /**
      * 401 Unauthorized
@@ -43,6 +45,8 @@ public enum ErrorCode {
      * 403 Forbidden
      */
     FORBIDDEN(HttpStatus.FORBIDDEN, "리소스 접근 권한이 없습니다."),
+    INVALID_MEETING_AUTHORITY(HttpStatus.FORBIDDEN, "올바른 미팅 권한자가 아닙니다."),
+    INVALID_MODIFY_TIME(HttpStatus.FORBIDDEN, "모임 정보 수정 가능한 시간이 아닙니다."),
 
     /**
      * 404 Not Found

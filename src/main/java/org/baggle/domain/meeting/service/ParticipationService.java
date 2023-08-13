@@ -75,12 +75,11 @@ public class ParticipationService {
     }
     private Boolean duplicateParticipation(List<Participation> participations, Long userId) {
         return participations.stream()
-                .anyMatch(participation ->
-                        Objects.equals(participation.getUser().getId(), userId));
+                .anyMatch(participation -> Objects.equals(participation.getUser().getId(), userId));
     }
-    private void validateMeetingCapacity(Meeting meeting) {
-        if (meeting.getParticipations().size() == 6)
-            throw new InvalidValueException(INVALID_MEETING_CAPACITY);
+
+    private Boolean validateMeetingCapacity(Meeting meeting) {
+        return !(meeting.getParticipations().size() == 6);
     }
 
 

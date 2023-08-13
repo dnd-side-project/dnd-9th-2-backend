@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 import org.baggle.domain.fcm.domain.FcmToken;
 
 import java.util.List;
-
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class FcmNotificationRequestDto {
     private List<FcmToken> targetTokenList;
     private String title;

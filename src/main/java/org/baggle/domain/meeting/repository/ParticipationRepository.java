@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ParticipationRepository extends JpaRepository<Participation, Long> {
     @Query("SELECT fcm.user.fcmToken FROM Participation p " +
@@ -16,4 +17,6 @@ public interface ParticipationRepository extends JpaRepository<Participation, Lo
             "JOIN u.fcmToken fcm " +
             "WHERE p.buttonAuthority = :buttonAuthority AND m = :meeting")
     List<FcmToken> findFcmTokensByMeetingAndButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority);
+
+    Optional<Participation> findByUserIdAndMeetingId(Long userId, Long meetingId);
 }
