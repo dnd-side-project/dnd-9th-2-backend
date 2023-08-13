@@ -47,26 +47,40 @@ public class ParticipationService {
      * throw: 모임이 다 찼을 경우
      */
     public ParticipationResponseDto createParticipation(Long userId, ParticipationReqeustDto reqeustDto) {
-        Meeting meeting = meetingRepository.findById(reqeustDto.getMeetingId()).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-        if (!meetingService.isMeetingInDeadline(meeting) || !meetingService.isValidTime(meeting))
-            throw new InvalidValueException(INVALID_MEETING_TIME);
-        if (duplicateParticipation(meeting.getParticipations(), userId))
-            throw new InvalidValueException(DUPLICATE_PARTICIPATION);
-        if (!validateMeetingCapacity(meeting))
-            throw new InvalidValueException(INVALID_MEETING_CAPACITY);
+        Meeting meeting = getMeeting(reqeustDto.getMeetingId());
+        User user = getUser(userId);
+        validateMeetingTime(meeting);
+        handleDuplicatePaticipationError(meeting.getParticipations(), userId);
+        validateMeetingCapacity(meeting);
         Participation participation = Participation.createParticipationWithoutFeed(user, meeting, MeetingAuthority.PARTICIPATION, ParticipationMeetingStatus.PARTICIPATING, ButtonAuthority.NON_OWNER);
         participationRepository.save(participation);
         return ParticipationResponseDto.of(participation.getId());
     }
 
+    private Meeting getMeeting(Long meetingId){
+        return meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
+    }
+    private User getUser(Long userId){
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
+    }
+    private void validateMeetingTime(Meeting meeting){
+        if (!meetingService.isMeetingInDeadline(meeting) || !meetingService.isValidTime(meeting))
+            throw new InvalidValueException(INVALID_MEETING_TIME);
+    }
+    private  void handleDuplicatePaticipationError(List<Participation> participations, Long userId){
+        if (duplicateParticipation(participations, userId))
+            throw new InvalidValueException(DUPLICATE_PARTICIPATION);
+    }
     private Boolean duplicateParticipation(List<Participation> participations, Long userId) {
         return participations.stream()
-                .anyMatch(participation -> Objects.equals(participation.getUser().getId(), userId));
+                .anyMatch(participation ->
+                        Objects.equals(participation.getUser().getId(), userId));
     }
-
-    private Boolean validateMeetingCapacity(Meeting meeting) {
-        return !(meeting.getParticipations().size() == 6);
+    private void validateMeetingCapacity(Meeting meeting) {
+        if (meeting.getParticipations().size() == 6)
+            throw new InvalidValueException(INVALID_MEETING_CAPACITY);
     }
 
 
