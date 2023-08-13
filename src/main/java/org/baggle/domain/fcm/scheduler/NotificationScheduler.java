@@ -9,6 +9,7 @@ import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
+import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.service.MeetingService;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -41,15 +42,13 @@ public class NotificationScheduler {
      */
     @Scheduled(cron = "0 * * * * *")
     public void notificationScheduleTask() throws FirebaseMessagingException {
-        FcmTimer certificationTime = fcmTimerRepository.findById(1L).orElse(new FcmTimer(null, null));
         LocalDateTime now = LocalDateTime.now();
         List<Meeting> notificationMeeting = meetingService.findMeetingsInRange(now, 59, 60);
         for (Meeting m : notificationMeeting) {
-            if (fcmNotificationService.hasFcmNotification(m.getId())) continue;
-
+            if (m.getMeetingStatus() != MeetingStatus.SCHEDULED) continue;
+            m.updateMeetingStatusIntoConfirmation();
             List<FcmToken> ownerFcmTokens = fcmNotificationService.findFcmTokensByButtonAuthority(m, ButtonAuthority.OWNER);
             List<FcmToken> nonOwnerFcmTokens = fcmNotificationService.findFcmTokensByButtonAuthority(m, ButtonAuthority.NON_OWNER);
-
 //            fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(ownerFcmTokens, "", ""));
 //            fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(nonOwnerFcmTokens, "", ""));
             fcmNotificationService.createFcmNotification(m.getId());

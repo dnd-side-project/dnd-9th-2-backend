@@ -15,6 +15,7 @@ import org.baggle.domain.feed.repository.FeedRepository;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.domain.Participation;
+import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.baggle.global.common.ImageType;
 import org.baggle.global.error.exception.EntityNotFoundException;
@@ -41,6 +42,7 @@ public class FeedService {
     private final FcmNotificationService fcmNotificationService;
     private final FcmTimerRepository fcmTimerRepository;
     private final FcmRepository fcmRepository;
+    private final MeetingRepository meetingRepository;
 
     /**
      * 피드를 업로드하는 메서드입니다.
@@ -70,9 +72,12 @@ public class FeedService {
             throw new InvalidValueException(INVALID_CERTIFICATION_TIME);
 //        broadcastNotification(participation.getMeeting());
         // 이벤트 로직 5분 타이머를 시작하는 code 입니다.
-        fcmNotificationService.deleteFcmNotification(participation.getMeeting().getId());
-        fcmNotificationService.createFcmTimer(participation.getMeeting().getId(), authorizationTime);
+        startEmergencyNotificationEvent(participation, authorizationTime);
         return FeedNotificationResponseDto.of(participation.getMeeting(), authorizationTime);
+    }
+
+    private Meeting getMeeting(Long meetingId){
+        return meetingRepository.findById(meetingId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
     }
 
     /**
@@ -97,5 +102,12 @@ public class FeedService {
         List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meeting.getId());
         FcmNotificationRequestDto fcmNotificationRequestDto = FcmNotificationRequestDto.of(fcmTokens, "", "");
         fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto);
+    }
+
+    private void startEmergencyNotificationEvent(Participation participation, LocalDateTime authorizationTime){
+        fcmNotificationService.deleteFcmNotification(participation.getMeeting().getId());
+        fcmNotificationService.createFcmTimer(participation.getMeeting().getId(), authorizationTime);
+        Meeting meeting = getMeeting(participation.getMeeting().getId());
+        meeting.updateMeetingStatusIntoOngoing();
     }
 }

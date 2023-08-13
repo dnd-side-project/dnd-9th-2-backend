@@ -24,8 +24,6 @@ public class ParticipationApiController {
     public ResponseEntity<BaseResponse<?>> findMeetingAvailability(@UserId final Long userId,
                                                                    @RequestParam final Long meetingId) {
         final ParticipationAvailabilityResponseDto responseDto = participationService.findParticipationAvailability(userId, meetingId);
-        if (Objects.isNull(responseDto))
-            return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, true));
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
     }
 
