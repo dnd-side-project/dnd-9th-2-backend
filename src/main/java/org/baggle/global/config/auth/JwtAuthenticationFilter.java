@@ -26,9 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String accessToken = getAccessTokenFromHttpServletRequest(request);
         jwtProvider.validateAccessToken(accessToken);
         final Long userId = jwtProvider.getSubject(accessToken);
-        UserAuthentication authentication = new UserAuthentication(userId, null, null);
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuthentication(request, userId);
         filterChain.doFilter(request, response);
     }
 
@@ -38,5 +36,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return accessToken.substring(BEARER.length());
         }
         throw new UnauthorizedException(ErrorCode.INVALID_ACCESS_TOKEN);
+    }
+
+    private void setAuthentication(HttpServletRequest request, Long userId) {
+        UserAuthentication authentication = new UserAuthentication(userId, null, null);
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }
