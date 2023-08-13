@@ -39,7 +39,7 @@ public class ParticipationService {
      * throw: 모임이 다 찼을 경우
      */
     public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long requestId) {
-        Meeting meeting = meetingRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
+        Meeting meeting = getMeeting(requestId);
         validateMeetingTime(userId, meeting);
         duplicateParticipation(meeting.getParticipations(), userId);
         validateMeetingCapacity(meeting);
