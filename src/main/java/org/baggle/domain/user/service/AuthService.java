@@ -69,7 +69,7 @@ public class AuthService {
     }
 
     private User getUser(Long userId) {
-        return getUserById(userId);
+        return getUserByUserId(userId);
     }
 
     private void deleteRefreshToken(Long userId) {
@@ -116,7 +116,7 @@ public class AuthService {
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
-    private User getUserById(Long userId) {
+    private User getUserByUserId(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
