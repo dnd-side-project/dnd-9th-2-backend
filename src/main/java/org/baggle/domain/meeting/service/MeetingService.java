@@ -7,9 +7,9 @@ import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.domain.MeetingAuthority;
 import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.domain.Participation;
-import org.baggle.domain.meeting.dto.reponse.MeetingDetailResponseDto;
-import org.baggle.domain.meeting.dto.reponse.ParticipationDetailResponseDto;
-import org.baggle.domain.meeting.dto.reponse.UpdateMeetingInfoResponseDto;
+import org.baggle.domain.meeting.dto.response.MeetingDetailResponseDto;
+import org.baggle.domain.meeting.dto.response.ParticipationDetailResponseDto;
+import org.baggle.domain.meeting.dto.response.UpdateMeetingInfoResponseDto;
 import org.baggle.domain.meeting.dto.request.UpdateMeetingInfoRequestDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.baggle.global.error.exception.ErrorCode.*;
 
@@ -76,7 +77,6 @@ public class MeetingService {
     public List<Meeting> findMeetingsInRange(LocalDateTime localDateTime, int from, int to) {
         LocalDateTime fromDateTime = localDateTime.plusMinutes(from);
         LocalDateTime toDateTime = localDateTime.plusMinutes(to);
-
         return meetingRepository.findMeetingsStartingSoon(
                 fromDateTime.toLocalTime(),
                 toDateTime.toLocalDate(),
@@ -86,7 +86,6 @@ public class MeetingService {
     private List<Meeting> findMeetingsInRangeForUser(Long userId, LocalDateTime localDateTime, int from, int to) {
         LocalDateTime fromDateTime = localDateTime.plusMinutes(from);
         LocalDateTime toDateTime = localDateTime.plusMinutes(to);
-
         return meetingRepository.findMeetingsWithinTimeRange(
                 userId,
                 fromDateTime,
@@ -114,14 +113,15 @@ public class MeetingService {
     }
 
     private void validateParticition(Meeting meeting, Long userId) {
-        boolean isvalidParticipation = meeting.getParticipations().stream().anyMatch(participation -> participation.getUser().getId() == userId);
+        boolean isvalidParticipation = meeting.getParticipations().stream()
+                .anyMatch(participation -> participation.getUser().getId() == userId);
         if (!isvalidParticipation)
             throw new InvalidValueException(INVALID_MEETING_PARTICIPATION);
     }
 
     private void validateMeetingHost(Long meetingId, Long userId) {
-        Participation participation = participationRepository.findFirstByUserIdAndMeetingId(userId, meetingId);
-        if (participation.getMeetingAuthority() != MeetingAuthority.HOST)
+        Optional<Participation> participation = participationRepository.findByUserIdAndMeetingId(userId, meetingId);
+        if (participation.get().getMeetingAuthority() != MeetingAuthority.HOST)
             throw new ForbiddenException(INVALID_MEETING_AUTHORITY);
     }
 
@@ -156,6 +156,7 @@ public class MeetingService {
     }
 
     private FcmTimer getFcmTimer(Long fcmTimerId) {
-        return fcmTimerRepository.findById(fcmTimerId).orElse(new FcmTimer(null, null));
+        return fcmTimerRepository.findById(fcmTimerId)
+                .orElse(FcmTimer.getFcmTimerWithNull());
     }
 }

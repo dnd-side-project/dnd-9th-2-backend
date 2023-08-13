@@ -2,8 +2,8 @@ package org.baggle.domain.meeting.service;
 
 import lombok.RequiredArgsConstructor;
 import org.baggle.domain.meeting.domain.*;
-import org.baggle.domain.meeting.dto.reponse.ParticipationAvailabilityResponseDto;
-import org.baggle.domain.meeting.dto.reponse.ParticipationResponseDto;
+import org.baggle.domain.meeting.dto.response.ParticipationAvailabilityResponseDto;
+import org.baggle.domain.meeting.dto.response.ParticipationResponseDto;
 import org.baggle.domain.meeting.dto.request.ParticipationReqeustDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
