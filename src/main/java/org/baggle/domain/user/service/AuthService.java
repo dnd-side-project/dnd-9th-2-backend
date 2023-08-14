@@ -72,10 +72,6 @@ public class AuthService {
         return getUserByUserId(userId);
     }
 
-    private void deleteRefreshToken(Long userId) {
-        refreshTokenRepository.deleteById(userId);
-    }
-
     private void updateFcmToken(String fcmToken, User user) {
         FcmToken findFcmToken = getFcmTokenByUserId(user.getId());
         findFcmToken.updateFcmToken(fcmToken);
@@ -98,6 +94,10 @@ public class AuthService {
     private void updateRefreshToken(User user, String refreshToken) {
         user.updateRefreshToken(refreshToken);
         refreshTokenRepository.save(RefreshToken.createRefreshToken(user.getId(), refreshToken));
+    }
+
+    private void deleteRefreshToken(Long userId) {
+        refreshTokenRepository.deleteById(userId);
     }
 
     private Platform getEnumPlatformFromStringPlatform(String platform) {
