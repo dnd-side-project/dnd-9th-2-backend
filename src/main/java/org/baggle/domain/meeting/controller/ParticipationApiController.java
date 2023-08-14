@@ -21,14 +21,14 @@ public class ParticipationApiController {
     private final ParticipationService participationService;
 
     @GetMapping
-    public ResponseEntity<BaseResponse<?>> findMeetingAvailability(@UserId Long userId,
+    public ResponseEntity<BaseResponse<?>> findMeetingAvailability(@UserId final Long userId,
                                                                    @RequestParam final Long meetingId) {
         final ParticipationAvailabilityResponseDto responseDto = participationService.findParticipationAvailability(userId, meetingId);
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
     }
 
     @PostMapping
-    public ResponseEntity<BaseResponse<?>> createParticipation(@UserId Long userId,
+    public ResponseEntity<BaseResponse<?>> createParticipation(@UserId final Long userId,
                                                                @RequestBody final ParticipationReqeustDto requestDto) {
         final ParticipationResponseDto responseDto = participationService.createParticipation(userId, requestDto);
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
