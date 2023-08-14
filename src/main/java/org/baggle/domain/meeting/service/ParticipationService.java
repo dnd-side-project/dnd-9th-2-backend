@@ -17,6 +17,7 @@ import org.baggle.global.error.exception.InvalidValueException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,6 +41,7 @@ public class ParticipationService {
      */
     public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long requestId) {
         Meeting meeting = getMeeting(requestId);
+        validateMeetingStatus(meeting);
         validateMeetingTime(userId, meeting);
         duplicateParticipation(meeting.getParticipations(), userId);
         validateMeetingCapacity(meeting);
@@ -53,6 +55,10 @@ public class ParticipationService {
         Meeting meeting = getMeeting(reqeustDto.getMeetingId());
         User user = getUser(userId);
         Participation participation = Participation.createParticipationWithoutFeed(user, meeting, MeetingAuthority.PARTICIPATION, ParticipationMeetingStatus.PARTICIPATING, ButtonAuthority.NON_OWNER);
+        validateMeetingStatus(meeting);
+        validateMeetingTime(userId, meeting);
+        duplicateParticipation(meeting.getParticipations(), userId);
+        validateMeetingCapacity(meeting);
         participationRepository.save(participation);
         return ParticipationResponseDto.of(participation.getId());
     }
@@ -65,9 +71,13 @@ public class ParticipationService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
     }
-    private void validateMeetingTime(Long userId, Meeting meeting){
-        if (meetingService.isMeetingInDeadline(userId, meeting) || meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
+    private void validateMeetingStatus(Meeting meeting){
+        if (meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
             throw new InvalidValueException(INVALID_MEETING_TIME);
+    }
+    private void validateMeetingTime(Long userId, Meeting meeting){
+        LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
+        meetingService.isMeetingInDeadline(meeting.getId(), userId, meetingTime);
     }
     private void duplicateParticipation(List<Participation> participations, Long userId) {
         boolean isDupilcate = participations.stream()
