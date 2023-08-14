@@ -5,36 +5,27 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.global.error.exception.ErrorCode;
 import org.baggle.global.error.exception.UnauthorizedException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class KakaoOAuthProvider {
-    @Value("${oauth.kakao.client-id}")
-    private String clientId;
-    @Value("${oauth.kakao.client-secret}")
-    private String clientSecret;
-    @Value("${oauth.kakao.redirect-uri}")
-    private String redirectUri;
-    private final KakaoAccessTokenFeignClient kakaoAccessTokenFeignClient;
-    private final KakaoAccessTokenInfoFeignClient kakaoAccessTokenInfoFeignClient;
+    private final KakaoFeignClient kakaoFeignClient;
 
-    public String getKakaoPlatformId(String authorizationCode) {
-        KakaoAccessToken kakaoAccessToken = getKakaoAccessToken(clientId, redirectUri, authorizationCode, clientSecret);
+    public String getKakaoPlatformId(String accessToken) {
+        KakaoAccessToken kakaoAccessToken = KakaoAccessToken.createKakaoAccessToken(accessToken);
         String accessTokenWithTokenType = kakaoAccessToken.getAccessTokenWithTokenType();
-        KakaoAccessTokenInfo kakaoAccessTokenInfo = kakaoAccessTokenInfoFeignClient.getKakaoAccessTokenInfo(accessTokenWithTokenType);
+        KakaoAccessTokenInfo kakaoAccessTokenInfo = getKakaoAccessTokenInfo(accessTokenWithTokenType);
         return String.valueOf(kakaoAccessTokenInfo.getId());
     }
 
-    private KakaoAccessToken getKakaoAccessToken(String clientId, String redirectUri, String code, String clientSecret) {
+    private KakaoAccessTokenInfo getKakaoAccessTokenInfo(String accessTokenWithTokenType) {
         try {
-            log.info("feign request: {}, {}, {}, {}", clientId, redirectUri, code, clientSecret);
-            return kakaoAccessTokenFeignClient.getKakaoAccessToken("authorization_code", clientId, redirectUri, code, clientSecret);
+            return kakaoFeignClient.getKakaoAccessTokenInfo(accessTokenWithTokenType);
         } catch (FeignException e) {
-            log.info("feign exception: ", e);
-            throw new UnauthorizedException(ErrorCode.INVALID_AUTHORIZATION_CODE);
+            log.error("Feign Exception: ", e);
+            throw new UnauthorizedException(ErrorCode.INVALID_KAKAO_ACCESS_TOKEN);
         }
     }
 }
