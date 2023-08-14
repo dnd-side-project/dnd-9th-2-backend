@@ -2,11 +2,13 @@ package org.baggle.domain.user.auth.kakao;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.baggle.global.error.exception.ErrorCode;
 import org.baggle.global.error.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class KakaoOAuthProvider {
@@ -28,8 +30,10 @@ public class KakaoOAuthProvider {
 
     private KakaoAccessToken getKakaoAccessToken(String clientId, String redirectUri, String code, String clientSecret) {
         try {
+            log.info("feign request: {}, {}, {}, {}", clientId, redirectUri, code, clientSecret);
             return kakaoAccessTokenFeignClient.getKakaoAccessToken("authorization_code", clientId, redirectUri, code, clientSecret);
         } catch (FeignException e) {
+            log.info("feign exception: ", e);
             throw new UnauthorizedException(ErrorCode.INVALID_AUTHORIZATION_CODE);
         }
     }
