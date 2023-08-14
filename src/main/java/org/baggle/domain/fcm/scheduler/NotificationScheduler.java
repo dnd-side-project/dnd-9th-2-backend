@@ -1,6 +1,7 @@
 package org.baggle.domain.fcm.scheduler;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmTimer;
@@ -40,6 +41,7 @@ public class NotificationScheduler {
      * Cron 표현식을 사용한 작업 예약
      * 초(0-59) 분(0-59) 시간(0-23) 일(1-31) 월(1-12) 요일(0-7)
      */
+    @Transactional
     @Scheduled(cron = "0 * * * * *")
     public void notificationScheduleTask() throws FirebaseMessagingException {
         LocalDateTime now = LocalDateTime.now();

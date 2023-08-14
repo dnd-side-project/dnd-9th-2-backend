@@ -1,5 +1,6 @@
 package org.baggle.infra.redis;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmToken;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 @Component
 public class ExpirationListener implements MessageListener {
     private final FcmNotificationService fcmNotificationService;
