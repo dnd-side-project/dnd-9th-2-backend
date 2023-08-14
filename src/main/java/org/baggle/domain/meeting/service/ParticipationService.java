@@ -2,7 +2,6 @@ package org.baggle.domain.meeting.service;
 
 import lombok.RequiredArgsConstructor;
 import org.baggle.domain.meeting.domain.*;
-
 import org.baggle.domain.meeting.dto.request.ParticipationReqeustDto;
 import org.baggle.domain.meeting.dto.response.ParticipationAvailabilityResponseDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
@@ -61,22 +60,26 @@ public class ParticipationService {
         participationRepository.save(participation);
     }
 
-    private Meeting getMeeting(Long meetingId){
+    private Meeting getMeeting(Long meetingId) {
         return meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
     }
-    private User getUser(Long userId){
+
+    private User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
     }
-    private void validateMeetingStatus(Meeting meeting){
+
+    private void validateMeetingStatus(Meeting meeting) {
         if (meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
             throw new InvalidValueException(INVALID_MEETING_TIME);
     }
-    private void validateMeetingTime(Long userId, Meeting meeting){
+
+    private void validateMeetingTime(Long userId, Meeting meeting) {
         LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
         meetingService.isMeetingInDeadline(meeting.getId(), userId, meetingTime);
     }
+
     private void duplicateParticipation(List<Participation> participations, Long userId) {
         boolean isDupilcate = participations.stream()
                 .anyMatch(participation ->
@@ -84,6 +87,7 @@ public class ParticipationService {
         if (isDupilcate)
             throw new ConflictException(DUPLICATE_PARTICIPATION);
     }
+
     private void validateMeetingCapacity(Meeting meeting) {
         if (meeting.getParticipations().size() == 6)
             throw new ForbiddenException(INVALID_MEETING_CAPACITY);
