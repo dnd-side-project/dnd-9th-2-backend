@@ -14,7 +14,7 @@ import static org.baggle.global.error.exception.ErrorCode.INVALID_REDIS_DATA_TYP
 @Getter
 public enum RedisDataType {
     REFRESHTOKEN("refreshToken"),
-    FCM_NOTIFICATION("fcmNoticiation"),
+    FCM_NOTIFICATION("fcmNotification"),
     FCM_TIMER("fcmTimer");
 
     private final String stringPlatform;
@@ -22,7 +22,7 @@ public enum RedisDataType {
     public static RedisDataType getEnumRedisDataTypeFromString(String stringRedisType){
         return Arrays.stream(values())
                 .filter(redisDataType -> redisDataType.stringPlatform.equals(stringRedisType))
-                .findFirst()
+                .findAny()
                 .orElseThrow(()-> new InvalidValueException(INVALID_REDIS_DATA_TYPE));
     }
 }
