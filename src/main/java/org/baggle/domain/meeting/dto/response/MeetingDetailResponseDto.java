@@ -13,33 +13,31 @@ public class MeetingDetailResponseDto {
     private Long meetingId;
     private String title;
     private String place;
-    private String date;
-    private String time;
     private String memo;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime meetingTime;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime certificationTime;
     private List<ParticipationDetailResponseDto> members;
 
     @Builder
-    public MeetingDetailResponseDto(Long meetingId, String title, String place, String date, String time, String memo, LocalDateTime certificationTime, List<ParticipationDetailResponseDto> members) {
+    public MeetingDetailResponseDto(Long meetingId, String title, String place, String memo, LocalDateTime meetingTime, LocalDateTime certificationTime, List<ParticipationDetailResponseDto> members) {
         this.meetingId = meetingId;
         this.title = title;
         this.place = place;
-        this.date = date;
-        this.time = time;
         this.memo = memo;
+        this.meetingTime = meetingTime;
         this.certificationTime = certificationTime;
         this.members = members;
     }
 
-    public static MeetingDetailResponseDto of(Meeting meeting, LocalDateTime certificationTime, List<ParticipationDetailResponseDto> participationDetailResponseDto) {
+    public static MeetingDetailResponseDto of(Meeting meeting, LocalDateTime meetingTime, LocalDateTime certificationTime, List<ParticipationDetailResponseDto> participationDetailResponseDto) {
         return MeetingDetailResponseDto.builder()
                 .meetingId(meeting.getId())
                 .title(meeting.getTitle())
                 .place(meeting.getPlace())
-                .date(meeting.getDate().toString())
-                .time(meeting.getTime().toString())
                 .memo(meeting.getMemo())
+                .meetingTime(meetingTime)
                 .certificationTime(certificationTime)
                 .members(participationDetailResponseDto)
                 .build();

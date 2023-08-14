@@ -7,10 +7,10 @@ import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.domain.MeetingAuthority;
 import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.domain.Participation;
+import org.baggle.domain.meeting.dto.request.UpdateMeetingInfoRequestDto;
 import org.baggle.domain.meeting.dto.response.MeetingDetailResponseDto;
 import org.baggle.domain.meeting.dto.response.ParticipationDetailResponseDto;
 import org.baggle.domain.meeting.dto.response.UpdateMeetingInfoResponseDto;
-import org.baggle.domain.meeting.dto.request.UpdateMeetingInfoRequestDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.baggle.global.error.exception.EntityNotFoundException;
@@ -46,7 +46,8 @@ public class MeetingService {
         FcmTimer certificationTime = getFcmTimer(requestId);
         List<Participation> participations = meeting.getParticipations();
         List<ParticipationDetailResponseDto> participationDetails = ParticipationDetailResponseDto.listOf(participations);
-        return MeetingDetailResponseDto.of(meeting, certificationTime.getStartTime(), participationDetails);
+        LocalDateTime meetingTime = getMeetingTime(meeting.getDate(), meeting.getTime());
+        return MeetingDetailResponseDto.of(meeting, meetingTime, certificationTime.getStartTime(), participationDetails);
     }
 
     /**
@@ -67,6 +68,10 @@ public class MeetingService {
     private Meeting getMeeting(Long meetingId) {
         return meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
+    }
+
+    private LocalDateTime getMeetingTime(LocalDate date, LocalTime time) {
+        return LocalDateTime.of(date, time);
     }
 
     /**
