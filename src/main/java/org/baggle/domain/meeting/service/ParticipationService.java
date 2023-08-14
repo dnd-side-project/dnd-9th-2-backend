@@ -5,7 +5,6 @@ import org.baggle.domain.meeting.domain.*;
 
 import org.baggle.domain.meeting.dto.request.ParticipationReqeustDto;
 import org.baggle.domain.meeting.dto.response.ParticipationAvailabilityResponseDto;
-import org.baggle.domain.meeting.dto.response.ParticipationResponseDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.baggle.domain.user.domain.User;
@@ -51,7 +50,7 @@ public class ParticipationService {
     /**
      * 모임 참여 메서드
      */
-    public ParticipationResponseDto createParticipation(Long userId, ParticipationReqeustDto reqeustDto) {
+    public void createParticipation(Long userId, ParticipationReqeustDto reqeustDto) {
         Meeting meeting = getMeeting(reqeustDto.getMeetingId());
         User user = getUser(userId);
         Participation participation = Participation.createParticipationWithoutFeed(user, meeting, MeetingAuthority.PARTICIPATION, ParticipationMeetingStatus.PARTICIPATING, ButtonAuthority.NON_OWNER);
@@ -60,7 +59,6 @@ public class ParticipationService {
         duplicateParticipation(meeting.getParticipations(), userId);
         validateMeetingCapacity(meeting);
         participationRepository.save(participation);
-        return ParticipationResponseDto.of(participation.getId());
     }
 
     private Meeting getMeeting(Long meetingId){
