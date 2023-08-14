@@ -1,5 +1,6 @@
 package org.baggle.domain.meeting.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,7 +13,9 @@ public class UpdateMeetingInfoResponseDto {
     private Long meetingId;
     private String title;
     private String place;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private LocalDate date;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss", timezone = "Asia/Seoul")
     private LocalTime time;
     private String memo;
 
