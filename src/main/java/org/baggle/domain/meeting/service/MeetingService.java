@@ -93,16 +93,6 @@ public class MeetingService {
     }
 
     /**
-     * 2시간 전,후 모임 여부를 확인하는 메서드
-     * return: 모임이 있을 경우 True, else False
-     */
-    public Boolean isMeetingInDeadline(Long userId, Meeting meeting) {
-        LocalDateTime criteriaTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
-        List<Meeting> meetings = this.findMeetingsInRangeForUser(userId, criteriaTime, -120, 120);
-        return meetings.size() != 0;
-    }
-
-    /**
      * 모임 시간까지 남은 시간을 확인하는 메서드
      */
     private Long getTimeUntilMeeting(Meeting meeting) {
@@ -146,13 +136,17 @@ public class MeetingService {
     private void validateMeetingTime(Meeting meeting, LocalDate date, LocalTime time) {
         LocalDateTime meetingTime = LocalDateTime.of(date, time);
         for (Participation participation : meeting.getParticipations()) {
-            List<Meeting> meetings = findMeetingsInRangeForUser(participation.getUser().getId(), meetingTime, -120, 120)
-                    .stream()
-                    .filter(m -> m.getId() != meeting.getId())
-                    .toList();
-            if (!meetings.isEmpty())
-                throw new InvalidValueException(UNAVAILABLE_MEETING_TIME);
+            isMeetingInDeadline(meeting.getId(), participation.getUser().getId(), meetingTime);
         }
+    }
+
+    public void isMeetingInDeadline(Long meetingId, Long userId, LocalDateTime meetingTime) {
+        List<Meeting> meetings = findMeetingsInRangeForUser(userId, meetingTime, -120, 120)
+                .stream()
+                .filter(m -> m.getId() != meetingId)
+                .toList();
+        if (!meetings.isEmpty())
+            throw new InvalidValueException(UNAVAILABLE_MEETING_TIME);
     }
 
     private FcmTimer getFcmTimer(Long fcmTimerId) {
