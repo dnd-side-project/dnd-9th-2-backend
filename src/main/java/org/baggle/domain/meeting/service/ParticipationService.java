@@ -69,7 +69,7 @@ public class ParticipationService {
     }
     private User getUser(Long userId){
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
     }
     private void validateMeetingStatus(Meeting meeting){
         if (meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
