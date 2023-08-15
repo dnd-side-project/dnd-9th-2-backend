@@ -97,9 +97,6 @@ public class MeetingService {
                 toDateTime);
     }
 
-    /**
-     * 모임 시간까지 남은 시간을 확인하는 메서드
-     */
     private Long getTimeUntilMeeting(Meeting meeting) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
