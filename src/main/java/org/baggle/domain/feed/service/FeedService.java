@@ -17,6 +17,7 @@ import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.baggle.global.common.ImageType;
+import org.baggle.global.error.exception.ConflictException;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.InvalidValueException;
 import org.baggle.infra.s3.S3Provider;
@@ -27,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.baggle.global.error.exception.ErrorCode.*;
 
@@ -45,10 +47,12 @@ public class FeedService {
     /**
      * 피드를 업로드하는 메서드입니다.
      * throw 모임에 참가자가 없는 경우
+     * throw 이미 인증을 완료한 경우
      * throw 긴급소집 이벤트가 진행 중이 아닌 경우
      */
     public FeedUploadResponseDto feedUpload(FeedUploadRequestDto requestDto, MultipartFile feedImage) {
         Participation participation = getParticipation(requestDto.getMemberId());
+        duplicationParticipation(participation);
         validateCertificationTime(participation.getMeeting());
         String imgUrl = s3Provider.uploadFile(feedImage, ImageType.FEED.getImageType());
         Feed feed = Feed.createParticipationWithFeedImg(participation, imgUrl);
@@ -89,6 +93,12 @@ public class FeedService {
     private void validateCertificationTime(Meeting meeting) {
         if (meeting.getMeetingStatus() != MeetingStatus.ONGOING)
             throw new InvalidValueException(INVALID_CERTIFICATION_TIME);
+    }
+
+    private void duplicationParticipation(Participation participation){
+        Optional<Feed> feed = feedRepository.findByParticipationId(participation.getId());
+        if(feed.isPresent())
+            throw new ConflictException(DUPLICATE_FEED);
     }
 
     private void validateNotificationTime(Meeting meeting, LocalDateTime authorizationTime) {
