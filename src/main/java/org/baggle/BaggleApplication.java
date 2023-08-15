@@ -15,12 +15,8 @@ public class BaggleApplication {
         System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true");
     }
 
-    @PostConstruct
-    public void setTimeZone(){
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-    }
-
     public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         SpringApplication.run(BaggleApplication.class, args);
     }
 }
