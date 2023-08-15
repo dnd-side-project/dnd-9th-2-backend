@@ -21,10 +21,10 @@ public class ParticipationApiController {
     public ResponseEntity<BaseResponse<?>> findMeetingAvailability(@UserId final Long userId,
                                                                    @RequestParam final Long meetingId) {
         final ParticipationAvailabilityResponseDto responseDto = participationService.findParticipationAvailability(userId, meetingId);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, responseDto));
     }
 
-    @PostMapping
+    @PostMapping("/participation")
     public ResponseEntity<BaseResponse<?>> createParticipation(@UserId final Long userId,
                                                                @RequestBody final ParticipationReqeustDto requestDto) {
         participationService.createParticipation(userId, requestDto);
