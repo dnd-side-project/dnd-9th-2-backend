@@ -9,6 +9,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class FeedUploadRequestDto {
-    private Long participationId;
+    private Long memberId;
     private LocalDateTime authorizationTime;
 }
