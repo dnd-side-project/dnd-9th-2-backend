@@ -86,7 +86,7 @@ public class FeedService {
     }
 
     private void validateMeetingStatusForScheduled(Meeting meeting) {
-        if (meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
+        if (meeting.getMeetingStatus() != MeetingStatus.CONFIRMATION)
             throw new InvalidValueException(INVALID_MEETING_TIME);
     }
 
