@@ -95,9 +95,9 @@ public class FeedService {
             throw new InvalidValueException(INVALID_CERTIFICATION_TIME);
     }
 
-    private void duplicationParticipation(Participation participation){
+    private void duplicationParticipation(Participation participation) {
         Optional<Feed> feed = feedRepository.findByParticipationId(participation.getId());
-        if(feed.isPresent())
+        if (feed.isPresent())
             throw new ConflictException(DUPLICATE_FEED);
     }
 
