@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-@RedisHash(value = "fcmTimer", timeToLive = 330)
+@RedisHash(value = "fcmTimer", timeToLive = 300)
 public class FcmTimer {
     @Id
     private Long id;

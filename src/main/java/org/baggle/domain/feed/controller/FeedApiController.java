@@ -25,7 +25,7 @@ public class FeedApiController {
     public ResponseEntity<BaseResponse<?>> createFeedUpload(@RequestPart final FeedUploadRequestDto uploadInfo,
                                                             @RequestPart final MultipartFile feedImage) {
         final FeedUploadResponseDto responseDto = feedService.feedUpload(uploadInfo, feedImage);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, responseDto));
     }
 
     @GetMapping

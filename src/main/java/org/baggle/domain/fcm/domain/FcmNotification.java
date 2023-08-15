@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisHash;
 @AllArgsConstructor
 @Builder
 @Getter
-@RedisHash(value = "fcmNotification", timeToLive = 3537)
+@RedisHash(value = "fcmNotification", timeToLive = 2820)
 public class FcmNotification {
     @Id
     private Long id;
