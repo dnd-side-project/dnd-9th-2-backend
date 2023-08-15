@@ -16,7 +16,12 @@ public class BaggleApplication {
     }
 
     public static void main(String[] args) {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         SpringApplication.run(BaggleApplication.class, args);
+    }
+
+    @PostConstruct
+    public void started(){
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+
     }
 }
