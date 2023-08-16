@@ -33,7 +33,15 @@ public class Participation extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private ButtonAuthority buttonAuthority;
 
-    public static Participation createParticipationWithoutFeed(User user, Meeting meeting, MeetingAuthority meetingAuthority, ParticipationMeetingStatus participationMeetingStatus, ButtonAuthority buttonAuthority){
+    public static Participation createParticipation() {
+        return Participation.builder()
+                .meetingAuthority(MeetingAuthority.HOST)
+                .participationMeetingStatus(ParticipationMeetingStatus.PARTICIPATING)
+                .buttonAuthority(ButtonAuthority.NON_OWNER)
+                .build();
+    }
+
+    public static Participation createParticipationWithoutFeed(User user, Meeting meeting, MeetingAuthority meetingAuthority, ParticipationMeetingStatus participationMeetingStatus, ButtonAuthority buttonAuthority) {
         return Participation.builder()
                 .user(user)
                 .meeting(meeting)
@@ -43,4 +51,13 @@ public class Participation extends BaseTimeEntity {
                 .build();
     }
 
+    public void changeUser(User user) {
+        this.user = user;
+        user.getParticipations().add(this);
+    }
+
+    public void changeMeeting(Meeting meeting) {
+        this.meeting = meeting;
+        meeting.getParticipations().add(this);
+    }
 }

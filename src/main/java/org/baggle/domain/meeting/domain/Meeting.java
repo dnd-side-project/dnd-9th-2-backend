@@ -2,6 +2,7 @@ package org.baggle.domain.meeting.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.baggle.domain.user.domain.User;
 import org.baggle.global.common.BaseTimeEntity;
 
 import java.time.LocalDate;
@@ -19,7 +20,8 @@ public class Meeting extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "meeting_id")
     private Long id;
-    @OneToMany(mappedBy = "meeting")
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Participation> participations = new ArrayList<>();
     @Column(nullable = false)
     private String title;
@@ -31,6 +33,21 @@ public class Meeting extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private MeetingStatus meetingStatus;
 
+    public static Meeting createMeeting(User user, String title, String place, LocalDate date, LocalTime time, String memo) {
+        Meeting meeting = Meeting.builder()
+                .title(title)
+                .place(place)
+                .date(date)
+                .time(time)
+                .memo(memo)
+                .meetingStatus(MeetingStatus.SCHEDULED)
+                .build();
+        Participation participation = Participation.createParticipation();
+        participation.changeUser(user);
+        participation.changeMeeting(meeting);
+        return meeting;
+    }
+
     public void updateTitleAndPlaceAndDateAndTimeAndMemo(String title, String place, LocalDate date, LocalTime time, String memo) {
         this.title = (title != null) ? title : this.title;
         this.place = (place != null) ? place : this.place;
@@ -39,13 +56,15 @@ public class Meeting extends BaseTimeEntity {
         this.memo = (memo != null) ? memo : this.place;
     }
 
-    public void updateMeetingStatusIntoConfirmation(){
+    public void updateMeetingStatusIntoConfirmation() {
         this.meetingStatus = MeetingStatus.CONFIRMATION;
     }
-    public void updateMeetingStatusIntoOngoing(){
+
+    public void updateMeetingStatusIntoOngoing() {
         this.meetingStatus = MeetingStatus.ONGOING;
     }
-    public void updateMeetingStatusIntoTermination(){
+
+    public void updateMeetingStatusIntoTermination() {
         this.meetingStatus = MeetingStatus.TERMINATION;
     }
 }

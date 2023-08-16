@@ -1,7 +1,7 @@
 package org.baggle.domain.meeting.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.baggle.domain.meeting.dto.request.ParticipationReqeustDto;
+import org.baggle.domain.meeting.dto.request.ParticipationRequestDto;
 import org.baggle.domain.meeting.dto.response.ParticipationAvailabilityResponseDto;
 import org.baggle.domain.meeting.service.ParticipationService;
 import org.baggle.global.common.BaseResponse;
@@ -26,7 +26,7 @@ public class ParticipationApiController {
 
     @PostMapping("/participation")
     public ResponseEntity<BaseResponse<?>> createParticipation(@UserId final Long userId,
-                                                               @RequestBody final ParticipationReqeustDto requestDto) {
+                                                               @RequestBody final ParticipationRequestDto requestDto) {
         participationService.createParticipation(userId, requestDto);
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, true));
     }

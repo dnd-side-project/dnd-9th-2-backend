@@ -4,14 +4,13 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.baggle.domain.fcm.domain.FcmTimer;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.domain.MeetingStatus;
-import org.baggle.domain.meeting.service.MeetingService;
+import org.baggle.domain.meeting.service.MeetingDetailService;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -32,7 +31,7 @@ import java.util.List;
 @EnableAsync
 @RequiredArgsConstructor
 public class NotificationScheduler {
-    private final MeetingService meetingService;
+    private final MeetingDetailService meetingDetailService;
     private final FcmNotificationService fcmNotificationService;
     private final FcmTimerRepository fcmTimerRepository;
 
@@ -45,7 +44,7 @@ public class NotificationScheduler {
     @Scheduled(cron = "0 * * * * *")
     public void notificationScheduleTask() throws FirebaseMessagingException {
         LocalDateTime now = LocalDateTime.now();
-        List<Meeting> notificationMeeting = meetingService.findMeetingsInRange(now, 59, 60);
+        List<Meeting> notificationMeeting = meetingDetailService.findMeetingsInRange(now, 59, 60);
         for (Meeting m : notificationMeeting) {
             if (m.getMeetingStatus() != MeetingStatus.SCHEDULED) continue;
             m.updateMeetingStatusIntoConfirmation();
