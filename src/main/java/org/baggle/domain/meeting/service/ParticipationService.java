@@ -2,7 +2,7 @@ package org.baggle.domain.meeting.service;
 
 import lombok.RequiredArgsConstructor;
 import org.baggle.domain.meeting.domain.*;
-import org.baggle.domain.meeting.dto.request.ParticipationReqeustDto;
+import org.baggle.domain.meeting.dto.request.ParticipationRequestDto;
 import org.baggle.domain.meeting.dto.response.ParticipationAvailabilityResponseDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
@@ -25,10 +25,10 @@ import static org.baggle.global.error.exception.ErrorCode.*;
 @Transactional
 @Service
 public class ParticipationService {
-    private final MeetingRepository meetingRepository;
-    private final ParticipationRepository participationRepository;
     private final MeetingDetailService meetingDetailService;
     private final UserRepository userRepository;
+    private final MeetingRepository meetingRepository;
+    private final ParticipationRepository participationRepository;
 
     /**
      * 현재 모임에 참여 여부를 판단하는 메서드.
@@ -49,8 +49,8 @@ public class ParticipationService {
     /**
      * 모임 참여 메서드
      */
-    public void createParticipation(Long userId, ParticipationReqeustDto reqeustDto) {
-        Meeting meeting = getMeeting(reqeustDto.getMeetingId());
+    public void createParticipation(Long userId, ParticipationRequestDto requestDto) {
+        Meeting meeting = getMeeting(requestDto.getMeetingId());
         User user = getUser(userId);
         Participation participation = Participation.createParticipationWithoutFeed(user, meeting, MeetingAuthority.PARTICIPATION, ParticipationMeetingStatus.PARTICIPATING, ButtonAuthority.NON_OWNER);
         validateMeetingStatus(meeting);
@@ -81,10 +81,10 @@ public class ParticipationService {
     }
 
     private void duplicateParticipation(List<Participation> participations, Long userId) {
-        boolean isDupilcate = participations.stream()
+        boolean isDuplicate = participations.stream()
                 .anyMatch(participation ->
                         Objects.equals(participation.getUser().getId(), userId));
-        if (isDupilcate)
+        if (isDuplicate)
             throw new ConflictException(DUPLICATE_PARTICIPATION);
     }
 
@@ -92,6 +92,4 @@ public class ParticipationService {
         if (meeting.getParticipations().size() == 6)
             throw new ForbiddenException(INVALID_MEETING_CAPACITY);
     }
-
-
 }
