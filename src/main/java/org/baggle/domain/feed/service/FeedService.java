@@ -69,7 +69,6 @@ public class FeedService {
     public FeedNotificationResponseDto uploadNotification(Long requestId, LocalDateTime authorizationTime) {
         Participation participation = getParticipation(requestId);
         validateMeetingStatusForConfirmation(participation.getMeeting());
-        validateNotificationTime(participation.getMeeting(), authorizationTime);
         validateButtonOwner(participation);
 //        broadcastNotification(participation.getMeeting());
         // 이벤트 로직 5분 타이머를 시작하는 code 입니다.
@@ -106,13 +105,6 @@ public class FeedService {
         Optional<Feed> feed = feedRepository.findByParticipationId(participation.getId());
         if (feed.isPresent())
             throw new ConflictException(DUPLICATE_FEED);
-    }
-
-    private void validateNotificationTime(Meeting meeting, LocalDateTime authorizationTime) {
-        LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
-        Duration duration = Duration.between(authorizationTime, meetingTime);
-        if (!(0 <= duration.toSeconds() && duration.toSeconds() <= 1800))
-            throw new InvalidValueException(INVALID_CERTIFICATION_TIME);
     }
 
     private void broadcastNotification(Meeting meeting) {
