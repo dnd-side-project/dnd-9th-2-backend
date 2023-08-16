@@ -22,9 +22,9 @@ public class FeedApiController {
     private final FeedService feedService;
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<BaseResponse<?>> createFeedUpload(@RequestPart final FeedUploadRequestDto uploadInfo,
+    public ResponseEntity<BaseResponse<?>> createFeedUpload(@RequestPart final FeedUploadRequestDto memberInfo,
                                                             @RequestPart final MultipartFile feedImage) {
-        final FeedUploadResponseDto responseDto = feedService.feedUpload(uploadInfo, feedImage);
+        final FeedUploadResponseDto responseDto = feedService.feedUpload(memberInfo, feedImage);
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, responseDto));
     }
 

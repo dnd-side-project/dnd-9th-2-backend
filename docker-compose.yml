@@ -7,6 +7,8 @@ services:
       - 8080
     ports:
       - 8081:8080
+    environment:
+      - TZ=Asia/Seoul
   green:
     container_name: green
     image: kingzzangssang/blue-green
@@ -14,3 +16,5 @@ services:
       - 8080
     ports:
       - 8082:8080
+    environment:
+      - TZ=Asia/Seoul

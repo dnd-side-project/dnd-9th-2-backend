@@ -7,10 +7,12 @@ import lombok.Getter;
 @Getter
 public class FeedUploadResponseDto {
     private Long feedId;
+    private String feedUrl;
 
-    public static FeedUploadResponseDto of(Long feedId) {
+    public static FeedUploadResponseDto of(Long feedId, String feedUrl) {
         return FeedUploadResponseDto.builder()
                 .feedId(feedId)
+                .feedUrl(feedUrl)
                 .build();
     }
 }
