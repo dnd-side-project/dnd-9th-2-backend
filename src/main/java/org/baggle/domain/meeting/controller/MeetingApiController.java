@@ -25,7 +25,7 @@ public class MeetingApiController {
     public ResponseEntity<BaseResponse<?>> createMeeting(@UserId final Long userId,
                                                          @RequestBody final CreateMeetingRequestDto createMeetingRequestDto) {
         meetingService.createMeeting(userId, createMeetingRequestDto);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, true));
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, null));
     }
 
     @GetMapping("/detail")
