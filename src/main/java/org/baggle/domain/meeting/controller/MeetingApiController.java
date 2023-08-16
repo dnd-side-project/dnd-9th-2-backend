@@ -3,6 +3,7 @@ package org.baggle.domain.meeting.controller;
 import lombok.RequiredArgsConstructor;
 import org.baggle.domain.meeting.dto.request.CreateMeetingRequestDto;
 import org.baggle.domain.meeting.dto.request.UpdateMeetingInfoRequestDto;
+import org.baggle.domain.meeting.dto.response.CreateMeetingResponseDto;
 import org.baggle.domain.meeting.dto.response.MeetingDetailResponseDto;
 import org.baggle.domain.meeting.dto.response.UpdateMeetingInfoResponseDto;
 import org.baggle.domain.meeting.service.MeetingDetailService;
@@ -24,8 +25,8 @@ public class MeetingApiController {
     @PostMapping
     public ResponseEntity<BaseResponse<?>> createMeeting(@UserId final Long userId,
                                                          @RequestBody final CreateMeetingRequestDto createMeetingRequestDto) {
-        meetingService.createMeeting(userId, createMeetingRequestDto);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, null));
+        final CreateMeetingResponseDto createMeetingResponseDto = meetingService.createMeeting(userId, createMeetingRequestDto);
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, createMeetingResponseDto));
     }
 
     @GetMapping("/detail")
