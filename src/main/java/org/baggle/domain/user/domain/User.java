@@ -23,6 +23,7 @@ public class User extends BaseTimeEntity {
     private String profileImageUrl;
     private String nickname;
     @OneToMany(mappedBy = "user")
+    @Builder.Default
     private List<Participation> participations = new ArrayList<>();
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private FcmToken fcmToken;
