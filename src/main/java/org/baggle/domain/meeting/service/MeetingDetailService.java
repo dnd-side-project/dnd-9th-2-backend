@@ -42,7 +42,7 @@ public class MeetingDetailService {
      */
     public MeetingDetailResponseDto findMeetingDetail(Long userId, Long requestId) {
         Meeting meeting = getMeeting(requestId);
-        validateParticition(meeting, userId);
+        validateParticipation(meeting, userId);
         FcmTimer certificationTime = getFcmTimer(requestId);
         List<Participation> participations = meeting.getParticipations();
         List<ParticipationDetailResponseDto> participationDetails = ParticipationDetailResponseDto.listOf(participations);
@@ -104,10 +104,10 @@ public class MeetingDetailService {
         return duration.toSeconds();
     }
 
-    private void validateParticition(Meeting meeting, Long userId) {
-        boolean isvalidParticipation = meeting.getParticipations().stream()
+    private void validateParticipation(Meeting meeting, Long userId) {
+        boolean isValidParticipation = meeting.getParticipations().stream()
                 .anyMatch(participation -> participation.getUser().getId() == userId);
-        if (!isvalidParticipation)
+        if (!isValidParticipation)
             throw new InvalidValueException(INVALID_MEETING_PARTICIPATION);
     }
 
