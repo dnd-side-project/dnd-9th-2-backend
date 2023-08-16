@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ParticipationReqeustDto {
+public class ParticipationRequestDto {
     private Long meetingId;
 }
