@@ -27,7 +27,7 @@ import static org.baggle.global.error.exception.ErrorCode.*;
 public class ParticipationService {
     private final MeetingRepository meetingRepository;
     private final ParticipationRepository participationRepository;
-    private final MeetingService meetingService;
+    private final MeetingDetailService meetingDetailService;
     private final UserRepository userRepository;
 
     /**
@@ -77,7 +77,7 @@ public class ParticipationService {
 
     private void validateMeetingTime(Long userId, Meeting meeting) {
         LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
-        meetingService.isMeetingInDeadline(meeting.getId(), userId, meetingTime);
+        meetingDetailService.isMeetingInDeadline(meeting.getId(), userId, meetingTime);
     }
 
     private void duplicateParticipation(List<Participation> participations, Long userId) {

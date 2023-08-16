@@ -31,7 +31,7 @@ import static org.baggle.global.error.exception.ErrorCode.*;
 @RequiredArgsConstructor
 @Transactional
 @Service
-public class MeetingService {
+public class MeetingDetailService {
     private final MeetingRepository meetingRepository;
     private final ParticipationRepository participationRepository;
     private final FcmTimerRepository fcmTimerRepository;
