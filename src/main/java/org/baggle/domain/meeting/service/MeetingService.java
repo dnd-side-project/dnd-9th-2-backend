@@ -3,6 +3,7 @@ package org.baggle.domain.meeting.service;
 import lombok.RequiredArgsConstructor;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.dto.request.CreateMeetingRequestDto;
+import org.baggle.domain.meeting.dto.response.CreateMeetingResponseDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.user.domain.User;
 import org.baggle.domain.user.repository.UserRepository;
@@ -25,11 +26,12 @@ public class MeetingService {
     private final UserRepository userRepository;
     private final MeetingRepository meetingRepository;
 
-    public void createMeeting(Long userId, CreateMeetingRequestDto createMeetingRequestDto) {
+    public CreateMeetingResponseDto createMeeting(Long userId, CreateMeetingRequestDto createMeetingRequestDto) {
         User findUser = getUser(userId);
         validateCreateMeeting(findUser.getId(), createMeetingRequestDto.getMeetingTime());
         Meeting meeting = createMeetingAndParticipationWithUser(findUser, createMeetingRequestDto);
-        meetingRepository.save(meeting);
+        Meeting savedMeeting = meetingRepository.save(meeting);
+        return CreateMeetingResponseDto.of(savedMeeting.getId());
     }
 
     private User getUser(Long userId) {
