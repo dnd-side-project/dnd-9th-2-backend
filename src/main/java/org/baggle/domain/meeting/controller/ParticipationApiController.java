@@ -28,6 +28,6 @@ public class ParticipationApiController {
     public ResponseEntity<BaseResponse<?>> createParticipation(@UserId final Long userId,
                                                                @RequestBody final ParticipationRequestDto requestDto) {
         participationService.createParticipation(userId, requestDto);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, true));
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, null));
     }
 }
