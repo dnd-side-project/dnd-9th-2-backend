@@ -48,6 +48,7 @@ public enum ErrorCode {
     INVALID_MODIFY_TIME(HttpStatus.FORBIDDEN, "모임 정보 수정 가능한 시간이 아닙니다."),
     INVALID_MEETING_CAPACITY(HttpStatus.FORBIDDEN, "모임 인원이 초과됐습니다."),
     NOT_MATCH_BUTTON_OWNER(HttpStatus.FORBIDDEN, "긴급 버튼 할당자가 아닙니다."),
+    INVALID_CREATE_MEETING(HttpStatus.FORBIDDEN, "모임은 하루에 2개까지만 생성 가능합니다."),
 
     /**
      * 404 Not Found
