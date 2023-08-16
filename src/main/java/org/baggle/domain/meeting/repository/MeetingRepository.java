@@ -20,4 +20,9 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
             "WHERE STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s') BETWEEN :from AND :to " +
             "AND p.user.id = :userId")
     List<Meeting> findMeetingsWithinTimeRange(@Param("userId") Long userId, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+    @Query("SELECT count(m) FROM Meeting m " +
+            "JOIN Participation p on m = p.meeting " +
+            "WHERE m.date = :date AND p.user.id = :userId")
+    Long countMeetingWithinDate(@Param("userId") Long userId, @Param("date") LocalDate date);
 }
