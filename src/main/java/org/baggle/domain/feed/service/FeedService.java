@@ -11,6 +11,7 @@ import org.baggle.domain.feed.dto.request.FeedUploadRequestDto;
 import org.baggle.domain.feed.dto.response.FeedNotificationResponseDto;
 import org.baggle.domain.feed.dto.response.FeedUploadResponseDto;
 import org.baggle.domain.feed.repository.FeedRepository;
+import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.domain.Participation;
@@ -19,6 +20,7 @@ import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.baggle.global.common.ImageType;
 import org.baggle.global.error.exception.ConflictException;
 import org.baggle.global.error.exception.EntityNotFoundException;
+import org.baggle.global.error.exception.ForbiddenException;
 import org.baggle.global.error.exception.InvalidValueException;
 import org.baggle.infra.s3.S3Provider;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,6 @@ public class FeedService {
     private final FeedRepository feedRepository;
     private final S3Provider s3Provider;
     private final FcmNotificationService fcmNotificationService;
-    private final FcmTimerRepository fcmTimerRepository;
     private final FcmRepository fcmRepository;
     private final MeetingRepository meetingRepository;
 
@@ -67,8 +68,9 @@ public class FeedService {
      */
     public FeedNotificationResponseDto uploadNotification(Long requestId, LocalDateTime authorizationTime) {
         Participation participation = getParticipation(requestId);
-        validateMeetingStatusForScheduled(participation.getMeeting());
+        validateMeetingStatusForConfirmation(participation.getMeeting());
         validateNotificationTime(participation.getMeeting(), authorizationTime);
+        validateButtonOwner(participation);
 //        broadcastNotification(participation.getMeeting());
         // 이벤트 로직 5분 타이머를 시작하는 code 입니다.
         startEmergencyNotificationEvent(participation, authorizationTime);
@@ -85,7 +87,12 @@ public class FeedService {
                 .orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
     }
 
-    private void validateMeetingStatusForScheduled(Meeting meeting) {
+    private void validateButtonOwner(Participation participation){
+        if(participation.getButtonAuthority() != ButtonAuthority.OWNER)
+            throw new ForbiddenException(NOT_MATCH_BUTTON_OWNER);
+    }
+
+    private void validateMeetingStatusForConfirmation(Meeting meeting) {
         if (meeting.getMeetingStatus() != MeetingStatus.CONFIRMATION)
             throw new InvalidValueException(INVALID_MEETING_TIME);
     }
