@@ -34,14 +34,7 @@ public class Meeting extends BaseTimeEntity {
     private MeetingStatus meetingStatus;
 
     public static Meeting createMeeting(User user, String title, String place, LocalDate date, LocalTime time, String memo) {
-        Meeting meeting = Meeting.builder()
-                .title(title)
-                .place(place)
-                .date(date)
-                .time(time)
-                .memo(memo)
-                .meetingStatus(MeetingStatus.SCHEDULED)
-                .build();
+        Meeting meeting = Meeting.builder().title(title).place(place).date(date).time(time).memo(memo).meetingStatus(MeetingStatus.SCHEDULED).build();
         Participation participation = Participation.createParticipation();
         participation.changeUser(user);
         participation.changeMeeting(meeting);
@@ -66,5 +59,14 @@ public class Meeting extends BaseTimeEntity {
 
     public void updateMeetingStatusIntoTermination() {
         this.meetingStatus = MeetingStatus.TERMINATION;
+    }
+
+    public void updateParticipationList(Participation newParticipation) {
+        this.participations.forEach(participation -> participation.updateButtonAuthority(ButtonAuthority.NON_OWNER));
+        this.participations.add(newParticipation);
+    }
+
+    public void updateButtonAuthorityOfParticipationList(int randomNumber) {
+        this.getParticipations().get(randomNumber).updateButtonAuthority(ButtonAuthority.OWNER);
     }
 }
