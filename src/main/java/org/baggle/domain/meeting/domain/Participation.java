@@ -49,7 +49,8 @@ public class Participation extends BaseTimeEntity {
                 .buttonAuthority(ButtonAuthority.NON_OWNER)
                 .meetingAuthority(MeetingAuthority.PARTICIPATION)
                 .build();
-        meeting.updateParticipationList(participation);
+        meeting.initButtonAuthorityOfParticipationList();
+        meeting.addParticipation(participation);
         return participation;
     }
 
