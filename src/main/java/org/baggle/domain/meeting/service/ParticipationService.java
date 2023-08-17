@@ -1,7 +1,10 @@
 package org.baggle.domain.meeting.service;
 
 import lombok.RequiredArgsConstructor;
-import org.baggle.domain.meeting.domain.*;
+import org.baggle.domain.meeting.domain.ButtonAuthority;
+import org.baggle.domain.meeting.domain.Meeting;
+import org.baggle.domain.meeting.domain.MeetingStatus;
+import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.domain.meeting.dto.request.ParticipationRequestDto;
 import org.baggle.domain.meeting.dto.response.ParticipationAvailabilityResponseDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import static org.baggle.global.error.exception.ErrorCode.*;
 
@@ -52,11 +56,11 @@ public class ParticipationService {
     public void createParticipation(Long userId, ParticipationRequestDto requestDto) {
         Meeting meeting = getMeeting(requestDto.getMeetingId());
         User user = getUser(userId);
-        Participation participation = Participation.createParticipationWithoutFeed(user, meeting, MeetingAuthority.PARTICIPATION, ParticipationMeetingStatus.PARTICIPATING, ButtonAuthority.NON_OWNER);
         validateMeetingStatus(meeting);
         validateMeetingTime(userId, meeting);
         duplicateParticipation(meeting.getParticipations(), userId);
         validateMeetingCapacity(meeting);
+        Participation participation = createParticipationWithRandomButtonAuthority(user, meeting);
         participationRepository.save(participation);
     }
 
@@ -91,5 +95,17 @@ public class ParticipationService {
     private void validateMeetingCapacity(Meeting meeting) {
         if (meeting.getParticipations().size() == 6)
             throw new ForbiddenException(INVALID_MEETING_CAPACITY);
+    }
+
+    private Participation createParticipationWithRandomButtonAuthority(User user, Meeting meeting) {
+        Participation participation = Participation.createParticipationWithoutFeed(user, meeting);
+        updateButtonAuthorityWithRandomNumber(meeting);
+        return participation;
+    }
+
+    private void updateButtonAuthorityWithRandomNumber(Meeting meeting) {
+        int randomNumber = new Random().nextInt(meeting.getParticipations().size());
+        Participation randomNumberParticipation = meeting.getRandomNumberParticipation(randomNumber);
+        randomNumberParticipation.updateButtonAuthority(ButtonAuthority.OWNER);
     }
 }

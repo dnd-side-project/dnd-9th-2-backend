@@ -41,14 +41,17 @@ public class Participation extends BaseTimeEntity {
                 .build();
     }
 
-    public static Participation createParticipationWithoutFeed(User user, Meeting meeting, MeetingAuthority meetingAuthority, ParticipationMeetingStatus participationMeetingStatus, ButtonAuthority buttonAuthority) {
-        return Participation.builder()
+    public static Participation createParticipationWithoutFeed(User user, Meeting meeting) {
+        Participation participation = Participation.builder()
                 .user(user)
                 .meeting(meeting)
-                .participationMeetingStatus(participationMeetingStatus)
-                .buttonAuthority(buttonAuthority)
-                .meetingAuthority(meetingAuthority)
+                .participationMeetingStatus(ParticipationMeetingStatus.PARTICIPATING)
+                .buttonAuthority(ButtonAuthority.NON_OWNER)
+                .meetingAuthority(MeetingAuthority.PARTICIPATION)
                 .build();
+        meeting.initButtonAuthorityOfParticipationList();
+        meeting.addParticipation(participation);
+        return participation;
     }
 
     public void changeUser(User user) {
@@ -59,5 +62,9 @@ public class Participation extends BaseTimeEntity {
     public void changeMeeting(Meeting meeting) {
         this.meeting = meeting;
         meeting.getParticipations().add(this);
+    }
+
+    public void updateButtonAuthority(ButtonAuthority buttonAuthority) {
+        this.buttonAuthority = buttonAuthority;
     }
 }

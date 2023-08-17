@@ -67,4 +67,16 @@ public class Meeting extends BaseTimeEntity {
     public void updateMeetingStatusIntoTermination() {
         this.meetingStatus = MeetingStatus.TERMINATION;
     }
+
+    public void initButtonAuthorityOfParticipationList() {
+        this.participations.forEach(participation -> participation.updateButtonAuthority(ButtonAuthority.NON_OWNER));
+    }
+
+    public void addParticipation(Participation newParticipation) {
+        this.participations.add(newParticipation);
+    }
+
+    public Participation getRandomNumberParticipation(int randomNumber) {
+        return getParticipations().get(randomNumber);
+    }
 }
