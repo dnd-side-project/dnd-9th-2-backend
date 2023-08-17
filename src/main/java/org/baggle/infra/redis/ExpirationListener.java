@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmToken;
+import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
+import org.baggle.domain.fcm.service.FcmNotificationProvider;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.fcm.service.FcmService;
 import org.baggle.domain.meeting.domain.Meeting;
@@ -25,6 +27,7 @@ public class ExpirationListener implements MessageListener {
     private final FcmNotificationService fcmNotificationService;
     private final FcmService fcmService;
     private final MeetingRepository meetingRepository;
+    private final FcmNotificationProvider fcmNotificationProvider;
 
     /**
      * cache가 만료되었을 때 실행되는 메서드입니다.
@@ -39,7 +42,7 @@ public class ExpirationListener implements MessageListener {
         String title = getNotificationTitle(parts[0]);
         String body = getNotificationBody(parts[0]);
         List<FcmToken> fcmTokens = getFcmTokens(Long.parseLong(parts[1]));
-        // fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(fcmTokens, title, body));
+        fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(fcmTokens, title, body));
         log.info("########## onMessage message " + message.toString());
     }
 
@@ -83,14 +86,14 @@ public class ExpirationListener implements MessageListener {
 
     private String getNotificationTitle(String dateType) {
         if (getRedisDataType(dateType) == RedisDataType.FCM_NOTIFICATION)
-            return "긴급소집!!";
-        return "긴급소집 종료";
+            return fcmNotificationProvider.getEmergencyNotificationTitle();
+        return fcmNotificationProvider.getTerminationNotificationTitle();
     }
 
     private String getNotificationBody(String dateType) {
         if (getRedisDataType(dateType) == RedisDataType.FCM_NOTIFICATION)
-            return "지금 당장 사진을 인증하세요!!";
-        return "긴급 소집이 종료되었습니다. 사진을 확인하세요!";
+            return fcmNotificationProvider.getEmergencyNotificationBody();
+        return fcmNotificationProvider.getTerminationNotificationBody();
     }
 
 }
