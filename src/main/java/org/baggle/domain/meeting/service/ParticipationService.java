@@ -1,6 +1,7 @@
 package org.baggle.domain.meeting.service;
 
 import lombok.RequiredArgsConstructor;
+import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.domain.Participation;
@@ -104,6 +105,7 @@ public class ParticipationService {
 
     private void updateButtonAuthorityWithRandomNumber(Meeting meeting) {
         int randomNumber = new Random().nextInt(meeting.getParticipations().size());
-        meeting.updateButtonAuthorityOfParticipationList(randomNumber);
+        Participation randomNumberParticipation = meeting.getRandomNumberParticipation(randomNumber);
+        randomNumberParticipation.updateButtonAuthority(ButtonAuthority.OWNER);
     }
 }
