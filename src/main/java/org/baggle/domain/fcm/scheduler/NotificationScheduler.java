@@ -71,7 +71,7 @@ public class NotificationScheduler {
 
     private void sendNotificationByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority){
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting, buttonAuthority);
-        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto);
+        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
     }
 
     private String getNotificationTitleWithButtonAuthority(ButtonAuthority buttonAuthority){

@@ -52,10 +52,10 @@ public class FcmNotificationService {
         return participationRepository.findFcmTokensByMeetingAndButtonAuthority(meeting, buttonAuthority);
     }
 
-    public void sendNotificationByToken(FcmNotificationRequestDto fcmNotificationRequestDto) {
+    public void sendNotificationByToken(FcmNotificationRequestDto fcmNotificationRequestDto, Long meetingId) {
         for (FcmToken fcmToken : fcmNotificationRequestDto.getTargetTokenList()) {
             Notification notification = createNotification(fcmNotificationRequestDto.getTitle(), fcmNotificationRequestDto.getBody());
-            Message message = createMessage(notification, fcmToken);
+            Message message = createMessage(notification, fcmToken, meetingId);
             sendNotification(message);
         }
     }
@@ -68,9 +68,10 @@ public class FcmNotificationService {
                 .build();
     }
 
-    private Message createMessage(Notification notification, FcmToken fcmToken) {
+    private Message createMessage(Notification notification, FcmToken fcmToken, Long meetingId) {
         return Message.builder()
                 .setToken(fcmToken.getFcmToken())
+                .putData("meetingId", meetingId.toString())
                 .setNotification(notification)
                 .build();
     }

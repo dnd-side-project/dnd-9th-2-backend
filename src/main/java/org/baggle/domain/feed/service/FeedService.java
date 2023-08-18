@@ -89,6 +89,13 @@ public class FeedService {
                 .orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
     }
 
+    private FcmNotificationRequestDto createFcmNotificationRequestDto(Long meetingId){
+        List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meetingId);
+        String title = fcmNotificationProvider.getEmergencyNotificationTitle();
+        String body = fcmNotificationProvider.getEmergencyNotificationBody();
+        return FcmNotificationRequestDto.of(fcmTokens, title, body);
+    }
+
     private void validateButtonOwner(Participation participation){
         if(participation.getButtonAuthority() != ButtonAuthority.OWNER)
             throw new ForbiddenException(NOT_MATCH_BUTTON_OWNER);
@@ -111,10 +118,8 @@ public class FeedService {
     }
 
     private void broadcastNotification(Meeting meeting) {
-        List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meeting.getId());
-        String title = fcmNotificationProvider.getEmergencyNotificationTitle();
-        String body = fcmNotificationProvider.getEmergencyNotificationBody();
-        fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(fcmTokens, title, body));
+        FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting.getId());
+        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
     }
 
     private void startEmergencyNotificationEvent(Participation participation, LocalDateTime authorizationTime) {

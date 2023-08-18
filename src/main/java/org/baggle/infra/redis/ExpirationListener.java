@@ -39,10 +39,8 @@ public class ExpirationListener implements MessageListener {
         if (!validateRedisDataType(parts[0])) return;
         createEmergencyTimerWithRedisDataAndMeetingId(parts[0], Long.parseLong(parts[1]));
         updateMeetingStatus(Long.parseLong(parts[1]), parts[0]);
-        String title = getNotificationTitle(parts[0]);
-        String body = getNotificationBody(parts[0]);
-        List<FcmToken> fcmTokens = getFcmTokens(Long.parseLong(parts[1]));
-        fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(fcmTokens, title, body));
+        FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(parts[0], Long.parseLong(parts[1]));
+        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, Long.parseLong(parts[1]));
         log.info("########## onMessage message " + message.toString());
     }
 
@@ -53,6 +51,13 @@ public class ExpirationListener implements MessageListener {
 
     private List<FcmToken> getFcmTokens(Long meetingId) {
         return fcmService.findFcmTokens(meetingId);
+    }
+
+    private FcmNotificationRequestDto createFcmNotificationRequestDto(String dataType, Long meetingId){
+        List<FcmToken> fcmTokens = getFcmTokens(meetingId);
+        String title = getNotificationTitle(dataType);
+        String body = getNotificationBody(dataType);
+        return FcmNotificationRequestDto.of(fcmTokens, title, body);
     }
 
     private boolean validateRedisDataType(String dataType) {
