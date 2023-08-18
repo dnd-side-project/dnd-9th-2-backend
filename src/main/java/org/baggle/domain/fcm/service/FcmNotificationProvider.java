@@ -12,28 +12,36 @@ import java.util.Locale;
 @Component
 public class FcmNotificationProvider {
     private final MessageSource messageSource;
-    public String getEmergencyNotificationTitle(){
+
+    public String getEmergencyNotificationTitle() {
         return messageSource.getMessage("emergency.notification.title", null, Locale.KOREA);
     }
-    public String getEmergencyNotificationBody(){
+
+    public String getEmergencyNotificationBody() {
         return messageSource.getMessage("emergency.notification.body", null, Locale.KOREA);
     }
-    public String getConfirmationNotificationTitle(){
+
+    public String getConfirmationNotificationTitle() {
         return messageSource.getMessage("confirmation.notification.title", null, Locale.KOREA);
     }
-    public String getConfirmationNotificationBody(){
+
+    public String getConfirmationNotificationBody() {
         return messageSource.getMessage("confirmation.notification.body", null, Locale.KOREA);
     }
-    public String getButtonOwnerNotificationTitle(){
+
+    public String getButtonOwnerNotificationTitle() {
         return messageSource.getMessage("button.owner.notification.title", null, Locale.KOREA);
     }
-    public String getButtonOwnerNotificationBody(){
+
+    public String getButtonOwnerNotificationBody() {
         return messageSource.getMessage("button.owner.notification.body", null, Locale.KOREA);
     }
-    public String getTerminationNotificationTitle(){
+
+    public String getTerminationNotificationTitle() {
         return messageSource.getMessage("termination.notification.title", null, Locale.KOREA);
     }
-    public String getTerminationNotificationBody(){
+
+    public String getTerminationNotificationBody() {
         return messageSource.getMessage("termination.notification.body", null, Locale.KOREA);
     }
 }
