@@ -5,12 +5,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmToken;
+import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
+import org.baggle.domain.fcm.service.FcmNotificationProvider;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.service.MeetingDetailService;
+import org.springframework.context.MessageSource;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -33,7 +36,7 @@ import java.util.List;
 public class NotificationScheduler {
     private final MeetingDetailService meetingDetailService;
     private final FcmNotificationService fcmNotificationService;
-    private final FcmTimerRepository fcmTimerRepository;
+    private final FcmNotificationProvider fcmNotificationProvider;
 
     /**
      * 시작 1시간 전 모임을 찾아 알람을 전송하는 메서드
@@ -42,19 +45,45 @@ public class NotificationScheduler {
      */
     @Transactional
     @Scheduled(cron = "0 * * * * *")
-    public void notificationScheduleTask() throws FirebaseMessagingException {
+    public void notificationScheduleTask() {
         LocalDateTime now = LocalDateTime.now();
-        List<Meeting> notificationMeeting = meetingDetailService.findMeetingsInRange(now, 59, 60);
+        List<Meeting> notificationMeeting = meetingDetailService.findMeetingsInRange(now, 58, 60);
         for (Meeting m : notificationMeeting) {
             if (m.getMeetingStatus() != MeetingStatus.SCHEDULED) continue;
             m.updateMeetingStatusIntoConfirmation();
-            List<FcmToken> ownerFcmTokens = fcmNotificationService.findFcmTokensByButtonAuthority(m, ButtonAuthority.OWNER);
-            List<FcmToken> nonOwnerFcmTokens = fcmNotificationService.findFcmTokensByButtonAuthority(m, ButtonAuthority.NON_OWNER);
-//            fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(ownerFcmTokens, "", ""));
-//            fcmNotificationService.sendNotificationByToken(FcmNotificationRequestDto.of(nonOwnerFcmTokens, "", ""));
+            sendNotificationByButtonAuthority(m, ButtonAuthority.OWNER);
+            sendNotificationByButtonAuthority(m, ButtonAuthority.NON_OWNER);
             fcmNotificationService.createFcmNotification(m.getId());
             log.info("meeting information - ID {}, date {}, time {}", m.getId(), m.getDate(), m.getTime());
         }
+    }
+
+    private List<FcmToken> getFcmTokens(Meeting meeting, ButtonAuthority buttonAuthority){
+        return fcmNotificationService.findFcmTokensByButtonAuthority(meeting, buttonAuthority);
+    }
+
+    private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting, ButtonAuthority buttonAuthority){
+        List<FcmToken> fcmTokens = getFcmTokens(meeting, buttonAuthority);
+        String title = getNotificationTitleWithButtonAuthority(buttonAuthority);
+        String body = getNotificationBodyWithButtonAuthority(buttonAuthority);
+        return FcmNotificationRequestDto.of(fcmTokens, title, body);
+    }
+
+    private void sendNotificationByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority){
+        FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting, buttonAuthority);
+        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+    }
+
+    private String getNotificationTitleWithButtonAuthority(ButtonAuthority buttonAuthority){
+        if(buttonAuthority == ButtonAuthority.OWNER)
+            return fcmNotificationProvider.getButtonOwnerNotificationTitle();
+        return fcmNotificationProvider.getConfirmationNotificationTitle();
+    }
+
+    private String getNotificationBodyWithButtonAuthority(ButtonAuthority buttonAuthority){
+        if(buttonAuthority == ButtonAuthority.OWNER)
+            return fcmNotificationProvider.getButtonOwnerNotificationBody();
+        return fcmNotificationProvider.getConfirmationNotificationBody();
     }
 
 }

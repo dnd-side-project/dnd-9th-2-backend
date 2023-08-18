@@ -5,6 +5,7 @@ import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
 import org.baggle.domain.fcm.repository.FcmRepository;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
+import org.baggle.domain.fcm.service.FcmNotificationProvider;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.feed.domain.Feed;
 import org.baggle.domain.feed.dto.request.FeedUploadRequestDto;
@@ -17,12 +18,14 @@ import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
+import org.baggle.domain.user.domain.User;
 import org.baggle.global.common.ImageType;
 import org.baggle.global.error.exception.ConflictException;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.ForbiddenException;
 import org.baggle.global.error.exception.InvalidValueException;
 import org.baggle.infra.s3.S3Provider;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +47,7 @@ public class FeedService {
     private final FcmNotificationService fcmNotificationService;
     private final FcmRepository fcmRepository;
     private final MeetingRepository meetingRepository;
+    private final FcmNotificationProvider fcmNotificationProvider;
 
     /**
      * 피드를 업로드하는 메서드입니다.
@@ -70,8 +74,7 @@ public class FeedService {
         Participation participation = getParticipation(requestId);
         validateMeetingStatusForConfirmation(participation.getMeeting());
         validateButtonOwner(participation);
-//        broadcastNotification(participation.getMeeting());
-        // 이벤트 로직 5분 타이머를 시작하는 code 입니다.
+        broadcastNotification(participation.getMeeting());
         startEmergencyNotificationEvent(participation, authorizationTime);
         return FeedNotificationResponseDto.of(participation.getMeeting(), authorizationTime);
     }
@@ -84,6 +87,13 @@ public class FeedService {
     private Participation getParticipation(Long participationId) {
         return participationRepository.findById(participationId)
                 .orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
+    }
+
+    private FcmNotificationRequestDto createFcmNotificationRequestDto(Long meetingId){
+        List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meetingId);
+        String title = fcmNotificationProvider.getEmergencyNotificationTitle();
+        String body = fcmNotificationProvider.getEmergencyNotificationBody();
+        return FcmNotificationRequestDto.of(fcmTokens, title, body);
     }
 
     private void validateButtonOwner(Participation participation){
@@ -108,9 +118,8 @@ public class FeedService {
     }
 
     private void broadcastNotification(Meeting meeting) {
-        List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meeting.getId());
-        FcmNotificationRequestDto fcmNotificationRequestDto = FcmNotificationRequestDto.of(fcmTokens, "", "");
-        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto);
+        FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting.getId());
+        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
     }
 
     private void startEmergencyNotificationEvent(Participation participation, LocalDateTime authorizationTime) {

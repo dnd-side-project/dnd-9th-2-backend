@@ -12,7 +12,6 @@ import org.baggle.domain.fcm.domain.FcmTimer;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
 import org.baggle.domain.fcm.repository.FcmNotificationRepository;
-import org.baggle.domain.fcm.repository.FcmRepository;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
@@ -29,7 +28,6 @@ import java.util.List;
 @Service
 public class FcmNotificationService {
     private final FirebaseMessaging firebaseMessaging;
-    private final FcmRepository fcmRepository;
     private final FcmNotificationRepository fcmNotificationRepository;
     private final FcmTimerRepository fcmTimerRepository;
     private final ParticipationRepository participationRepository;
@@ -45,18 +43,8 @@ public class FcmNotificationService {
         fcmNotificationRepository.save(fcmNotification);
     }
 
-    /**
-     * TODO: 데이터 없을 시 예외 처리
-     */
     public void deleteFcmNotification(Long key) {
         fcmNotificationRepository.deleteById(key);
-    }
-
-    /**
-     * TODO: 데이터 조회 예외 처리
-     */
-    public Boolean hasFcmNotification(Long key) {
-        return fcmNotificationRepository.existsById(key);
     }
 
     @Transactional
@@ -64,28 +52,36 @@ public class FcmNotificationService {
         return participationRepository.findFcmTokensByMeetingAndButtonAuthority(meeting, buttonAuthority);
     }
 
-    /**
-     * 알람 내용을 firebase 서버에 전달하는 method입니다.
-     */
-    public void sendNotificationByToken(FcmNotificationRequestDto fcmNotificationRequestDto) {
+    public void sendNotificationByToken(FcmNotificationRequestDto fcmNotificationRequestDto, Long meetingId) {
         for (FcmToken fcmToken : fcmNotificationRequestDto.getTargetTokenList()) {
-            Notification notification = Notification.builder()
-                    .setTitle(fcmNotificationRequestDto.getTitle())
-                    .setBody(fcmNotificationRequestDto.getBody())
-                    // .setImage(fcmNotificationRequestDto.getImg())
-                    .build();
-            // 기기에 맞는 token과 내용을 담는 부분입니다.
-            Message message = Message.builder()
-                    .setToken(fcmToken.getFcmToken())
-                    .setNotification(notification)
-                    .build();
+            Notification notification = createNotification(fcmNotificationRequestDto.getTitle(), fcmNotificationRequestDto.getBody());
+            Message message = createMessage(notification, fcmToken, meetingId);
+            sendNotification(message);
+        }
+    }
 
-            try {
-                firebaseMessaging.send(message);
-            } catch (FirebaseMessagingException e) {
-                log.error("Failed to send Notification", e);
-                throw new InvalidValueException(ErrorCode.INVALID_FCM_UPLOAD);
-            }
+    private Notification createNotification(String title, String body) {
+        return Notification.builder()
+                .setTitle(title)
+                .setBody(body)
+                // .setImage(fcmNotificationRequestDto.getImg())
+                .build();
+    }
+
+    private Message createMessage(Notification notification, FcmToken fcmToken, Long meetingId) {
+        return Message.builder()
+                .setToken(fcmToken.getFcmToken())
+                .putData("meetingId", meetingId.toString())
+                .setNotification(notification)
+                .build();
+    }
+
+    private void sendNotification(Message message) {
+        try {
+            firebaseMessaging.send(message);
+        } catch (FirebaseMessagingException e) {
+            log.error("Failed to send Notification", e);
+            throw new InvalidValueException(ErrorCode.INVALID_FCM_UPLOAD);
         }
     }
 
