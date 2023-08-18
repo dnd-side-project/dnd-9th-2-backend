@@ -40,7 +40,7 @@ public class MeetingResponseDto {
         return MeetingResponseDto.builder()
                 .remainingDate(Period.between(LocalDate.now(), meeting.getDate()).getDays())
                 .title(meeting.getTitle())
-                .place(meeting.getTitle())
+                .place(meeting.getPlace())
                 .time(LocalDateTime.of(meeting.getDate(), meeting.getTime()))
                 .participantCount(meeting.getParticipations().size())
                 .status(meeting.getMeetingStatus().name())
