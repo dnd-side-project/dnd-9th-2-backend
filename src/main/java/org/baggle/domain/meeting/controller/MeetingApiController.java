@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.baggle.domain.meeting.dto.request.CreateMeetingRequestDto;
 import org.baggle.domain.meeting.dto.request.UpdateMeetingInfoRequestDto;
 import org.baggle.domain.meeting.dto.response.CreateMeetingResponseDto;
+import org.baggle.domain.meeting.dto.response.GetMeetingResponseDto;
 import org.baggle.domain.meeting.dto.response.MeetingDetailResponseDto;
 import org.baggle.domain.meeting.dto.response.UpdateMeetingInfoResponseDto;
 import org.baggle.domain.meeting.service.MeetingDetailService;
@@ -11,6 +12,7 @@ import org.baggle.domain.meeting.service.MeetingService;
 import org.baggle.global.common.BaseResponse;
 import org.baggle.global.common.SuccessCode;
 import org.baggle.global.config.auth.UserId;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +31,18 @@ public class MeetingApiController {
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, createMeetingResponseDto));
     }
 
+    @GetMapping
+    public ResponseEntity<BaseResponse<?>> getMeetings(@UserId final Long userId,
+                                                       @RequestParam final String period,
+                                                       final Pageable pageable) {
+        final GetMeetingResponseDto getMeetingResponseDto = meetingService.getMeetings(userId, period, pageable);
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, getMeetingResponseDto));
+    }
+
     @GetMapping("/detail")
     public ResponseEntity<BaseResponse<?>> findMeetingDetail(@UserId final Long userId,
                                                              @RequestParam final Long meetingId) {
-        MeetingDetailResponseDto responseDto = meetingDetailService.findMeetingDetail(userId, meetingId);
+        final MeetingDetailResponseDto responseDto = meetingDetailService.findMeetingDetail(userId, meetingId);
         return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
     }
 

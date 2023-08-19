@@ -21,6 +21,7 @@ public enum ErrorCode {
     INVALID_CERTIFICATION_TIME(HttpStatus.BAD_REQUEST, "유효하지 않은 인증 시간입니다."),
     INVALID_MEETING_PARTICIPATION(HttpStatus.BAD_REQUEST, "잘못된 모임 참가자 입니다."),
     UNAVAILABLE_MEETING_TIME(HttpStatus.BAD_REQUEST, "모임 2시간 전후 일정이 존재합니다."),
+    INVALID_PERIOD_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 기간 타입입니다."),
 
     /**
      * 401 Unauthorized
@@ -58,6 +59,7 @@ public enum ErrorCode {
     MEETING_NOT_FOUND(HttpStatus.NOT_FOUND, "모임 정보를 찾을 수 없습니다."),
     PARTICIPATION_NOT_FOUND(HttpStatus.NOT_FOUND, "모임 참가자를 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
+    MEETING_COUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "모임의 총개수를 확인할 수 없습니다."),
 
     /**
      * 405 Method Not Allowed

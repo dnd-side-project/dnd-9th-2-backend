@@ -2,8 +2,13 @@ package org.baggle.domain.meeting.service;
 
 import lombok.RequiredArgsConstructor;
 import org.baggle.domain.meeting.domain.Meeting;
+import org.baggle.domain.meeting.domain.MeetingStatus;
+import org.baggle.domain.meeting.domain.Period;
 import org.baggle.domain.meeting.dto.request.CreateMeetingRequestDto;
 import org.baggle.domain.meeting.dto.response.CreateMeetingResponseDto;
+import org.baggle.domain.meeting.dto.response.GetMeetingResponseDto;
+import org.baggle.domain.meeting.dto.response.MeetingResponseDto;
+import org.baggle.domain.meeting.repository.MeetingCountQueryDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.user.domain.User;
 import org.baggle.domain.user.repository.UserRepository;
@@ -11,6 +16,8 @@ import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.ErrorCode;
 import org.baggle.global.error.exception.ForbiddenException;
 import org.baggle.global.error.exception.InvalidValueException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,18 +27,26 @@ import java.time.LocalTime;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Service
 public class MeetingService {
     private final UserRepository userRepository;
     private final MeetingRepository meetingRepository;
 
+    @Transactional
     public CreateMeetingResponseDto createMeeting(Long userId, CreateMeetingRequestDto createMeetingRequestDto) {
         User findUser = getUser(userId);
         validateCreateMeeting(findUser.getId(), createMeetingRequestDto.getMeetingTime());
         Meeting meeting = createMeetingAndParticipationWithUser(findUser, createMeetingRequestDto);
         Meeting savedMeeting = meetingRepository.save(meeting);
         return CreateMeetingResponseDto.of(savedMeeting.getId());
+    }
+
+    public GetMeetingResponseDto getMeetings(Long userId, String period, Pageable pageable) {
+        Period enumPeriod = Period.getEnumPeriodFromStringPeriod(period);
+        MeetingCountQueryDto meetingCountQueryDto = getMeetingCount(userId);
+        List<MeetingResponseDto> meetingResponseDtos = getMeetingsAccordingToPeriod(userId, enumPeriod, pageable);
+        return GetMeetingResponseDto.of(meetingCountQueryDto, meetingResponseDtos);
     }
 
     private User getUser(Long userId) {
@@ -41,15 +56,30 @@ public class MeetingService {
 
     private void validateCreateMeeting(Long userId, LocalDateTime meetingTime) {
         validateAvailableMeetingTime(userId, meetingTime);
-        LocalDate meetingDate = convertLocalDateTimeToLocalDate(meetingTime);
+        LocalDate meetingDate = convertToLocalDate(meetingTime);
         validateMaximumCreatableMeetings(userId, meetingDate);
     }
 
     private Meeting createMeetingAndParticipationWithUser(User user, CreateMeetingRequestDto createMeetingRequestDto) {
-        return Meeting.createMeeting(user, createMeetingRequestDto.getTitle(), createMeetingRequestDto.getPlace(),
-                convertLocalDateTimeToLocalDate(createMeetingRequestDto.getMeetingTime()),
-                convertLocalDateTimeToLocalTime(createMeetingRequestDto.getMeetingTime()),
-                createMeetingRequestDto.getMemo());
+        return Meeting.createMeeting(user, createMeetingRequestDto.getTitle(), createMeetingRequestDto.getPlace(), convertToLocalDate(createMeetingRequestDto.getMeetingTime()),
+                convertToLocalTime(createMeetingRequestDto.getMeetingTime()), createMeetingRequestDto.getMemo());
+    }
+
+    private MeetingCountQueryDto getMeetingCount(Long userId) {
+        return meetingRepository.countMeetings(MeetingStatus.TERMINATION, userId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEETING_COUNT_NOT_FOUND));
+    }
+
+    private List<MeetingResponseDto> getMeetingsAccordingToPeriod(Long userId, Period period, Pageable pageable) {
+        Page<Meeting> meetings;
+        if (period == Period.SCHEDULED) {
+            meetings = meetingRepository.findMeetingsWithoutMeetingStatus(userId, MeetingStatus.TERMINATION, LocalDateTime.now(), pageable);
+        } else {
+            meetings = meetingRepository.findMeetingsWithMeetingStatus(userId, MeetingStatus.TERMINATION, LocalDateTime.now(), pageable);
+        }
+        return meetings.stream()
+                .map(MeetingResponseDto::of)
+                .toList();
     }
 
     private void validateAvailableMeetingTime(Long userId, LocalDateTime meetingTime) {
@@ -68,11 +98,11 @@ public class MeetingService {
         }
     }
 
-    private LocalDate convertLocalDateTimeToLocalDate(LocalDateTime meetingTime) {
+    private LocalDate convertToLocalDate(LocalDateTime meetingTime) {
         return meetingTime.toLocalDate();
     }
 
-    private LocalTime convertLocalDateTimeToLocalTime(LocalDateTime meetingTime) {
+    private LocalTime convertToLocalTime(LocalDateTime meetingTime) {
         return meetingTime.toLocalTime();
     }
 }
