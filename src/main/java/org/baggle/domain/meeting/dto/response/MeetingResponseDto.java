@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public class MeetingResponseDto {
+    private Long meetingId;
     private int remainingDate;
     private String title;
     private String place;
@@ -21,10 +22,11 @@ public class MeetingResponseDto {
     private LocalDateTime time;
     private int participantCount;
     private String status;
-    private List<ParticipantResponseDto> participants;
+    private List<String> participants;
 
     @Builder
-    private MeetingResponseDto(int remainingDate, String title, String place, LocalDateTime time, int participantCount, String status, List<Participation> participations) {
+    private MeetingResponseDto(Long meetingId, int remainingDate, String title, String place, LocalDateTime time, int participantCount, String status, List<Participation> participations) {
+        this.meetingId = meetingId;
         this.remainingDate = remainingDate;
         this.title = title;
         this.place = place;
@@ -32,12 +34,14 @@ public class MeetingResponseDto {
         this.participantCount = participantCount;
         this.status = status;
         this.participants = participations.stream()
-                .map(participation -> ParticipantResponseDto.of(participation.getUser()))
+                .map(participation ->
+                        participation.getUser().getProfileImageUrl() != null ? participation.getUser().getProfileImageUrl() : "")
                 .collect(Collectors.toList());
     }
 
     public static MeetingResponseDto of(Meeting meeting) {
         return MeetingResponseDto.builder()
+                .meetingId(meeting.getId())
                 .remainingDate(Period.between(LocalDate.now(), meeting.getDate()).getDays())
                 .title(meeting.getTitle())
                 .place(meeting.getPlace())
