@@ -15,6 +15,7 @@ import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.service.MeetingDetailService;
 import org.springframework.context.MessageSource;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -32,24 +33,18 @@ import java.util.List;
 @Slf4j
 @Component
 @EnableAsync
+@EnableScheduling
 @RequiredArgsConstructor
 public class NotificationScheduler {
     private final MeetingDetailService meetingDetailService;
     private final FcmNotificationService fcmNotificationService;
     private final FcmNotificationProvider fcmNotificationProvider;
 
-    /**
-     * 시작 1시간 전 모임을 찾아 알람을 전송하는 메서드
-     * Cron 표현식을 사용한 작업 예약
-     * 초(0-59) 분(0-59) 시간(0-23) 일(1-31) 월(1-12) 요일(0-7)
-     */
     @Transactional
     @Scheduled(cron = "0 * * * * *")
     public void notificationScheduleTask() {
-        LocalDateTime now = LocalDateTime.now();
-        List<Meeting> notificationMeeting = meetingDetailService.findMeetingsInRange(now, 58, 60);
+        List<Meeting> notificationMeeting = meetingDetailService.findMeetingsInRange(59, 60, MeetingStatus.SCHEDULED);
         for (Meeting m : notificationMeeting) {
-            if (m.getMeetingStatus() != MeetingStatus.SCHEDULED) continue;
             m.updateMeetingStatusIntoConfirmation();
             sendNotificationByButtonAuthority(m, ButtonAuthority.OWNER);
             sendNotificationByButtonAuthority(m, ButtonAuthority.NON_OWNER);
