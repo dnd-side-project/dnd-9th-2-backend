@@ -25,10 +25,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // aws
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.1.RELEASE'
@@ -38,16 +34,16 @@ dependencies {
 
     // flyway
     implementation "org.flywaydb:flyway-core"
-
-    // flyway와 mysql 버전 8과 맞추기 위해 사용
     implementation "org.flywaydb:flyway-mysql"
 
     // h2
-    //runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.h2database:h2'
+
+    // mysql
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
     // spring security
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.security:spring-security-test'
 
     // jwt
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
@@ -59,6 +55,17 @@ dependencies {
 
     // open feign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.0.3'
+
+    // p6spy
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
