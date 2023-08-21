@@ -74,18 +74,14 @@ public class MeetingDetailService {
         return LocalDateTime.of(date, time);
     }
 
-    /**
-     * 서버 시간 기준 a ~ b분 사이에 모임을 조회하는 메서드입니다.
-     * using:
-     * NotificationScheduler - 1시간 전 모임 조회
-     */
-    public List<Meeting> findMeetingsInRange(LocalDateTime localDateTime, int from, int to) {
-        LocalDateTime fromDateTime = localDateTime.plusMinutes(from);
-        LocalDateTime toDateTime = localDateTime.plusMinutes(to);
-        return meetingRepository.findMeetingsStartingSoon(
-                fromDateTime.toLocalTime(),
-                toDateTime.toLocalDate(),
-                toDateTime.toLocalTime());
+    public List<Meeting> findMeetingsInRange(int from, int to, MeetingStatus meetingStatus) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime fromDateTime = now.plusMinutes(from);
+        LocalDateTime toDateTime = now.plusMinutes(to);
+        return meetingRepository.findMeetingsWithinTimeRangeAlongMeetingStatus(
+                fromDateTime,
+                toDateTime,
+                meetingStatus);
     }
 
     private List<Meeting> findMeetingsInRangeForUser(Long userId, LocalDateTime localDateTime, int from, int to) {
