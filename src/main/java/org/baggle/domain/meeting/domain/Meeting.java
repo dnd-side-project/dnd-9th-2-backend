@@ -20,7 +20,6 @@ public class Meeting extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "meeting_id")
     private Long id;
-    @Getter
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Participation> participations = new ArrayList<>();
