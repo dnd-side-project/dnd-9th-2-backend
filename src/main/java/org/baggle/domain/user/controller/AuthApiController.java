@@ -8,6 +8,7 @@ import org.baggle.global.common.BaseResponse;
 import org.baggle.global.common.SuccessCode;
 import org.baggle.global.config.auth.UserId;
 import org.baggle.global.config.jwt.Token;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,8 @@ public class AuthApiController {
     public ResponseEntity<BaseResponse<?>> signIn(@RequestHeader("Authorization") final String token,
                                                   @RequestBody final UserSignInRequestDto userSignInRequestDto) {
         final UserAuthResponseDto userAuthResponseDto = authService.signIn(token, userSignInRequestDto);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, userAuthResponseDto));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.of(SuccessCode.OK, userAuthResponseDto));
     }
 
     @PostMapping("/signup")
@@ -33,18 +35,21 @@ public class AuthApiController {
                                                   @RequestParam final String platform,
                                                   @RequestParam final String fcmToken) {
         final UserAuthResponseDto userAuthResponseDto = authService.signUp(token, image, nickname, platform, fcmToken);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, userAuthResponseDto));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(BaseResponse.of(SuccessCode.CREATED, userAuthResponseDto));
     }
 
     @PatchMapping("/withdraw")
     public ResponseEntity<BaseResponse<?>> withdraw(@UserId final Long userId) {
         authService.withdraw(userId);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, null));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.of(SuccessCode.OK, null));
     }
 
     @GetMapping("/reissue")
     public ResponseEntity<BaseResponse<?>> reissue(@RequestHeader("Authorization") final String refreshToken) {
         final Token reissuedToken = authService.reissue(refreshToken);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, reissuedToken));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.of(SuccessCode.OK, reissuedToken));
     }
 }
