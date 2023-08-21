@@ -49,7 +49,7 @@ public class NotificationScheduler {
             sendNotificationByButtonAuthority(m, ButtonAuthority.OWNER);
             sendNotificationByButtonAuthority(m, ButtonAuthority.NON_OWNER);
             fcmNotificationService.createFcmNotification(m.getId());
-            log.info("meeting information - ID {}, date {}, time {}", m.getId(), m.getDate(), m.getTime());
+            log.info("meeting information - date {}, time {}", m.getDate(), m.getTime());
         }
     }
 
