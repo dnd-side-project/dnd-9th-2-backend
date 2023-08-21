@@ -7,6 +7,7 @@ import org.baggle.domain.meeting.service.ParticipationService;
 import org.baggle.global.common.BaseResponse;
 import org.baggle.global.common.SuccessCode;
 import org.baggle.global.config.auth.UserId;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +22,15 @@ public class ParticipationApiController {
     public ResponseEntity<BaseResponse<?>> findMeetingAvailability(@UserId final Long userId,
                                                                    @RequestParam final Long meetingId) {
         final ParticipationAvailabilityResponseDto responseDto = participationService.findParticipationAvailability(userId, meetingId);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, responseDto));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.of(SuccessCode.OK, responseDto));
     }
 
     @PostMapping("/participation")
     public ResponseEntity<BaseResponse<?>> createParticipation(@UserId final Long userId,
                                                                @RequestBody final ParticipationRequestDto requestDto) {
         participationService.createParticipation(userId, requestDto);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, null));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(BaseResponse.of(SuccessCode.CREATED, null));
     }
 }
