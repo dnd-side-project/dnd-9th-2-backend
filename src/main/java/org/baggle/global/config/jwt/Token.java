@@ -1,9 +1,10 @@
 package org.baggle.global.config.jwt;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class Token {
     private String accessToken;
