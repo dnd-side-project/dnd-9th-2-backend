@@ -46,18 +46,20 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
     @Query("SELECT m " +
             "FROM Meeting m " +
-            "JOIN FETCH m.participations p " +
-            "JOIN FETCH p.user u " +
-            "WHERE u.id = :userId " +
+            "JOIN Participation p " +
+            "ON m = p.meeting " +
+            "JOIN User u " +
+            "ON u.id = :userId " +
             "AND m.meetingStatus = :meetingStatus " +
             "ORDER BY TIMEDIFF(:currTime, STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s'))")
     Page<Meeting> findMeetingsWithMeetingStatus(@Param("userId") Long userId, @Param("meetingStatus") MeetingStatus meetingStatus, @Param("currTime") LocalDateTime currTime, Pageable pageable);
 
     @Query("SELECT m " +
             "FROM Meeting m " +
-            "JOIN FETCH m.participations p " +
-            "JOIN FETCH p.user u " +
-            "WHERE u.id = :userId " +
+            "JOIN Participation p " +
+            "ON m = p.meeting " +
+            "JOIN User u " +
+            "ON u.id = :userId " +
             "AND m.meetingStatus != :meetingStatus " +
             "ORDER BY TIMEDIFF(STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s'), :currTime)")
     Page<Meeting> findMeetingsWithoutMeetingStatus(@Param("userId") Long userId, @Param("meetingStatus") MeetingStatus meetingStatus, @Param("currTime") LocalDateTime currTime, Pageable pageable);
