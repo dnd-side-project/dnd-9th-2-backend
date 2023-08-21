@@ -21,7 +21,7 @@ public class ParticipationApiController {
     public ResponseEntity<BaseResponse<?>> findMeetingAvailability(@UserId final Long userId,
                                                                    @RequestParam final Long meetingId) {
         final ParticipationAvailabilityResponseDto responseDto = participationService.findParticipationAvailability(userId, meetingId);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, responseDto));
+        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
     }
 
     @PostMapping("/participation")
