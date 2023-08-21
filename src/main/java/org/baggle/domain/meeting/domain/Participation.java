@@ -74,11 +74,4 @@ public class Participation extends BaseTimeEntity {
     public void updateMeetingAuthorityToParticipation() {
         this.meetingAuthority = MeetingAuthority.PARTICIPATION;
     }
-
-    public void withdraw() {
-        this.meetingAuthority = null;
-        this.buttonAuthority = null;
-        this.participationMeetingStatus = null;
-        this.meeting.withdrawParticipation(this);
-    }
 }

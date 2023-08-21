@@ -72,7 +72,7 @@ public class ParticipationService {
         validateMeetingHost(fromParticipation);
         validateMeetingStatus(meeting);
         delegateMeetingHostToOtherParticipation(fromParticipation, toParticipation);
-        withdrawBeforeMeetingConfirmation(fromParticipation);
+        withdrawBeforeMeetingConfirmation(fromParticipation, meeting);
         updateButtonAuthorityWithRandomNumber(meeting);
     }
 
@@ -105,8 +105,8 @@ public class ParticipationService {
         toParticipation.updateMeetingAuthorityToHost();
     }
 
-    private void withdrawBeforeMeetingConfirmation(Participation fromParticipation) {
-        fromParticipation.withdraw();
+    private void withdrawBeforeMeetingConfirmation(Participation fromParticipation, Meeting meeting) {
+        meeting.withdrawParticipation(fromParticipation);
         participationRepository.delete(fromParticipation);
     }
 
