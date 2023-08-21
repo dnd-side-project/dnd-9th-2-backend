@@ -7,6 +7,7 @@ import org.baggle.domain.feed.dto.response.FeedUploadResponseDto;
 import org.baggle.domain.feed.service.FeedService;
 import org.baggle.global.common.BaseResponse;
 import org.baggle.global.common.SuccessCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,14 +26,15 @@ public class FeedApiController {
     public ResponseEntity<BaseResponse<?>> createFeedUpload(@RequestPart final FeedUploadRequestDto memberInfo,
                                                             @RequestPart final MultipartFile feedImage) {
         final FeedUploadResponseDto responseDto = feedService.feedUpload(memberInfo, feedImage);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.CREATED, responseDto));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(BaseResponse.of(SuccessCode.CREATED, responseDto));
     }
 
     @GetMapping
     public ResponseEntity<BaseResponse<?>> uploadNotification(@RequestParam final Long memberId,
                                                               @RequestParam final LocalDateTime authorizationTime) {
         final FeedNotificationResponseDto responseDto = feedService.uploadNotification(memberId, authorizationTime);
-        return ResponseEntity.ok(BaseResponse.of(SuccessCode.OK, responseDto));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.of(SuccessCode.OK, responseDto));
     }
-
 }
