@@ -14,6 +14,7 @@ public class MeetingDetailResponseDto {
     private String title;
     private String place;
     private String memo;
+    private String status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime meetingTime;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
@@ -21,11 +22,12 @@ public class MeetingDetailResponseDto {
     private List<ParticipationDetailResponseDto> members;
 
     @Builder
-    public MeetingDetailResponseDto(Long meetingId, String title, String place, String memo, LocalDateTime meetingTime, LocalDateTime certificationTime, List<ParticipationDetailResponseDto> members) {
+    public MeetingDetailResponseDto(Long meetingId, String title, String place, String memo, String status, LocalDateTime meetingTime, LocalDateTime certificationTime, List<ParticipationDetailResponseDto> members) {
         this.meetingId = meetingId;
         this.title = title;
         this.place = place;
         this.memo = memo;
+        this.status = status;
         this.meetingTime = meetingTime;
         this.certificationTime = certificationTime;
         this.members = members;
@@ -37,6 +39,7 @@ public class MeetingDetailResponseDto {
                 .title(meeting.getTitle())
                 .place(meeting.getPlace())
                 .memo(meeting.getMemo())
+                .status(meeting.getMeetingStatus().name())
                 .meetingTime(meetingTime)
                 .certificationTime(certificationTime)
                 .members(participationDetailResponseDto)
