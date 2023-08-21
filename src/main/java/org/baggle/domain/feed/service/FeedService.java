@@ -126,6 +126,6 @@ public class FeedService {
         fcmNotificationService.deleteFcmNotification(participation.getMeeting().getId());
         fcmNotificationService.createFcmTimer(participation.getMeeting().getId(), authorizationTime);
         Meeting meeting = getMeeting(participation.getMeeting().getId());
-        meeting.updateMeetingStatusIntoOngoing();
+        meeting.updateMeetingStatusInto(MeetingStatus.ONGOING);
     }
 }

@@ -55,17 +55,8 @@ public class Meeting extends BaseTimeEntity {
         this.time = (time != null) ? time : this.time;
         this.memo = (memo != null) ? memo : this.place;
     }
-
-    public void updateMeetingStatusIntoConfirmation() {
-        this.meetingStatus = MeetingStatus.CONFIRMATION;
-    }
-
-    public void updateMeetingStatusIntoOngoing() {
-        this.meetingStatus = MeetingStatus.ONGOING;
-    }
-
-    public void updateMeetingStatusIntoTermination() {
-        this.meetingStatus = MeetingStatus.TERMINATION;
+    public void updateMeetingStatusInto(MeetingStatus meetingStatus) {
+        this.meetingStatus = meetingStatus;
     }
 
     public void initButtonAuthorityOfParticipationList() {

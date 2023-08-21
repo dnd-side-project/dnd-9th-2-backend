@@ -9,6 +9,7 @@ import org.baggle.domain.fcm.service.FcmNotificationProvider;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.fcm.service.FcmService;
 import org.baggle.domain.meeting.domain.Meeting;
+import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.ErrorCode;
@@ -84,9 +85,9 @@ public class ExpirationListener implements MessageListener {
     private void updateMeetingStatus(Long meetingId, String dateType) {
         Meeting meeting = getMeeting(meetingId);
         if (getRedisDataType(dateType) == RedisDataType.FCM_NOTIFICATION)
-            meeting.updateMeetingStatusIntoOngoing();
+            meeting.updateMeetingStatusInto(MeetingStatus.ONGOING);
         else if (getRedisDataType(dateType) == RedisDataType.FCM_TIMER)
-            meeting.updateMeetingStatusIntoTermination();
+            meeting.updateMeetingStatusInto(MeetingStatus.TERMINATION);
     }
 
     private String getNotificationTitle(String dateType) {

@@ -45,7 +45,7 @@ public class NotificationScheduler {
     public void notificationScheduleTask() {
         List<Meeting> notificationMeeting = meetingDetailService.findMeetingsInRange(59, 60, MeetingStatus.SCHEDULED);
         for (Meeting m : notificationMeeting) {
-            m.updateMeetingStatusIntoConfirmation();
+            m.updateMeetingStatusInto(MeetingStatus.CONFIRMATION);
             sendNotificationByButtonAuthority(m, ButtonAuthority.OWNER);
             sendNotificationByButtonAuthority(m, ButtonAuthority.NON_OWNER);
             fcmNotificationService.createFcmNotification(m.getId());
