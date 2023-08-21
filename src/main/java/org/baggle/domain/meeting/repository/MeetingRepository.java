@@ -10,17 +10,10 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
-    @Query("SELECT m " +
-            "FROM Meeting m " +
-            "WHERE m.date = :currentDate " +
-            "AND m.time BETWEEN :prevTime AND :currentTime ")
-    List<Meeting> findMeetingsStartingSoon(@Param(value = "prevTime") LocalTime prevTime, @Param(value = "currentDate") LocalDate currentDate, @Param(value = "currentTime") LocalTime currentTime);
-
     @Query("SELECT m " +
             "FROM Meeting m " +
             "WHERE m.meetingStatus = :meetingStatus " +
