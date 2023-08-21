@@ -33,4 +33,12 @@ public class ParticipationApiController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(BaseResponse.of(SuccessCode.CREATED, null));
     }
+
+    @PatchMapping("/delegate")
+    public ResponseEntity<BaseResponse<?>> delegateMeetingHost(@RequestParam final Long fromMemberId,
+                                                               @RequestParam final Long toMemberId) {
+        participationService.delegateMeetingHost(fromMemberId, toMemberId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.of(SuccessCode.OK, null));
+    }
 }

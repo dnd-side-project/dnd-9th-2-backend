@@ -1,10 +1,7 @@
 package org.baggle.domain.meeting.service;
 
 import lombok.RequiredArgsConstructor;
-import org.baggle.domain.meeting.domain.ButtonAuthority;
-import org.baggle.domain.meeting.domain.Meeting;
-import org.baggle.domain.meeting.domain.MeetingStatus;
-import org.baggle.domain.meeting.domain.Participation;
+import org.baggle.domain.meeting.domain.*;
 import org.baggle.domain.meeting.dto.request.ParticipationRequestDto;
 import org.baggle.domain.meeting.dto.response.ParticipationAvailabilityResponseDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
@@ -64,6 +61,21 @@ public class ParticipationService {
         participationRepository.save(participation);
     }
 
+    /**
+     * throw: 방장이 아닌 경우
+     * throw: 방장 위임 가능 시간이 아닌 경우
+     */
+    public void delegateMeetingHost(Long fromMemberId, Long toMemberId) {
+        Participation fromParticipation = getParticipation(fromMemberId);
+        Participation toParticipation = getParticipation(toMemberId);
+        Meeting meeting = getMeetingWithParticipation(fromParticipation);
+        validateMeetingHost(fromParticipation);
+        validateMeetingStatus(meeting);
+        delegateMeetingHostToOtherParticipation(fromParticipation, toParticipation);
+        withdrawBeforeMeetingConfirmation(fromParticipation, meeting);
+        updateButtonAuthorityWithRandomNumber(meeting);
+    }
+
     private Meeting getMeeting(Long meetingId) {
         return meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
@@ -72,6 +84,30 @@ public class ParticipationService {
     private User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+    }
+
+    private Meeting getMeetingWithParticipation(Participation participation) {
+        return participation.getMeeting();
+    }
+
+    private Participation getParticipation(Long participationId) {
+        return participationRepository.findById(participationId)
+                .orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
+    }
+
+    private void validateMeetingHost(Participation participation) {
+        if (participation.getMeetingAuthority() != MeetingAuthority.HOST)
+            throw new ForbiddenException(INVALID_MEETING_AUTHORITY);
+    }
+
+    private void delegateMeetingHostToOtherParticipation(Participation fromParticipation, Participation toParticipation) {
+        fromParticipation.updateMeetingAuthorityToParticipation();
+        toParticipation.updateMeetingAuthorityToHost();
+    }
+
+    private void withdrawBeforeMeetingConfirmation(Participation fromParticipation, Meeting meeting) {
+        meeting.withdrawParticipation(fromParticipation);
+        participationRepository.delete(fromParticipation);
     }
 
     private void validateMeetingStatus(Meeting meeting) {
@@ -98,13 +134,14 @@ public class ParticipationService {
     }
 
     private Participation createParticipationWithRandomButtonAuthority(User user, Meeting meeting) {
-        Participation participation = Participation.createParticipationWithoutFeed(user, meeting);
+        Participation participation = Participation.createParticipationWithMeeting(user, meeting);
         updateButtonAuthorityWithRandomNumber(meeting);
         return participation;
     }
 
     private void updateButtonAuthorityWithRandomNumber(Meeting meeting) {
         int randomNumber = new Random().nextInt(meeting.getParticipations().size());
+        meeting.initButtonAuthorityOfParticipationList();
         Participation randomNumberParticipation = meeting.getRandomNumberParticipation(randomNumber);
         randomNumberParticipation.updateButtonAuthority(ButtonAuthority.OWNER);
     }
