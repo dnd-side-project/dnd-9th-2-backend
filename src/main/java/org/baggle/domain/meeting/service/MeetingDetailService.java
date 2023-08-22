@@ -3,10 +3,7 @@ package org.baggle.domain.meeting.service;
 import lombok.RequiredArgsConstructor;
 import org.baggle.domain.fcm.domain.FcmTimer;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
-import org.baggle.domain.meeting.domain.Meeting;
-import org.baggle.domain.meeting.domain.MeetingAuthority;
-import org.baggle.domain.meeting.domain.MeetingStatus;
-import org.baggle.domain.meeting.domain.Participation;
+import org.baggle.domain.meeting.domain.*;
 import org.baggle.domain.meeting.dto.request.UpdateMeetingInfoRequestDto;
 import org.baggle.domain.meeting.dto.response.MeetingDetailResponseDto;
 import org.baggle.domain.meeting.dto.response.ParticipationDetailResponseDto;
@@ -23,6 +20,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,8 +38,8 @@ public class MeetingDetailService {
         Meeting meeting = getMeeting(requestId);
         validateParticipation(meeting, userId);
         FcmTimer certificationTime = getFcmTimer(requestId);
-        List<Participation> participations = meeting.getParticipations();
-        List<ParticipationDetailResponseDto> participationDetails = ParticipationDetailResponseDto.listOf(participations);
+        List<Participation> participationList = sortParticipationAlongAuthorization(meeting);
+        List<ParticipationDetailResponseDto> participationDetails = ParticipationDetailResponseDto.listOf(participationList);
         LocalDateTime meetingTime = getMeetingTime(meeting.getDate(), meeting.getTime());
         return MeetingDetailResponseDto.of(meeting, meetingTime, certificationTime.getStartTime(), participationDetails);
     }
@@ -72,6 +70,15 @@ public class MeetingDetailService {
                 fromDateTime,
                 toDateTime,
                 meetingStatus);
+    }
+
+    private List<Participation> sortParticipationAlongAuthorization(Meeting meeting) {
+        List<Participation> participationList = meeting.getParticipations();
+        return participationList.stream()
+                .sorted(Comparator
+                        .comparing((Participation p) -> p.getMeetingAuthority() == MeetingAuthority.HOST ? 0 : 1)
+                        .thenComparing(p -> p.getButtonAuthority() == ButtonAuthority.OWNER ? 0 : 1))
+                .toList();
     }
 
     private List<Meeting> findMeetingsInRangeForUser(Long userId, LocalDateTime localDateTime, int from, int to) {
