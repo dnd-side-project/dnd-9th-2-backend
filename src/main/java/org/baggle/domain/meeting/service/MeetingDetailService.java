@@ -36,10 +36,6 @@ public class MeetingDetailService {
     private final ParticipationRepository participationRepository;
     private final FcmTimerRepository fcmTimerRepository;
 
-    /**
-     * throw 모임이 존재하지 않는 경우
-     * throw 모임 참가자가 아닌 경우
-     */
     public MeetingDetailResponseDto findMeetingDetail(Long userId, Long requestId) {
         Meeting meeting = getMeeting(requestId);
         validateParticipation(meeting, userId);
@@ -50,12 +46,6 @@ public class MeetingDetailService {
         return MeetingDetailResponseDto.of(meeting, meetingTime, certificationTime.getStartTime(), participationDetails);
     }
 
-    /**
-     * throw: 방장이 아닌 경우
-     * throw: 날짜 & 시간 수정 -> 모임 참가 인원중 2시간 이내 만남이 있는 경우
-     * throw: 날짜 & 시간 수정 -> 모임 시작이 2시간 이내일 경우.
-     * throw: 모임이 확정된 경우.
-     */
     public UpdateMeetingInfoResponseDto updateMeetingInfo(Long userId, UpdateMeetingInfoRequestDto requestDto) {
         Meeting meeting = getMeeting(requestDto.getMeetingId());
         validateMeetingHost(meeting.getId(), userId);

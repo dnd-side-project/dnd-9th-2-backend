@@ -45,12 +45,6 @@ public class FeedService {
     private final MeetingRepository meetingRepository;
     private final FcmNotificationProvider fcmNotificationProvider;
 
-    /**
-     * 피드를 업로드하는 메서드입니다.
-     * throw 모임에 참가자가 없는 경우
-     * throw 이미 인증을 완료한 경우
-     * throw 긴급소집 이벤트가 진행 중이 아닌 경우
-     */
     public FeedUploadResponseDto feedUpload(FeedUploadRequestDto requestDto, MultipartFile feedImage) {
         Participation participation = getParticipation(requestDto.getMemberId());
         duplicationParticipation(participation);
@@ -61,11 +55,6 @@ public class FeedService {
         return FeedUploadResponseDto.of(feed.getId(), feed.getFeedImageUrl());
     }
 
-    /**
-     * 긴급소집 알람을 전송하는 api입니다.
-     * throw 모임에 참가자가 없는 경우
-     * throw 버튼 활성화 가능 시간이 아닌 경우
-     */
     public FeedNotificationResponseDto uploadNotification(Long requestId, LocalDateTime authorizationTime) {
         Participation participation = getParticipation(requestId);
         validateMeetingStatusForConfirmation(participation.getMeeting());
