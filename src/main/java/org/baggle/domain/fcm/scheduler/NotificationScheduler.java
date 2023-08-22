@@ -53,30 +53,30 @@ public class NotificationScheduler {
         }
     }
 
-    private List<FcmToken> getFcmTokens(Meeting meeting, ButtonAuthority buttonAuthority){
+    private List<FcmToken> getFcmTokens(Meeting meeting, ButtonAuthority buttonAuthority) {
         return fcmNotificationService.findFcmTokensByButtonAuthority(meeting, buttonAuthority);
     }
 
-    private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting, ButtonAuthority buttonAuthority){
+    private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting, ButtonAuthority buttonAuthority) {
         List<FcmToken> fcmTokens = getFcmTokens(meeting, buttonAuthority);
         String title = getNotificationTitleWithButtonAuthority(buttonAuthority);
         String body = getNotificationBodyWithButtonAuthority(buttonAuthority);
         return FcmNotificationRequestDto.of(fcmTokens, title, body);
     }
 
-    private void sendNotificationByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority){
+    private void sendNotificationByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting, buttonAuthority);
         fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
     }
 
-    private String getNotificationTitleWithButtonAuthority(ButtonAuthority buttonAuthority){
-        if(buttonAuthority == ButtonAuthority.OWNER)
+    private String getNotificationTitleWithButtonAuthority(ButtonAuthority buttonAuthority) {
+        if (buttonAuthority == ButtonAuthority.OWNER)
             return fcmNotificationProvider.getButtonOwnerNotificationTitle();
         return fcmNotificationProvider.getConfirmationNotificationTitle();
     }
 
-    private String getNotificationBodyWithButtonAuthority(ButtonAuthority buttonAuthority){
-        if(buttonAuthority == ButtonAuthority.OWNER)
+    private String getNotificationBodyWithButtonAuthority(ButtonAuthority buttonAuthority) {
+        if (buttonAuthority == ButtonAuthority.OWNER)
             return fcmNotificationProvider.getButtonOwnerNotificationBody();
         return fcmNotificationProvider.getConfirmationNotificationBody();
     }

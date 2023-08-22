@@ -55,6 +55,7 @@ public class Meeting extends BaseTimeEntity {
         this.time = (time != null) ? time : this.time;
         this.memo = (memo != null) ? memo : this.place;
     }
+
     public void updateMeetingStatusInto(MeetingStatus meetingStatus) {
         this.meetingStatus = meetingStatus;
     }

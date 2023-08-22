@@ -23,15 +23,19 @@ public class MeetingScheduler {
 
     @Transactional
     @Scheduled(cron = "30 * * * * *")
-    public void meetingScheduleTask(){
+    public void meetingScheduleTask() {
         List<Meeting> meetingList = getMeetingList();
+        updateMeetingListStatus(meetingList);
+    }
+
+    private void updateMeetingListStatus(List<Meeting> meetingList) {
         meetingList.forEach(meeting -> {
             meeting.updateMeetingStatusInto(MeetingStatus.PAST);
             log.info("Termination meeting information - date {}, time {}", meeting.getDate(), meeting.getTime());
         });
     }
 
-    private List<Meeting> getMeetingList(){
+    private List<Meeting> getMeetingList() {
         return meetingDetailService.findMeetingsInRange(-241, -240, MeetingStatus.TERMINATION);
     }
 }
