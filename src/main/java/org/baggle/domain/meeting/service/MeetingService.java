@@ -66,16 +66,16 @@ public class MeetingService {
     }
 
     private MeetingCountQueryDto getMeetingCount(Long userId) {
-        return meetingRepository.countMeetings(MeetingStatus.TERMINATION, userId)
+        return meetingRepository.countMeetings(MeetingStatus.PAST, userId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEETING_COUNT_NOT_FOUND));
     }
 
     private List<MeetingResponseDto> getMeetingsAccordingToPeriod(Long userId, Period period, Pageable pageable) {
         Page<Meeting> meetings;
         if (period == Period.SCHEDULED) {
-            meetings = meetingRepository.findMeetingsWithoutMeetingStatus(userId, MeetingStatus.TERMINATION, LocalDateTime.now(), pageable);
+            meetings = meetingRepository.findMeetingsWithoutMeetingStatus(userId, MeetingStatus.PAST, LocalDateTime.now(), pageable);
         } else {
-            meetings = meetingRepository.findMeetingsWithMeetingStatus(userId, MeetingStatus.TERMINATION, LocalDateTime.now(), pageable);
+            meetings = meetingRepository.findMeetingsWithMeetingStatus(userId, MeetingStatus.PAST, LocalDateTime.now(), pageable);
         }
         return meetings.stream()
                 .map(MeetingResponseDto::of)
