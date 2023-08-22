@@ -37,7 +37,7 @@ public class Participation extends BaseTimeEntity {
         return Participation.builder()
                 .meetingAuthority(MeetingAuthority.HOST)
                 .participationMeetingStatus(ParticipationMeetingStatus.PARTICIPATING)
-                .buttonAuthority(ButtonAuthority.NON_OWNER)
+                .buttonAuthority(ButtonAuthority.OWNER)
                 .build();
     }
 
