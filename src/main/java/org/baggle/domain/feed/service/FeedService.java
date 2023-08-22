@@ -70,7 +70,7 @@ public class FeedService {
         Participation participation = getParticipation(requestId);
         validateMeetingStatusForConfirmation(participation.getMeeting());
         validateButtonOwner(participation);
-        broadcastNotification(participation.getMeeting());
+        broadcastNotification(participation, participation.getMeeting());
         startEmergencyNotificationEvent(participation, authorizationTime);
         return FeedNotificationResponseDto.of(participation.getMeeting(), authorizationTime);
     }
@@ -83,13 +83,6 @@ public class FeedService {
     private Participation getParticipation(Long participationId) {
         return participationRepository.findById(participationId)
                 .orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
-    }
-
-    private FcmNotificationRequestDto createFcmNotificationRequestDto(Long meetingId) {
-        List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meetingId);
-        String title = fcmNotificationProvider.getEmergencyNotificationTitle();
-        String body = fcmNotificationProvider.getEmergencyNotificationBody();
-        return FcmNotificationRequestDto.of(fcmTokens, title, body);
     }
 
     private void validateButtonOwner(Participation participation) {
@@ -113,9 +106,22 @@ public class FeedService {
             throw new ConflictException(DUPLICATE_FEED);
     }
 
-    private void broadcastNotification(Meeting meeting) {
-        FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting.getId());
+    private void broadcastNotification(Participation requestParticipation, Meeting meeting) {
+        FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(requestParticipation, meeting.getId());
         fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+    }
+
+    private FcmNotificationRequestDto createFcmNotificationRequestDto(Participation participation, Long meetingId) {
+        List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meetingId);
+        deleteFcmTokenOfRequestParticipation(fcmTokens, participation);
+        String title = fcmNotificationProvider.getEmergencyNotificationTitle();
+        String body = fcmNotificationProvider.getEmergencyNotificationBody();
+        return FcmNotificationRequestDto.of(fcmTokens, title, body);
+    }
+
+    private void deleteFcmTokenOfRequestParticipation(List<FcmToken> fcmTokens, Participation participation){
+        FcmToken fcmToken = participation.getUser().getFcmToken();
+        fcmTokens.remove(fcmToken);
     }
 
     private void startEmergencyNotificationEvent(Participation participation, LocalDateTime authorizationTime) {
