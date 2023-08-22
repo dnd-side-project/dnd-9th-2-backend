@@ -4,5 +4,6 @@ public enum MeetingStatus {
     SCHEDULED,
     CONFIRMATION,
     ONGOING,
-    TERMINATION
+    TERMINATION,
+    PAST;
 }

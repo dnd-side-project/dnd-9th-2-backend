@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
 import org.baggle.domain.fcm.repository.FcmRepository;
-import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.fcm.service.FcmNotificationProvider;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.feed.domain.Feed;
@@ -18,19 +17,16 @@ import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
-import org.baggle.domain.user.domain.User;
 import org.baggle.global.common.ImageType;
 import org.baggle.global.error.exception.ConflictException;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.ForbiddenException;
 import org.baggle.global.error.exception.InvalidValueException;
 import org.baggle.infra.s3.S3Provider;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -89,15 +85,15 @@ public class FeedService {
                 .orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
     }
 
-    private FcmNotificationRequestDto createFcmNotificationRequestDto(Long meetingId){
+    private FcmNotificationRequestDto createFcmNotificationRequestDto(Long meetingId) {
         List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meetingId);
         String title = fcmNotificationProvider.getEmergencyNotificationTitle();
         String body = fcmNotificationProvider.getEmergencyNotificationBody();
         return FcmNotificationRequestDto.of(fcmTokens, title, body);
     }
 
-    private void validateButtonOwner(Participation participation){
-        if(participation.getButtonAuthority() != ButtonAuthority.OWNER)
+    private void validateButtonOwner(Participation participation) {
+        if (participation.getButtonAuthority() != ButtonAuthority.OWNER)
             throw new ForbiddenException(NOT_MATCH_BUTTON_OWNER);
     }
 
@@ -126,6 +122,6 @@ public class FeedService {
         fcmNotificationService.deleteFcmNotification(participation.getMeeting().getId());
         fcmNotificationService.createFcmTimer(participation.getMeeting().getId(), authorizationTime);
         Meeting meeting = getMeeting(participation.getMeeting().getId());
-        meeting.updateMeetingStatusIntoOngoing();
+        meeting.updateMeetingStatusInto(MeetingStatus.ONGOING);
     }
 }
