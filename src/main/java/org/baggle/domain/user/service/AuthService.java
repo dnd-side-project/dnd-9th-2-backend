@@ -38,13 +38,6 @@ public class AuthService {
     private final AppleOAuthProvider appleOAuthProvider;
     private final KakaoOAuthProvider kakaoOAuthProvider;
 
-    /**
-     * 소셜 로그인
-     *
-     * @param token                카카오 access token & 애플 identity token
-     * @param userSignInRequestDto 로그인 request dto
-     * @return userAuthResponseDto 인증 response dto
-     */
     public UserAuthResponseDto signIn(String token, UserSignInRequestDto userSignInRequestDto) {
         Platform enumPlatform = getEnumPlatformFromStringPlatform(userSignInRequestDto.getPlatform());
         String platformId = getPlatformId(token, enumPlatform);
@@ -54,16 +47,6 @@ public class AuthService {
         return UserAuthResponseDto.of(issuedToken, findUser);
     }
 
-    /**
-     * 회원 가입
-     *
-     * @param token    카카오 access token & 애플 identity token
-     * @param image    프로필 이미지
-     * @param nickname 닉네임
-     * @param platform 카카오 & 애플
-     * @param fcmToken fcm token
-     * @return userAuthResponseDto 인증 response dto
-     */
     public UserAuthResponseDto signUp(String token, MultipartFile image, String nickname, String platform, String fcmToken) {
         validateDuplicateNickname(nickname);
         Platform enumPlatform = getEnumPlatformFromStringPlatform(platform);
@@ -75,11 +58,6 @@ public class AuthService {
         return UserAuthResponseDto.of(issuedToken, savedUser);
     }
 
-    /**
-     * 회원 탈퇴
-     *
-     * @param userId 유저 코드
-     */
     public void withdraw(Long userId) {
         User findUser = getUser(userId);
         findUser.withdrawUser();
