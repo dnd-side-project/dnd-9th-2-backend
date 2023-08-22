@@ -1,1 +1,0 @@
-ALTER TABLE meeting MODIFY meeting_status VARCHAR(255) CHECK (meeting_status IN ('SCHEDULED', 'CONFIRMATION', 'ONGOING', 'TERMINATION', 'PAST'));

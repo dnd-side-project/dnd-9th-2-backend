@@ -1,0 +1,2 @@
+ALTER TABLE meeting DROP CHECK meeting_chk_1;
+ALTER TABLE meeting ADD CHECK (meeting_status IN ('SCHEDULED', 'CONFIRMATION', 'ONGOING', 'TERMINATION', 'PAST'));
