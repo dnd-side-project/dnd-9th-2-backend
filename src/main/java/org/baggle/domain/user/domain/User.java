@@ -9,6 +9,8 @@ import org.baggle.global.common.BaseTimeEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.baggle.domain.fcm.domain.FcmToken.createFcmToken;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -27,21 +29,19 @@ public class User extends BaseTimeEntity {
     private List<Participation> participations = new ArrayList<>();
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private FcmToken fcmToken;
-    private String platformId;
-    private String refreshToken;
     @Enumerated(value = EnumType.STRING)
     private Platform platform;
+    private String platformId;
+    private String refreshToken;
 
-    public static User createUserWithFcmToken(String profileImageUrl, String nickname, String fcmToken, String platformId, Platform platform) {
+    public static User createUser(String profileImageUrl, String nickname, String fcmToken, Platform platform, String platformId) {
         User user = User.builder()
-                .profileImageUrl(!profileImageUrl.isEmpty() ? profileImageUrl : null)
+                .profileImageUrl(profileImageUrl)
                 .nickname(nickname)
-                .platformId(platformId)
                 .platform(platform)
+                .platformId(platformId)
                 .build();
-        FcmToken token = FcmToken.builder()
-                .fcmToken(fcmToken)
-                .build();
+        FcmToken token = createFcmToken(fcmToken);
         token.changeUser(user);
         return user;
     }
