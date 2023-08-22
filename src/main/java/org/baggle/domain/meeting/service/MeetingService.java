@@ -36,7 +36,7 @@ public class MeetingService {
     @Transactional
     public CreateMeetingResponseDto createMeeting(Long userId, CreateMeetingRequestDto createMeetingRequestDto) {
         User findUser = getUser(userId);
-        validateCreateMeeting(findUser.getId(), createMeetingRequestDto.getMeetingTime());
+        //validateCreateMeeting(findUser.getId(), createMeetingRequestDto.getMeetingTime());
         Meeting meeting = createMeetingAndParticipationWithUser(findUser, createMeetingRequestDto);
         Meeting savedMeeting = meetingRepository.save(meeting);
         return CreateMeetingResponseDto.of(savedMeeting.getId());
