@@ -43,8 +43,8 @@ public class ParticipationService {
     public void createParticipation(Long userId, ParticipationRequestDto requestDto) {
         Meeting meeting = getMeeting(requestDto.getMeetingId());
         User user = getUser(userId);
-//        validateMeetingStatus(meeting);
 //        duplicateParticipation(meeting.getParticipations(), userId);
+//        validateMeetingStatus(meeting);
 //        validateMeetingCapacity(meeting);
 //        validateMeetingTime(userId, meeting);
         Participation participation = createParticipationWithRandomButtonAuthority(user, meeting);
