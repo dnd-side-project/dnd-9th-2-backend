@@ -32,9 +32,6 @@ public class FcmNotificationService {
     private final FcmTimerRepository fcmTimerRepository;
     private final ParticipationRepository participationRepository;
 
-    /**
-     * TODO: Create 예외 처리
-     */
     public void createFcmNotification(Long key) {
         FcmNotification fcmNotification = FcmNotification.builder()
                 .id(key)

@@ -1,35 +1,23 @@
 package org.baggle.domain.fcm.scheduler;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
-import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.fcm.service.FcmNotificationProvider;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.service.MeetingDetailService;
-import org.springframework.context.MessageSource;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * logic:
- * 1. 모임 조회 -> 서버 오차 범위 1분 적용
- * 2. redis cache 에서 알람 전송 여부 확인
- * 3. 긴급버튼 알람 전송시 cache 소모
- * 4. 만약 긴급버튼 알람을 전송하지 못할 경우 redis Cache(47분) 만료 기간에 맞춰 긴급버튼 알람 전송
- * 5. cache 소모
- */
 @Slf4j
 @Component
 @EnableAsync

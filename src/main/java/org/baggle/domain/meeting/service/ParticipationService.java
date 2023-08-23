@@ -31,13 +31,6 @@ public class ParticipationService {
     private final MeetingRepository meetingRepository;
     private final ParticipationRepository participationRepository;
 
-    /**
-     * 현재 모임에 참여 여부를 판단하는 메서드.
-     * throw: 모임이 존재하지 않을 경우
-     * throw: 2시간 내 모임이 존재하는 경우 or 모임시작 시간 < 1시간
-     * throw: 이미 모임에 참여한 경우
-     * throw: 모임이 다 찼을 경우
-     */
     public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long requestId) {
         Meeting meeting = getMeeting(requestId);
         validateMeetingStatus(meeting);
@@ -47,9 +40,6 @@ public class ParticipationService {
         return ParticipationAvailabilityResponseDto.of(meeting);
     }
 
-    /**
-     * 모임 참여 메서드
-     */
     public void createParticipation(Long userId, ParticipationRequestDto requestDto) {
         Meeting meeting = getMeeting(requestDto.getMeetingId());
         User user = getUser(userId);
@@ -61,10 +51,6 @@ public class ParticipationService {
         participationRepository.save(participation);
     }
 
-    /**
-     * throw: 방장이 아닌 경우
-     * throw: 방장 위임 가능 시간이 아닌 경우
-     */
     public void delegateMeetingHost(Long fromMemberId, Long toMemberId) {
         Participation fromParticipation = getParticipation(fromMemberId);
         Participation toParticipation = getParticipation(toMemberId);
