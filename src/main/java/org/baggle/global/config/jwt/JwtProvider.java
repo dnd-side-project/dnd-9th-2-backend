@@ -47,6 +47,12 @@ public class JwtProvider {
         }
     }
 
+    public void equalsRefreshToken(String providedRefreshToken, String storedRefreshToken) {
+        if (!providedRefreshToken.equals(storedRefreshToken)) {
+            throw new UnauthorizedException(ErrorCode.NOT_MATCH_REFRESH_TOKEN);
+        }
+    }
+
     public Long getSubject(String token) {
         return Long.valueOf(getJwtParser().parseClaimsJws(token)
                 .getBody()
