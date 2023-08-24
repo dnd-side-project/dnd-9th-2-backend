@@ -6,6 +6,7 @@ import org.baggle.domain.fcm.repository.FcmRepository;
 import org.baggle.domain.user.auth.apple.AppleOAuthProvider;
 import org.baggle.domain.user.auth.kakao.KakaoOAuthProvider;
 import org.baggle.domain.user.domain.Platform;
+import org.baggle.domain.user.domain.RefreshToken;
 import org.baggle.domain.user.domain.User;
 import org.baggle.domain.user.dto.request.UserSignInRequestDto;
 import org.baggle.domain.user.dto.response.UserAuthResponseDto;
@@ -64,9 +65,15 @@ public class AuthService {
         deleteRefreshToken(userId);
     }
 
-    // TODO
     public Token reissue(String refreshToken) {
-        return null;
+        jwtProvider.validateRefreshToken(refreshToken);
+        Long userId = jwtProvider.getSubject(refreshToken);
+        String storedRefreshToken = getRefreshToken(userId);
+        jwtProvider.equalsRefreshToken(refreshToken, storedRefreshToken);
+        User findUser = getUser(userId);
+        Token issuedToken = issueAccessTokenAndRefreshToken(findUser);
+        updateRefreshToken(findUser, issuedToken.getRefreshToken());
+        return issuedToken;
     }
 
     private User getUser(Platform platform, String platformId) {
@@ -97,11 +104,6 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    private void updateRefreshToken(User user, String refreshToken) {
-        user.updateRefreshToken(refreshToken);
-        refreshTokenRepository.save(createRefreshToken(user.getId(), refreshToken));
-    }
-
     private String getPlatformId(String token, Platform platform) {
         if (platform == Platform.KAKAO) {
             return kakaoOAuthProvider.getKakaoPlatformId(token);
@@ -109,17 +111,26 @@ public class AuthService {
         return appleOAuthProvider.getApplePlatformId(token);
     }
 
+    private void deleteRefreshToken(Long userId) {
+        refreshTokenRepository.deleteById(userId);
+    }
+
+    private String getRefreshToken(Long userId) {
+        try {
+            return getRefreshTokenFromRedis(userId);
+        } catch (EntityNotFoundException e) {
+            User findUser = getUser(userId);
+            return findUser.getRefreshToken();
+        }
+    }
+
     private Token issueAccessTokenAndRefreshToken(User user) {
         return jwtProvider.issueToken(user.getId());
     }
 
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
-    }
-
-    private void deleteRefreshToken(Long userId) {
-        refreshTokenRepository.deleteById(userId);
+    private void updateRefreshToken(User user, String refreshToken) {
+        user.updateRefreshToken(refreshToken);
+        refreshTokenRepository.save(createRefreshToken(user.getId(), refreshToken));
     }
 
     private FcmToken getFcmToken(User user) {
@@ -133,5 +144,16 @@ public class AuthService {
 
     private String uploadImageToS3AndGetImageUrl(MultipartFile image) {
         return s3Provider.uploadFile(image, ImageType.PROFILE.getImageType());
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private String getRefreshTokenFromRedis(Long userId) {
+        RefreshToken storedRefreshToken = refreshTokenRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
+        return storedRefreshToken.getRefreshToken();
     }
 }
