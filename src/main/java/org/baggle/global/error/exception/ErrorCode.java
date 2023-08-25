@@ -60,6 +60,7 @@ public enum ErrorCode {
     PARTICIPATION_NOT_FOUND(HttpStatus.NOT_FOUND, "모임 참가자를 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
     MEETING_COUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "모임의 총개수를 확인할 수 없습니다."),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "리프레쉬 토큰을 찾을 수 없습니다."),
 
     /**
      * 405 Method Not Allowed
