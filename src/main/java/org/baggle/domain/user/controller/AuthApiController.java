@@ -39,17 +39,24 @@ public class AuthApiController {
                 .body(BaseResponse.of(SuccessCode.CREATED, userAuthResponseDto));
     }
 
-    @PatchMapping("/withdraw")
-    public ResponseEntity<BaseResponse<?>> withdraw(@UserId final Long userId) {
-        authService.withdraw(userId);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(BaseResponse.of(SuccessCode.OK, null));
-    }
-
     @GetMapping("/reissue")
     public ResponseEntity<BaseResponse<?>> reissue(@RequestHeader("Authorization") final String refreshToken) {
         final Token reissuedToken = authService.reissue(refreshToken);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.of(SuccessCode.OK, reissuedToken));
+    }
+
+    @PatchMapping("/signout")
+    public ResponseEntity<BaseResponse<?>> signOut(@UserId final Long userId) {
+        authService.signOut(userId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.of(SuccessCode.OK, null));
+    }
+
+    @PatchMapping("/withdraw")
+    public ResponseEntity<BaseResponse<?>> withdraw(@UserId final Long userId) {
+        authService.withdraw(userId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.of(SuccessCode.OK, null));
     }
 }
