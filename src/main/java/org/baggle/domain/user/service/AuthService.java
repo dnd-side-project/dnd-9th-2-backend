@@ -55,14 +55,8 @@ public class AuthService {
         validateDuplicateUser(enumPlatform, platformId);
         User savedUser = saveUser(image, nickname, fcmToken, enumPlatform, platformId);
         Token issuedToken = issueAccessTokenAndRefreshToken(savedUser);
-        updateRefreshToken(savedUser, issuedToken.getRefreshToken());
+        updateRefreshToken(issuedToken.getRefreshToken(), savedUser);
         return UserAuthResponseDto.of(issuedToken, savedUser);
-    }
-
-    public void withdraw(Long userId) {
-        User findUser = getUser(userId);
-        findUser.withdrawUser();
-        deleteRefreshToken(userId);
     }
 
     public Token reissue(String refreshToken) {
@@ -72,8 +66,21 @@ public class AuthService {
         jwtProvider.equalsRefreshToken(refreshToken, storedRefreshToken);
         User findUser = getUser(userId);
         Token issuedToken = issueAccessTokenAndRefreshToken(findUser);
-        updateRefreshToken(findUser, issuedToken.getRefreshToken());
+        updateRefreshToken(issuedToken.getRefreshToken(), findUser);
         return issuedToken;
+    }
+
+    public void signOut(Long userId) {
+        User findUser = getUser(userId);
+        deleteRefreshToken(findUser);
+        deleteFcmToken(findUser);
+    }
+
+    public void withdraw(Long userId) {
+        User findUser = getUser(userId);
+        findUser.withdrawUser();
+        deleteRefreshToken(findUser);
+        deleteFcmToken(findUser);
     }
 
     private User getUser(Platform platform, String platformId) {
@@ -111,10 +118,6 @@ public class AuthService {
         return appleOAuthProvider.getApplePlatformId(token);
     }
 
-    private void deleteRefreshToken(Long userId) {
-        refreshTokenRepository.deleteById(userId);
-    }
-
     private String getRefreshToken(Long userId) {
         try {
             return getRefreshTokenFromRedis(userId);
@@ -128,9 +131,24 @@ public class AuthService {
         return jwtProvider.issueToken(user.getId());
     }
 
-    private void updateRefreshToken(User user, String refreshToken) {
+    private void updateRefreshToken(String refreshToken, User user) {
         user.updateRefreshToken(refreshToken);
         refreshTokenRepository.save(createRefreshToken(user.getId(), refreshToken));
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private void deleteRefreshToken(User user) {
+        user.updateRefreshToken(null);
+        refreshTokenRepository.deleteById(user.getId());
+    }
+
+    private void deleteFcmToken(User user) {
+        FcmToken findfcmToken = user.getFcmToken();
+        findfcmToken.updateFcmToken(null);
     }
 
     private FcmToken getFcmToken(User user) {
@@ -144,11 +162,6 @@ public class AuthService {
 
     private String uploadImageToS3AndGetImageUrl(MultipartFile image) {
         return s3Provider.uploadFile(image, ImageType.PROFILE.getImageType());
-    }
-
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     private String getRefreshTokenFromRedis(Long userId) {
