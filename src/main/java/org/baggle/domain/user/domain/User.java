@@ -51,7 +51,6 @@ public class User extends BaseTimeEntity {
         this.nickname = null;
         this.fcmToken.updateFcmToken(null);
         this.platformId = null;
-        this.refreshToken = null;
         this.platform = Platform.WITHDRAW;
     }
 
