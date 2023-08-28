@@ -1,5 +1,15 @@
 #  Baggle 🫧
-### 약속이 다가올수록 마음이 바글바글 🫧
+
+<img width="1920" alt="1" src="https://github.com/dnd-side-project/dnd-9th-2-backend/assets/81796317/67b7c0be-4240-4b54-a2b3-17229dd6fb39">
+
+<img width="1920" alt="2" src="https://github.com/dnd-side-project/dnd-9th-2-backend/assets/81796317/fc3112fe-897e-4d0a-beeb-b6a1da96a4a0">
+
+<img width="1920" alt="3" src="https://github.com/dnd-side-project/dnd-9th-2-backend/assets/81796317/1f5b81fd-b8f9-42d1-bc76-3470c63cdc5a">
+
+<img width="1920" alt="4" src="https://github.com/dnd-side-project/dnd-9th-2-backend/assets/81796317/c880184c-58ae-4a0d-8215-fe5c3c36ad19">
+
+<img width="1920" alt="5" src="https://github.com/dnd-side-project/dnd-9th-2-backend/assets/81796317/b74359c3-0a97-4c5c-9980-4928075c2ca5">
+
 
 <br>
 
@@ -22,7 +32,7 @@
 <br>
 
 ## Architecture ✨
-<img width="1504" alt="DND_2조_프로젝트_아키텍처" src="https://github.com/dnd-side-project/dnd-9th-2-backend/assets/81796317/c6782c12-e41d-4d3f-bc89-0f4623cd5684">
+<img width="1920" alt="16" src="https://github.com/dnd-side-project/dnd-9th-2-backend/assets/81796317/ddb0b80a-a3cd-406b-ab59-533463f219bf">
 
 <br>
 
