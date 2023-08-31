@@ -2,7 +2,13 @@ package org.baggle.domain.meeting.service;
 
 import lombok.RequiredArgsConstructor;
 import org.baggle.domain.fcm.domain.FcmTimer;
+import org.baggle.domain.fcm.domain.FcmToken;
+import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
+import org.baggle.domain.fcm.repository.FcmRepository;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
+import org.baggle.domain.fcm.service.FcmNotificationProvider;
+import org.baggle.domain.fcm.service.FcmNotificationService;
+import org.baggle.domain.fcm.service.FcmService;
 import org.baggle.domain.meeting.domain.*;
 import org.baggle.domain.meeting.dto.request.UpdateMeetingInfoRequestDto;
 import org.baggle.domain.meeting.dto.response.MeetingDetailResponseDto;
@@ -33,6 +39,9 @@ public class MeetingDetailService {
     private final MeetingRepository meetingRepository;
     private final ParticipationRepository participationRepository;
     private final FcmTimerRepository fcmTimerRepository;
+    private final FcmRepository fcmRepository;
+    private final FcmNotificationProvider fcmNotificationProvider;
+    private final FcmNotificationService fcmNotificationService;
 
     public MeetingDetailResponseDto findMeetingDetail(Long userId, Long requestId) {
         Meeting meeting = getMeeting(requestId);
@@ -53,9 +62,26 @@ public class MeetingDetailService {
         return UpdateMeetingInfoResponseDto.of(meeting.getId(), meeting.getTitle(), meeting.getPlace(), meeting.getDate(), meeting.getTime(), meeting.getMemo());
     }
 
+    public void deleteMeetingInfo(Long userId, Long meetingId) {
+        Meeting meeting = getMeeting(meetingId);
+        validateMeetingHost(meeting.getId(), userId);
+        validateMeetingStatus(meeting);
+        broadcastNotification(meeting);
+        deleteMeeting(meeting.getId());
+    }
+
     private Meeting getMeeting(Long meetingId) {
         return meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
+    }
+
+    private void deleteMeeting(Long meetingId) {
+        meetingRepository.deleteById(meetingId);
+    }
+
+    private FcmTimer getFcmTimer(Long fcmTimerId) {
+        return fcmTimerRepository.findById(fcmTimerId)
+                .orElse(FcmTimer.createFcmTimerWithNull());
     }
 
     private LocalDateTime getMeetingTime(LocalDate date, LocalTime time) {
@@ -144,8 +170,15 @@ public class MeetingDetailService {
             throw new InvalidValueException(UNAVAILABLE_MEETING_TIME);
     }
 
-    private FcmTimer getFcmTimer(Long fcmTimerId) {
-        return fcmTimerRepository.findById(fcmTimerId)
-                .orElse(FcmTimer.createFcmTimerWithNull());
+    private void broadcastNotification(Meeting meeting) {
+        FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting);
+        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+    }
+
+    private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting) {
+        List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meeting.getId());
+        String title = fcmNotificationProvider.getDeleteNotificationTitle();
+        String body = fcmNotificationProvider.getDeleteNotificationBody(meeting.getTitle());
+        return FcmNotificationRequestDto.of(fcmTokens, title, body);
     }
 }
