@@ -64,6 +64,7 @@ public class MeetingDetailService {
 
     public void deleteMeetingInfo(Long userId, Long meetingId) {
         Meeting meeting = getMeeting(meetingId);
+        validateParticipation(meeting, userId);
         validateMeetingHost(meeting.getId(), userId);
         validateMeetingStatus(meeting);
         broadcastNotification(meeting);
