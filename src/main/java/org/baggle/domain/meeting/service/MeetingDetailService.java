@@ -8,7 +8,6 @@ import org.baggle.domain.fcm.repository.FcmRepository;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.fcm.service.FcmNotificationProvider;
 import org.baggle.domain.fcm.service.FcmNotificationService;
-import org.baggle.domain.fcm.service.FcmService;
 import org.baggle.domain.meeting.domain.*;
 import org.baggle.domain.meeting.dto.request.UpdateMeetingInfoRequestDto;
 import org.baggle.domain.meeting.dto.response.MeetingDetailResponseDto;
@@ -57,9 +56,9 @@ public class MeetingDetailService {
         Meeting meeting = getMeeting(requestDto.getMeetingId());
         validateMeetingHost(meeting.getId(), userId);
         validateMeetingStatus(meeting);
-        validateMeetingDateTime(meeting, requestDto.getDate(), requestDto.getTime());
-        meeting.updateTitleAndPlaceAndDateAndTimeAndMemo(requestDto.getTitle(), requestDto.getPlace(), requestDto.getDate(), requestDto.getTime(), requestDto.getMemo());
-        return UpdateMeetingInfoResponseDto.of(meeting.getId(), meeting.getTitle(), meeting.getPlace(), meeting.getDate(), meeting.getTime(), meeting.getMemo());
+        validateMeetingDateTime(meeting, requestDto.getDateTime());
+        meeting.updateMeetingInfo(requestDto.getTitle(), requestDto.getPlace(), requestDto.getDateTime(), requestDto.getMemo());
+        return UpdateMeetingInfoResponseDto.of(meeting.getId(), meeting.getTitle(), meeting.getPlace(), LocalDateTime.of(meeting.getDate(), meeting.getTime()), meeting.getMemo());
     }
 
     public void deleteMeetingInfo(Long userId, Long meetingId) {
@@ -142,10 +141,10 @@ public class MeetingDetailService {
             throw new ForbiddenException(INVALID_MODIFY_TIME);
     }
 
-    private void validateMeetingDateTime(Meeting meeting, LocalDate requestDate, LocalTime requestTime) {
-        if (requestDate == null && requestTime == null) return;
-        LocalDate date = (requestDate == null) ? meeting.getDate() : requestDate;
-        LocalTime time = (requestTime == null) ? meeting.getTime() : requestTime;
+    private void validateMeetingDateTime(Meeting meeting, LocalDateTime requestDateTime) {
+        if (requestDateTime == null) return;
+        LocalDate date = requestDateTime.toLocalDate();
+        LocalTime time = requestDateTime.toLocalTime();
         validateModifyTimeWithRemainTime(meeting);
         validateMeetingTime(meeting, date, time);
     }
