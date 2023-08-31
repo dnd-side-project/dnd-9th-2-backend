@@ -6,6 +6,7 @@ import org.baggle.domain.user.domain.User;
 import org.baggle.global.common.BaseTimeEntity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,11 +49,11 @@ public class Meeting extends BaseTimeEntity {
         return meeting;
     }
 
-    public void updateTitleAndPlaceAndDateAndTimeAndMemo(String title, String place, LocalDate date, LocalTime time, String memo) {
+    public void updateTitleAndPlaceAndDateAndTimeAndMemo(String title, String place, LocalDateTime dateTime, String memo) {
         this.title = (title != null) ? title : this.title;
         this.place = (place != null) ? place : this.place;
-        this.date = (date != null) ? date : this.date;
-        this.time = (time != null) ? time : this.time;
+        this.date = (dateTime != null) ? dateTime.toLocalDate() : this.date;
+        this.time = (dateTime != null) ? dateTime.toLocalTime() : this.time;
         this.memo = (memo != null) ? memo : this.place;
     }
 
