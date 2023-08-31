@@ -57,4 +57,12 @@ public class MeetingApiController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.of(SuccessCode.OK, responseDto));
     }
+
+    @DeleteMapping
+    public ResponseEntity<BaseResponse<?>> deleteMeeting(@UserId final Long userId,
+                                                         @RequestParam final Long meetingId){
+        meetingDetailService.deleteMeetingInfo(userId, meetingId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.of(SuccessCode.OK, null));
+    }
 }

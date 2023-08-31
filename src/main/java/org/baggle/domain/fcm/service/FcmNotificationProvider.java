@@ -44,4 +44,12 @@ public class FcmNotificationProvider {
     public String getTerminationNotificationBody() {
         return messageSource.getMessage("termination.notification.body", null, Locale.KOREA);
     }
+
+    public String getDeleteNotificationTitle() {
+        return messageSource.getMessage("delete.notification.title", null, Locale.KOREA);
+    }
+
+    public String getDeleteNotificationBody(String name){
+        return messageSource.getMessage("delete.notification.body", new String[]{name}, Locale.KOREA);
+    }
 }
