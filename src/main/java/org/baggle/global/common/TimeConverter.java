@@ -5,11 +5,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public interface TimeConverter {
-    static LocalDate convertToLocalDate(LocalDateTime meetingTime) {
-        return meetingTime.toLocalDate();
+    static LocalDate convertToLocalDate(LocalDateTime localDateTime) {
+        return localDateTime.toLocalDate();
     }
 
-    static LocalTime convertToLocalTime(LocalDateTime meetingTime) {
-        return meetingTime.toLocalTime();
+    static LocalTime convertToLocalTime(LocalDateTime localDateTime) {
+        return localDateTime.toLocalTime();
     }
 }
