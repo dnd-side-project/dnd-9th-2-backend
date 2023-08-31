@@ -57,7 +57,7 @@ public class MeetingDetailService {
         validateMeetingHost(meeting.getId(), userId);
         validateMeetingStatus(meeting);
         validateMeetingDateTime(meeting, requestDto.getDateTime());
-        meeting.updateTitleAndPlaceAndDateAndTimeAndMemo(requestDto.getTitle(), requestDto.getPlace(), requestDto.getDateTime(), requestDto.getMemo());
+        meeting.updateMeetingInfo(requestDto.getTitle(), requestDto.getPlace(), requestDto.getDateTime(), requestDto.getMemo());
         return UpdateMeetingInfoResponseDto.of(meeting.getId(), meeting.getTitle(), meeting.getPlace(), LocalDateTime.of(meeting.getDate(), meeting.getTime()), meeting.getMemo());
     }
 

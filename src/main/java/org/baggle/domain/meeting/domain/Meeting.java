@@ -49,7 +49,7 @@ public class Meeting extends BaseTimeEntity {
         return meeting;
     }
 
-    public void updateTitleAndPlaceAndDateAndTimeAndMemo(String title, String place, LocalDateTime dateTime, String memo) {
+    public void updateMeetingInfo(String title, String place, LocalDateTime dateTime, String memo) {
         this.title = (title != null) ? title : this.title;
         this.place = (place != null) ? place : this.place;
         this.date = (dateTime != null) ? dateTime.toLocalDate() : this.date;
