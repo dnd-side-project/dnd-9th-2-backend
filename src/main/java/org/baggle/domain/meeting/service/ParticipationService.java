@@ -15,11 +15,11 @@ import org.baggle.global.error.exception.InvalidValueException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import static org.baggle.global.common.TimeConverter.convertToLocalDateTime;
 import static org.baggle.global.error.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
@@ -110,8 +110,8 @@ public class ParticipationService {
     }
 
     private void validateMeetingTime(Long userId, Meeting meeting) {
-        LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
-        meetingDetailService.isMeetingInDeadline(meeting.getId(), userId, meetingTime);
+        meetingDetailService.isMeetingInDeadline(meeting.getId(), userId,
+                convertToLocalDateTime(meeting.getDate(), meeting.getTime()));
     }
 
     private void duplicateParticipation(List<Participation> participations, Long userId) {
