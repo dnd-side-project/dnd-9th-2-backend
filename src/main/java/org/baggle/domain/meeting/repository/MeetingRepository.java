@@ -24,16 +24,20 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
             "FROM Meeting m " +
             "JOIN Participation p " +
             "ON m = p.meeting " +
+            "JOIN User u " +
+            "ON p.user = u " +
             "WHERE STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s') BETWEEN :from AND :to " +
-            "AND p.user.id = :userId")
+            "AND u.id = :userId")
     List<Meeting> findMeetingsWithinTimeRange(@Param("userId") Long userId, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 
     @Query("SELECT count(m) " +
             "FROM Meeting m " +
             "JOIN Participation p " +
             "ON m = p.meeting " +
+            "JOIN User u " +
+            "ON p.user = u " +
             "WHERE m.date = :date " +
-            "AND p.user.id = :userId")
+            "AND u.id = :userId")
     Long countMeetingWithinDate(@Param("userId") Long userId, @Param("date") LocalDate date);
 
     @Query("SELECT new org.baggle.domain.meeting.repository.MeetingCountQueryDto(SUM(CASE WHEN m.meetingStatus != :meetingStatus THEN 1 END), SUM(CASE WHEN m.meetingStatus = :meetingStatus THEN 1 END)) " +

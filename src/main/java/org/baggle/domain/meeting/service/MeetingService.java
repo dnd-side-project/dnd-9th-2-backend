@@ -23,8 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
+
+import static org.baggle.domain.meeting.domain.Period.getEnumPeriodFromStringPeriod;
+import static org.baggle.global.common.TimeConverter.convertToLocalDate;
+import static org.baggle.global.common.TimeConverter.convertToLocalTime;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -36,14 +39,15 @@ public class MeetingService {
     @Transactional
     public CreateMeetingResponseDto createMeeting(Long userId, CreateMeetingRequestDto createMeetingRequestDto) {
         User findUser = getUser(userId);
-        //validateCreateMeeting(findUser.getId(), createMeetingRequestDto.getMeetingTime());
-        Meeting meeting = createMeetingAndParticipationWithUser(findUser, createMeetingRequestDto);
+        //validateAvailableMeetingTime(userId, createMeetingRequestDto.getMeetingTime());
+        //validateMaximumCreatableMeetings(userId, convertToLocalDate(createMeetingRequestDto.getMeetingTime()));
+        Meeting meeting = createMeeting(findUser, createMeetingRequestDto);
         Meeting savedMeeting = meetingRepository.save(meeting);
         return CreateMeetingResponseDto.of(savedMeeting.getId());
     }
 
     public GetMeetingResponseDto getMeetings(Long userId, String period, Pageable pageable) {
-        Period enumPeriod = Period.getEnumPeriodFromStringPeriod(period);
+        Period enumPeriod = getEnumPeriodFromStringPeriod(period);
         MeetingCountQueryDto meetingCountQueryDto = getMeetingCount(userId);
         List<MeetingResponseDto> meetingResponseDtos = getMeetingsAccordingToPeriod(userId, enumPeriod, pageable);
         return GetMeetingResponseDto.of(meetingCountQueryDto, meetingResponseDtos);
@@ -54,13 +58,21 @@ public class MeetingService {
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
-    private void validateCreateMeeting(Long userId, LocalDateTime meetingTime) {
-        validateAvailableMeetingTime(userId, meetingTime);
-        LocalDate meetingDate = convertToLocalDate(meetingTime);
-        validateMaximumCreatableMeetings(userId, meetingDate);
+    private void validateAvailableMeetingTime(Long userId, LocalDateTime meetingTime) {
+        List<Meeting> findMeetings = meetingRepository.findMeetingsWithinTimeRange(userId, meetingTime.minusHours(2L), meetingTime.plusHours(2L));
+        if (!findMeetings.isEmpty()) {
+            throw new InvalidValueException(ErrorCode.UNAVAILABLE_MEETING_TIME);
+        }
     }
 
-    private Meeting createMeetingAndParticipationWithUser(User user, CreateMeetingRequestDto createMeetingRequestDto) {
+    private void validateMaximumCreatableMeetings(Long userId, LocalDate meetingDate) {
+        Long meetingCount = meetingRepository.countMeetingWithinDate(userId, meetingDate);
+        if (meetingCount > 1) {
+            throw new ForbiddenException(ErrorCode.INVALID_CREATE_MEETING);
+        }
+    }
+
+    private Meeting createMeeting(User user, CreateMeetingRequestDto createMeetingRequestDto) {
         return Meeting.createMeeting(user, createMeetingRequestDto.getTitle(), createMeetingRequestDto.getPlace(), convertToLocalDate(createMeetingRequestDto.getMeetingTime()),
                 convertToLocalTime(createMeetingRequestDto.getMeetingTime()), createMeetingRequestDto.getMemo());
     }
@@ -80,29 +92,5 @@ public class MeetingService {
         return meetings.stream()
                 .map(MeetingResponseDto::of)
                 .toList();
-    }
-
-    private void validateAvailableMeetingTime(Long userId, LocalDateTime meetingTime) {
-        LocalDateTime prevMeetingTime = meetingTime.minusHours(2L);
-        LocalDateTime nextMeetingTime = meetingTime.plusHours(2L);
-        List<Meeting> findMeetings = meetingRepository.findMeetingsWithinTimeRange(userId, prevMeetingTime, nextMeetingTime);
-        if (!findMeetings.isEmpty()) {
-            throw new InvalidValueException(ErrorCode.UNAVAILABLE_MEETING_TIME);
-        }
-    }
-
-    private void validateMaximumCreatableMeetings(Long userId, LocalDate meetingDate) {
-        Long meetingCount = meetingRepository.countMeetingWithinDate(userId, meetingDate);
-        if (meetingCount > 1) {
-            throw new ForbiddenException(ErrorCode.INVALID_CREATE_MEETING);
-        }
-    }
-
-    private LocalDate convertToLocalDate(LocalDateTime meetingTime) {
-        return meetingTime.toLocalDate();
-    }
-
-    private LocalTime convertToLocalTime(LocalDateTime meetingTime) {
-        return meetingTime.toLocalTime();
     }
 }
