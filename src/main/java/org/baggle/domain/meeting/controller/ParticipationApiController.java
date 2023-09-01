@@ -41,4 +41,11 @@ public class ParticipationApiController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.of(SuccessCode.OK, null));
     }
+
+    @PatchMapping("/withdraw")
+    public ResponseEntity<BaseResponse<?>> withdrawMember(@RequestParam final Long memberId){
+        participationService.withdrawMember(memberId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.of(SuccessCode.OK, null));
+    }
 }
