@@ -12,4 +12,8 @@ public interface TimeConverter {
     static LocalTime convertToLocalTime(LocalDateTime localDateTime) {
         return localDateTime.toLocalTime();
     }
+
+    static LocalDateTime convertToLocalDateTime(LocalDate localDate, LocalTime localTime) {
+        return LocalDateTime.of(localDate, localTime);
+    }
 }
