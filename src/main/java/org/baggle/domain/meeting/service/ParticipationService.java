@@ -62,6 +62,14 @@ public class ParticipationService {
         updateButtonAuthorityWithRandomNumber(meeting);
     }
 
+    public void withdrawMember(Long memberId){
+        Participation participation = getParticipation(memberId);
+        Meeting meeting = getMeetingWithParticipation(participation);
+        validateMeetingStatus(meeting);
+        withdrawBeforeMeetingConfirmation(participation, meeting);
+        updateButtonAuthorityWithRandomNumber(meeting);
+    }
+
     private Meeting getMeeting(Long meetingId) {
         return meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
@@ -91,9 +99,9 @@ public class ParticipationService {
         toParticipation.updateMeetingAuthorityToHost();
     }
 
-    private void withdrawBeforeMeetingConfirmation(Participation fromParticipation, Meeting meeting) {
-        meeting.withdrawParticipation(fromParticipation);
-        participationRepository.delete(fromParticipation);
+    private void withdrawBeforeMeetingConfirmation(Participation participation, Meeting meeting) {
+        meeting.withdrawParticipation(participation);
+        participationRepository.delete(participation);
     }
 
     private void validateMeetingStatus(Meeting meeting) {
