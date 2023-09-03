@@ -22,13 +22,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static org.baggle.global.common.TimeConverter.convertToLocalDateTime;
 import static org.baggle.global.error.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
@@ -48,8 +47,8 @@ public class MeetingDetailService {
         FcmTimer certificationTime = getFcmTimer(requestId);
         List<Participation> participationList = sortParticipationAlongAuthorization(meeting);
         List<ParticipationDetailResponseDto> participationDetails = ParticipationDetailResponseDto.listOf(participationList);
-        LocalDateTime meetingTime = getMeetingTime(meeting.getDate(), meeting.getTime());
-        return MeetingDetailResponseDto.of(meeting, meetingTime, certificationTime.getStartTime(), participationDetails);
+        return MeetingDetailResponseDto.of(meeting, convertToLocalDateTime(meeting.getDate(), meeting.getTime()),
+                certificationTime.getStartTime(), participationDetails);
     }
 
     public UpdateMeetingInfoResponseDto updateMeetingInfo(Long userId, UpdateMeetingInfoRequestDto requestDto) {
@@ -84,10 +83,6 @@ public class MeetingDetailService {
                 .orElse(FcmTimer.createFcmTimerWithNull());
     }
 
-    private LocalDateTime getMeetingTime(LocalDate date, LocalTime time) {
-        return LocalDateTime.of(date, time);
-    }
-
     public List<Meeting> findMeetingsInRange(int from, int to, MeetingStatus meetingStatus) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime fromDateTime = now.plusMinutes(from);
@@ -118,8 +113,7 @@ public class MeetingDetailService {
 
     private Long getTimeUntilMeeting(Meeting meeting) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime meetingTime = LocalDateTime.of(meeting.getDate(), meeting.getTime());
-        Duration duration = Duration.between(now, meetingTime);
+        Duration duration = Duration.between(now, convertToLocalDateTime(meeting.getDate(), meeting.getTime()));
         return duration.toSeconds();
     }
 
@@ -143,10 +137,8 @@ public class MeetingDetailService {
 
     private void validateMeetingDateTime(Meeting meeting, LocalDateTime requestDateTime) {
         if (requestDateTime == null) return;
-        LocalDate date = requestDateTime.toLocalDate();
-        LocalTime time = requestDateTime.toLocalTime();
         validateModifyTimeWithRemainTime(meeting);
-        validateMeetingTime(meeting, date, time);
+        validateMeetingTime(meeting, requestDateTime);
     }
 
     private void validateModifyTimeWithRemainTime(Meeting meeting) {
@@ -154,11 +146,9 @@ public class MeetingDetailService {
             throw new ForbiddenException(INVALID_MODIFY_TIME);
     }
 
-    private void validateMeetingTime(Meeting meeting, LocalDate date, LocalTime time) {
-        LocalDateTime meetingTime = LocalDateTime.of(date, time);
-        for (Participation participation : meeting.getParticipations()) {
-            isMeetingInDeadline(meeting.getId(), participation.getUser().getId(), meetingTime);
-        }
+    private void validateMeetingTime(Meeting meeting, LocalDateTime requestDateTime) {
+        meeting.getParticipations().forEach(participation ->
+                isMeetingInDeadline(meeting.getId(), participation.getUser().getId(), requestDateTime));
     }
 
     public void isMeetingInDeadline(Long meetingId, Long userId, LocalDateTime meetingTime) {
