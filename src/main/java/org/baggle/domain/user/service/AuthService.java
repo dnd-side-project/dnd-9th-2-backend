@@ -45,6 +45,7 @@ public class AuthService {
         User findUser = getUser(enumPlatform, platformId);
         updateFcmToken(userSignInRequestDto.getFcmToken(), findUser);
         Token issuedToken = issueAccessTokenAndRefreshToken(findUser);
+        updateRefreshToken(issuedToken.getRefreshToken(), findUser);
         return UserAuthResponseDto.of(issuedToken, findUser);
     }
 
