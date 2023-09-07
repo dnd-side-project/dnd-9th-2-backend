@@ -16,4 +16,8 @@ public interface TimeConverter {
     static LocalDateTime convertToLocalDateTime(LocalDate localDate, LocalTime localTime) {
         return LocalDateTime.of(localDate, localTime);
     }
+
+    static LocalDateTime convertToStartLocalDateTime(LocalDate localDate) {
+        return localDate.atStartOfDay();
+    }
 }
