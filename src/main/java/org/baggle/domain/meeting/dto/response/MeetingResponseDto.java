@@ -8,9 +8,12 @@ import org.baggle.domain.meeting.domain.Participation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.time.Duration.between;
+import static org.baggle.global.common.TimeConverter.convertToLocalDateTime;
+import static org.baggle.global.common.TimeConverter.convertToStartLocalDateTime;
 
 @Getter
 public class MeetingResponseDto {
@@ -42,10 +45,10 @@ public class MeetingResponseDto {
     public static MeetingResponseDto of(Meeting meeting) {
         return MeetingResponseDto.builder()
                 .meetingId(meeting.getId())
-                .remainingDate(Period.between(LocalDate.now(), meeting.getDate()).getDays())
+                .remainingDate((int) between(convertToStartLocalDateTime(LocalDate.now()), convertToStartLocalDateTime(meeting.getDate())).toDays())
                 .title(meeting.getTitle())
                 .place(meeting.getPlace())
-                .time(LocalDateTime.of(meeting.getDate(), meeting.getTime()))
+                .time(convertToLocalDateTime(meeting.getDate(), meeting.getTime()))
                 .participantCount(meeting.getParticipations().size())
                 .status(meeting.getMeetingStatus().name())
                 .participations(meeting.getParticipations())
