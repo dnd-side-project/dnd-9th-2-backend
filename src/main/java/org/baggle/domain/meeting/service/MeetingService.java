@@ -39,6 +39,7 @@ public class MeetingService {
     @Transactional
     public CreateMeetingResponseDto createMeeting(Long userId, CreateMeetingRequestDto createMeetingRequestDto) {
         User findUser = getUser(userId);
+        validateValidMeetingTime(createMeetingRequestDto.getMeetingTime());
         //validateAvailableMeetingTime(userId, createMeetingRequestDto.getMeetingTime());
         //validateMaximumCreatableMeetings(userId, convertToLocalDate(createMeetingRequestDto.getMeetingTime()));
         Meeting meeting = createMeeting(findUser, createMeetingRequestDto);
@@ -56,6 +57,14 @@ public class MeetingService {
     private User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private void validateValidMeetingTime(LocalDateTime meetingTime) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime criteriaTime = now.plusHours(2L);
+        if (criteriaTime.isAfter(meetingTime)) {
+            throw new InvalidValueException(ErrorCode.INVALID_MEETING_TIME);
+        }
     }
 
     private void validateAvailableMeetingTime(Long userId, LocalDateTime meetingTime) {
