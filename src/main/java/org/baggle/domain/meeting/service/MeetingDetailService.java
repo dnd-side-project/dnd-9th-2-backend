@@ -137,13 +137,7 @@ public class MeetingDetailService {
 
     private void validateMeetingDateTime(Meeting meeting, LocalDateTime requestDateTime) {
         if (requestDateTime == null) return;
-        validateModifyTimeWithRemainTime(meeting);
         validateMeetingTime(meeting, requestDateTime);
-    }
-
-    private void validateModifyTimeWithRemainTime(Meeting meeting) {
-        if (getTimeUntilMeeting(meeting) <= 7200)
-            throw new ForbiddenException(INVALID_MODIFY_TIME);
     }
 
     private void validateMeetingTime(Meeting meeting, LocalDateTime requestDateTime) {
