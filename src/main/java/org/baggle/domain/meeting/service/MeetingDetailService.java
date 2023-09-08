@@ -111,12 +111,6 @@ public class MeetingDetailService {
                 toDateTime);
     }
 
-    private Long getTimeUntilMeeting(Meeting meeting) {
-        LocalDateTime now = LocalDateTime.now();
-        Duration duration = Duration.between(now, convertToLocalDateTime(meeting.getDate(), meeting.getTime()));
-        return duration.toSeconds();
-    }
-
     private void validateParticipation(Meeting meeting, Long userId) {
         boolean isValidParticipation = meeting.getParticipations().stream()
                 .anyMatch(participation -> participation.getUser().getId() == userId);
