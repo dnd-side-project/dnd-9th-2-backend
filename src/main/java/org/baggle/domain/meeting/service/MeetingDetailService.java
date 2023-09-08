@@ -126,7 +126,7 @@ public class MeetingDetailService {
 
     private void validateMeetingStatus(Meeting meeting) {
         if (meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
-            throw new ForbiddenException(INVALID_MODIFY_TIME);
+            throw new InvalidValueException(INVALID_MEETING_TIME);
     }
 
     private void validateMeetingDateTime(Meeting meeting, LocalDateTime requestDateTime) {
