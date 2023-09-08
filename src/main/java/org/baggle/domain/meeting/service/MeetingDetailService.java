@@ -85,8 +85,8 @@ public class MeetingDetailService {
 
     public List<Meeting> findMeetingsInRange(int from, int to, MeetingStatus meetingStatus) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime fromDateTime = now.plusMinutes(from);
-        LocalDateTime toDateTime = now.plusMinutes(to);
+        LocalDateTime fromDateTime = now.plusSeconds(from);
+        LocalDateTime toDateTime = now.plusSeconds(to);
         return meetingRepository.findMeetingsWithinTimeRangeAlongMeetingStatus(
                 fromDateTime,
                 toDateTime,
