@@ -31,7 +31,7 @@ public class NotificationScheduler {
     @Transactional
     @Scheduled(cron = "0 * * * * *")
     public void notificationScheduleTask() {
-        List<Meeting> notificationMeeting = meetingDetailService.findMeetingsInRange(59, 60, MeetingStatus.SCHEDULED);
+        List<Meeting> notificationMeeting = meetingDetailService.findMeetingsInRange(3540, 3600, MeetingStatus.SCHEDULED);
         for (Meeting m : notificationMeeting) {
             m.updateMeetingStatusInto(MeetingStatus.CONFIRMATION);
             sendNotificationByButtonAuthority(m, ButtonAuthority.OWNER);
