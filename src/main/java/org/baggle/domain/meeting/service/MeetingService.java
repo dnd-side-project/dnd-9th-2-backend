@@ -93,10 +93,11 @@ public class MeetingService {
 
     private List<MeetingResponseDto> getMeetingsAccordingToPeriod(Long userId, Period period, Pageable pageable) {
         Page<Meeting> meetings;
+        LocalDateTime now = LocalDateTime.now();
         if (period == Period.SCHEDULED) {
-            meetings = meetingRepository.findMeetingsWithoutMeetingStatus(userId, MeetingStatus.PAST, LocalDateTime.now(), pageable);
+            meetings = meetingRepository.findMeetingsWithoutMeetingStatus(userId, MeetingStatus.PAST, convertToLocalDate(now).toString(), convertToLocalTime(now).toString(), pageable);
         } else {
-            meetings = meetingRepository.findMeetingsWithMeetingStatus(userId, MeetingStatus.PAST, LocalDateTime.now(), pageable);
+            meetings = meetingRepository.findMeetingsWithMeetingStatus(userId, MeetingStatus.PAST, convertToLocalDate(now).toString(), convertToLocalTime(now).toString(), pageable);
         }
         return meetings.stream()
                 .map(MeetingResponseDto::of)
