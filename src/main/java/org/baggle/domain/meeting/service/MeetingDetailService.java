@@ -126,7 +126,7 @@ public class MeetingDetailService {
 
     private void validateMeetingStatus(Meeting meeting) {
         if (meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
-            throw new ForbiddenException(INVALID_MODIFY_TIME);
+            throw new InvalidValueException(INVALID_MEETING_TIME);
     }
 
     private void validateMeetingDateTime(Meeting meeting, LocalDateTime requestDateTime) {
@@ -140,7 +140,7 @@ public class MeetingDetailService {
     }
 
     public void isMeetingInDeadline(Long meetingId, Long userId, LocalDateTime meetingTime) {
-        List<Meeting> meetings = findMeetingsInRangeForUser(userId, meetingTime, -120, 120)
+        List<Meeting> meetings = findMeetingsInRangeForUser(userId, meetingTime, -60, 60)
                 .stream()
                 .filter(m -> m.getId() != meetingId)
                 .toList();
