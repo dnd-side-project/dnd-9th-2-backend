@@ -111,12 +111,6 @@ public class MeetingDetailService {
                 toDateTime);
     }
 
-    private Long getTimeUntilMeeting(Meeting meeting) {
-        LocalDateTime now = LocalDateTime.now();
-        Duration duration = Duration.between(now, convertToLocalDateTime(meeting.getDate(), meeting.getTime()));
-        return duration.toSeconds();
-    }
-
     private void validateParticipation(Meeting meeting, Long userId) {
         boolean isValidParticipation = meeting.getParticipations().stream()
                 .anyMatch(participation -> participation.getUser().getId() == userId);
@@ -137,13 +131,7 @@ public class MeetingDetailService {
 
     private void validateMeetingDateTime(Meeting meeting, LocalDateTime requestDateTime) {
         if (requestDateTime == null) return;
-        validateModifyTimeWithRemainTime(meeting);
         validateMeetingTime(meeting, requestDateTime);
-    }
-
-    private void validateModifyTimeWithRemainTime(Meeting meeting) {
-        if (getTimeUntilMeeting(meeting) <= 7200)
-            throw new ForbiddenException(INVALID_MODIFY_TIME);
     }
 
     private void validateMeetingTime(Meeting meeting, LocalDateTime requestDateTime) {
