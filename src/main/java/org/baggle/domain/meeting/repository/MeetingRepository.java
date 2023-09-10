@@ -56,9 +56,9 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
             "JOIN User u " +
             "ON p.user = u " +
             "WHERE u.id = :userId " +
-            "AND m.meetingStatus = :meetingStatus " +
-            "ORDER BY TIMEDIFF(:currTime, STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s'))")
-    Page<Meeting> findMeetingsWithMeetingStatus(@Param("userId") Long userId, @Param("meetingStatus") MeetingStatus meetingStatus, @Param("currTime") LocalDateTime currTime, Pageable pageable);
+            "AND m.meetingStatus != :meetingStatus " +
+            "ORDER BY DATEDIFF(m.date, CAST(STR_TO_DATE(:currDate, '%Y-%m-%d') AS DATE)), REPLACE(CAST(TIMEDIFF(STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s'), STR_TO_DATE(CONCAT(:currDate, ' ', :currTime), '%Y-%m-%d %H:%i:%s')) AS STRING), ':', '')")
+    Page<Meeting> findMeetingsWithoutMeetingStatus(@Param("userId") Long userId, @Param("meetingStatus") MeetingStatus meetingStatus, @Param("currDate") String currDate, @Param("currTime") String currTime, Pageable pageable);
 
     @Query("SELECT m " +
             "FROM Meeting m " +
@@ -67,7 +67,7 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
             "JOIN User u " +
             "ON p.user = u " +
             "WHERE u.id = :userId " +
-            "AND m.meetingStatus != :meetingStatus " +
-            "ORDER BY TIMEDIFF(STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s'), :currTime)")
-    Page<Meeting> findMeetingsWithoutMeetingStatus(@Param("userId") Long userId, @Param("meetingStatus") MeetingStatus meetingStatus, @Param("currTime") LocalDateTime currTime, Pageable pageable);
+            "AND m.meetingStatus = :meetingStatus " +
+            "ORDER BY DATEDIFF(CAST(STR_TO_DATE(:currDate, '%Y-%m-%d') AS DATE), m.date), REPLACE(CAST(TIMEDIFF(STR_TO_DATE(CONCAT(:currDate, ' ', :currTime), '%Y-%m-%d %H:%i:%s'), STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s')) AS STRING), ':', '')")
+    Page<Meeting> findMeetingsWithMeetingStatus(@Param("userId") Long userId, @Param("meetingStatus") MeetingStatus meetingStatus, @Param("currDate") String currDate, @Param("currTime") String currTime, Pageable pageable);
 }
