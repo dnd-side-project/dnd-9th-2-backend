@@ -8,6 +8,7 @@ import org.baggle.domain.user.auth.kakao.KakaoOAuthProvider;
 import org.baggle.domain.user.domain.Platform;
 import org.baggle.domain.user.domain.RefreshToken;
 import org.baggle.domain.user.domain.User;
+import org.baggle.domain.user.dto.request.UserReissueRequestDto;
 import org.baggle.domain.user.dto.request.UserSignInRequestDto;
 import org.baggle.domain.user.dto.response.UserAuthResponseDto;
 import org.baggle.domain.user.repository.RefreshTokenRepository;
@@ -18,6 +19,7 @@ import org.baggle.global.config.jwt.Token;
 import org.baggle.global.error.exception.ConflictException;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.ErrorCode;
+import org.baggle.global.error.exception.UnauthorizedException;
 import org.baggle.infra.s3.S3Provider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,11 +62,10 @@ public class AuthService {
         return UserAuthResponseDto.of(issuedToken, savedUser);
     }
 
-    public Token reissue(String refreshToken) {
-        jwtProvider.validateRefreshToken(refreshToken);
-        Long userId = jwtProvider.getSubject(refreshToken);
-        String storedRefreshToken = getRefreshToken(userId);
-        jwtProvider.equalsRefreshToken(refreshToken, storedRefreshToken);
+    @Transactional(noRollbackFor = UnauthorizedException.class)
+    public Token reissue(String refreshToken, UserReissueRequestDto userReissueRequestDto) {
+        Long userId = userReissueRequestDto.getUserId();
+        validateRefreshToken(refreshToken, userId);
         User findUser = getUser(userId);
         Token issuedToken = issueAccessTokenAndRefreshToken(findUser);
         updateRefreshToken(issuedToken.getRefreshToken(), findUser);
@@ -119,12 +120,14 @@ public class AuthService {
         return appleOAuthProvider.getApplePlatformId(token);
     }
 
-    private String getRefreshToken(Long userId) {
+    private void validateRefreshToken(String refreshToken, Long userId) {
         try {
-            return getRefreshTokenFromRedis(userId);
-        } catch (EntityNotFoundException e) {
-            User findUser = getUser(userId);
-            return findUser.getRefreshToken();
+            jwtProvider.validateRefreshToken(refreshToken);
+            String storedRefreshToken = getRefreshToken(userId);
+            jwtProvider.equalsRefreshToken(refreshToken, storedRefreshToken);
+        } catch (UnauthorizedException e) {
+            signOut(userId);
+            throw e;
         }
     }
 
@@ -163,6 +166,15 @@ public class AuthService {
 
     private String uploadImageToS3AndGetImageUrl(MultipartFile image) {
         return s3Provider.uploadFile(image, ImageType.PROFILE.getImageType());
+    }
+
+    private String getRefreshToken(Long userId) {
+        try {
+            return getRefreshTokenFromRedis(userId);
+        } catch (EntityNotFoundException e) {
+            User findUser = getUser(userId);
+            return findUser.getRefreshToken();
+        }
     }
 
     private String getRefreshTokenFromRedis(Long userId) {
