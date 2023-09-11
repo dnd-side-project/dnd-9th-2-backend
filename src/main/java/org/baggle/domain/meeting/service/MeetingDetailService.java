@@ -155,7 +155,7 @@ public class MeetingDetailService {
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting) {
         List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meeting.getId());
-        fcmTokens = fcmTokens.stream().filter(fcmToken -> !Objects.isNull(fcmToken)).toList();
+        fcmTokens = fcmTokens.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).toList();
         String title = fcmNotificationProvider.getDeleteNotificationTitle();
         String body = fcmNotificationProvider.getDeleteNotificationBody(meeting.getTitle());
         return FcmNotificationRequestDto.of(fcmTokens, title, body);

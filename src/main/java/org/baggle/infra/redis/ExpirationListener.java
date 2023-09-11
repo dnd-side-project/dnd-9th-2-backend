@@ -53,8 +53,7 @@ public class ExpirationListener implements MessageListener {
 
     private List<FcmToken> getFcmTokens(Long meetingId) {
         List<FcmToken> fcmTokenList = fcmService.findFcmTokens(meetingId);
-        return fcmTokenList.stream()
-                .filter(fcmToken -> !Objects.isNull(fcmToken)).toList();
+        return fcmTokenList.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).toList();
     }
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(String dataType, Long meetingId) {
