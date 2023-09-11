@@ -1,6 +1,7 @@
 package org.baggle.domain.user.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.baggle.domain.user.dto.request.UserReissueRequestDto;
 import org.baggle.domain.user.dto.request.UserSignInRequestDto;
 import org.baggle.domain.user.dto.response.UserAuthResponseDto;
 import org.baggle.domain.user.service.AuthService;
@@ -39,9 +40,10 @@ public class AuthApiController {
                 .body(BaseResponse.of(SuccessCode.CREATED, userAuthResponseDto));
     }
 
-    @GetMapping("/reissue")
-    public ResponseEntity<BaseResponse<?>> reissue(@RequestHeader("Authorization") final String refreshToken) {
-        final Token reissuedToken = authService.reissue(refreshToken);
+    @PostMapping("/reissue")
+    public ResponseEntity<BaseResponse<?>> reissue(@RequestHeader("Authorization") final String refreshToken,
+                                                   @RequestBody final UserReissueRequestDto userReissueRequestDto) {
+        final Token reissuedToken = authService.reissue(refreshToken, userReissueRequestDto);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.of(SuccessCode.OK, reissuedToken));
     }
