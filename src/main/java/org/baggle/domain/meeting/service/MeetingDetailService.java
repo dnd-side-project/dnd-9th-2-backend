@@ -21,10 +21,10 @@ import org.baggle.global.error.exception.InvalidValueException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.baggle.global.common.TimeConverter.convertToLocalDateTime;
@@ -155,6 +155,7 @@ public class MeetingDetailService {
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting) {
         List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meeting.getId());
+        fcmTokens = fcmTokens.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).toList();
         String title = fcmNotificationProvider.getDeleteNotificationTitle();
         String body = fcmNotificationProvider.getDeleteNotificationBody(meeting.getTitle());
         return FcmNotificationRequestDto.of(fcmTokens, title, body);

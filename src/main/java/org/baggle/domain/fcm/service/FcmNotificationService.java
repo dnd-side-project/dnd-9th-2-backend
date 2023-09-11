@@ -33,20 +33,17 @@ public class FcmNotificationService {
     private final ParticipationRepository participationRepository;
 
     public void createFcmNotification(Long key) {
-        FcmNotification fcmNotification = FcmNotification.builder()
-                .id(key)
-                .isNotified(Boolean.TRUE)
-                .build();
+        FcmNotification fcmNotification = FcmNotification.createFcmNotification(key);
         fcmNotificationRepository.save(fcmNotification);
-    }
-
-    public void deleteFcmNotification(Long key) {
-        fcmNotificationRepository.deleteById(key);
     }
 
     @Transactional
     public List<FcmToken> findFcmTokensByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
         return participationRepository.findFcmTokensByMeetingAndButtonAuthority(meeting, buttonAuthority);
+    }
+
+    public void deleteFcmNotification(Long key) {
+        fcmNotificationRepository.deleteById(key);
     }
 
     public void sendNotificationByToken(FcmNotificationRequestDto fcmNotificationRequestDto, Long meetingId) {

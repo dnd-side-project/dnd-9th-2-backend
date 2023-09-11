@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -41,12 +42,13 @@ public class NotificationScheduler {
         }
     }
 
-    private List<FcmToken> getFcmTokens(Meeting meeting, ButtonAuthority buttonAuthority) {
-        return fcmNotificationService.findFcmTokensByButtonAuthority(meeting, buttonAuthority);
+    private List<FcmToken> findFcmTokensByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
+        List<FcmToken> fcmTokenList = fcmNotificationService.findFcmTokensByButtonAuthority(meeting, buttonAuthority);
+        return fcmTokenList.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).toList();
     }
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting, ButtonAuthority buttonAuthority) {
-        List<FcmToken> fcmTokens = getFcmTokens(meeting, buttonAuthority);
+        List<FcmToken> fcmTokens = findFcmTokensByButtonAuthority(meeting, buttonAuthority);
         String title = getNotificationTitleWithButtonAuthority(buttonAuthority);
         String body = getNotificationBodyWithButtonAuthority(buttonAuthority);
         return FcmNotificationRequestDto.of(fcmTokens, title, body);

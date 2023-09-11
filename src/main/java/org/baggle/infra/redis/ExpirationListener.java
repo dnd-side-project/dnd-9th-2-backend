@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -51,7 +52,8 @@ public class ExpirationListener implements MessageListener {
     }
 
     private List<FcmToken> getFcmTokens(Long meetingId) {
-        return fcmService.findFcmTokens(meetingId);
+        List<FcmToken> fcmTokenList = fcmService.findFcmTokens(meetingId);
+        return fcmTokenList.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).toList();
     }
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(String dataType, Long meetingId) {
