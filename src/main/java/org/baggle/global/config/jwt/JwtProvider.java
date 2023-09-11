@@ -2,7 +2,6 @@ package org.baggle.global.config.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.Getter;
 import org.baggle.global.error.exception.ErrorCode;
 import org.baggle.global.error.exception.UnauthorizedException;
@@ -32,7 +31,7 @@ public class JwtProvider {
             getJwtParser().parseClaimsJws(accessToken);
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException(ErrorCode.EXPIRED_ACCESS_TOKEN);
-        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+        } catch (Exception e) {
             throw new UnauthorizedException(ErrorCode.INVALID_ACCESS_TOKEN_VALUE);
         }
     }
@@ -42,7 +41,7 @@ public class JwtProvider {
             getJwtParser().parseClaimsJws(refreshToken);
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException(ErrorCode.EXPIRED_REFRESH_TOKEN);
-        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+        } catch (Exception e) {
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN_VALUE);
         }
     }
