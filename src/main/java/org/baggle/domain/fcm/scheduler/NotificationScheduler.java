@@ -49,7 +49,7 @@ public class NotificationScheduler {
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting, ButtonAuthority buttonAuthority) {
         List<FcmToken> fcmTokens = findFcmTokensByButtonAuthority(meeting, buttonAuthority);
-        fcmTokens.forEach(fcmToken -> log.info("fcmList", fcmToken));
+        fcmTokens.forEach(fcmToken -> log.info("fcmList - {}", fcmToken));
         String title = getNotificationTitleWithButtonAuthority(buttonAuthority);
         String body = getNotificationBodyWithButtonAuthority(buttonAuthority);
         return FcmNotificationRequestDto.of(fcmTokens, title, body);
