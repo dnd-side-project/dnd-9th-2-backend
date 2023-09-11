@@ -10,7 +10,6 @@ import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
 import org.baggle.domain.meeting.domain.MeetingStatus;
-import org.baggle.domain.meeting.repository.ParticipationRepository;
 import org.baggle.domain.meeting.service.MeetingDetailService;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -29,7 +28,6 @@ public class NotificationScheduler {
     private final MeetingDetailService meetingDetailService;
     private final FcmNotificationService fcmNotificationService;
     private final FcmNotificationProvider fcmNotificationProvider;
-    private final ParticipationRepository participationRepository;
 
     @Transactional
     @Scheduled(cron = "0 * * * * *")
@@ -45,12 +43,13 @@ public class NotificationScheduler {
     }
 
     private List<FcmToken> findFcmTokensByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
-        List<FcmToken> fcmTokenList = participationRepository.findFcmTokensByMeetingAndButtonAuthority(meeting, buttonAuthority);
+        List<FcmToken> fcmTokenList = fcmNotificationService.findFcmTokensByButtonAuthority(meeting, buttonAuthority);
         return fcmTokenList.stream().filter(fcmToken -> !Objects.isNull(fcmToken)).toList();
     }
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting, ButtonAuthority buttonAuthority) {
         List<FcmToken> fcmTokens = findFcmTokensByButtonAuthority(meeting, buttonAuthority);
+        fcmTokens.forEach(fcmToken -> log.info("fcmList", fcmToken));
         String title = getNotificationTitleWithButtonAuthority(buttonAuthority);
         String body = getNotificationBodyWithButtonAuthority(buttonAuthority);
         return FcmNotificationRequestDto.of(fcmTokens, title, body);
