@@ -4,6 +4,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmNotification;
@@ -32,13 +33,11 @@ public class FcmNotificationService {
     private final ParticipationRepository participationRepository;
 
     public void createFcmNotification(Long key) {
-        FcmNotification fcmNotification = FcmNotification.builder()
-                .id(key)
-                .isNotified(Boolean.TRUE)
-                .build();
+        FcmNotification fcmNotification = FcmNotification.createFcmNotification(key);
         fcmNotificationRepository.save(fcmNotification);
     }
 
+    @Transactional
     public List<FcmToken> findFcmTokensByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
         return participationRepository.findFcmTokensByMeetingAndButtonAuthority(meeting, buttonAuthority);
     }
