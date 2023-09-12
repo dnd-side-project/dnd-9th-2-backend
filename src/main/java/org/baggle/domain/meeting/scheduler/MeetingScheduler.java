@@ -36,6 +36,6 @@ public class MeetingScheduler {
     }
 
     private List<Meeting> getMeetingList() {
-        return meetingDetailService.findMeetingsInRange(-14340, -14400, MeetingStatus.TERMINATION);
+        return meetingDetailService.findMeetingsInRange(-14400, -14340, MeetingStatus.TERMINATION);
     }
 }
