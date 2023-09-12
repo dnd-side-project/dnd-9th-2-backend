@@ -54,7 +54,7 @@ public class Meeting extends BaseTimeEntity {
         this.place = (place != null) ? place : this.place;
         this.date = (dateTime != null) ? dateTime.toLocalDate() : this.date;
         this.time = (dateTime != null) ? dateTime.toLocalTime() : this.time;
-        this.memo = (memo != null) ? memo : this.place;
+        this.memo = (memo != null) ? memo : this.memo;
     }
 
     public void updateMeetingStatusInto(MeetingStatus meetingStatus) {
