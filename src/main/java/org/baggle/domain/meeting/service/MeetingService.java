@@ -6,7 +6,7 @@ import org.baggle.domain.meeting.domain.MeetingStatus;
 import org.baggle.domain.meeting.domain.Period;
 import org.baggle.domain.meeting.dto.request.CreateMeetingRequestDto;
 import org.baggle.domain.meeting.dto.response.CreateMeetingResponseDto;
-import org.baggle.domain.meeting.dto.response.GetMeetingResponseDto;
+import org.baggle.domain.meeting.dto.response.GetMeetingsResponseDto;
 import org.baggle.domain.meeting.dto.response.MeetingResponseDto;
 import org.baggle.domain.meeting.repository.MeetingCountQueryDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
@@ -14,14 +14,12 @@ import org.baggle.domain.user.domain.User;
 import org.baggle.domain.user.repository.UserRepository;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.ErrorCode;
-import org.baggle.global.error.exception.ForbiddenException;
 import org.baggle.global.error.exception.InvalidValueException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,47 +36,40 @@ public class MeetingService {
 
     @Transactional
     public CreateMeetingResponseDto createMeeting(Long userId, CreateMeetingRequestDto createMeetingRequestDto) {
+        LocalDateTime meetingTime = createMeetingRequestDto.getMeetingTime();
+        validateValidMeetingTime(meetingTime);
+        validateAvailableMeetingTime(userId, meetingTime);
         User findUser = getUser(userId);
-        validateValidMeetingTime(createMeetingRequestDto.getMeetingTime());
-        //validateAvailableMeetingTime(userId, createMeetingRequestDto.getMeetingTime());
-        //validateMaximumCreatableMeetings(userId, convertToLocalDate(createMeetingRequestDto.getMeetingTime()));
         Meeting meeting = createMeeting(findUser, createMeetingRequestDto);
         Meeting savedMeeting = meetingRepository.save(meeting);
         return CreateMeetingResponseDto.of(savedMeeting.getId());
     }
 
-    public GetMeetingResponseDto getMeetings(Long userId, String period, Pageable pageable) {
+    public GetMeetingsResponseDto getMeetings(Long userId, String period, Pageable pageable) {
         Period enumPeriod = getEnumPeriodFromStringPeriod(period);
         MeetingCountQueryDto meetingCountQueryDto = getMeetingCount(userId);
         List<MeetingResponseDto> meetingResponseDtos = getMeetingsAccordingToPeriod(userId, enumPeriod, pageable);
-        return GetMeetingResponseDto.of(meetingCountQueryDto, meetingResponseDtos);
-    }
-
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+        return GetMeetingsResponseDto.of(meetingCountQueryDto, meetingResponseDtos);
     }
 
     private void validateValidMeetingTime(LocalDateTime meetingTime) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime criteriaTime = now.plusHours(2L);
+        LocalDateTime criteriaTime = now.plusHours(1L);
         if (criteriaTime.isAfter(meetingTime)) {
             throw new InvalidValueException(ErrorCode.INVALID_MEETING_TIME);
         }
     }
 
     private void validateAvailableMeetingTime(Long userId, LocalDateTime meetingTime) {
-        List<Meeting> findMeetings = meetingRepository.findMeetingsWithinTimeRange(userId, meetingTime.minusHours(2L), meetingTime.plusHours(2L));
+        List<Meeting> findMeetings = meetingRepository.findMeetingsWithinTimeRange(userId, meetingTime.minusHours(1L), meetingTime.plusHours(1L));
         if (!findMeetings.isEmpty()) {
             throw new InvalidValueException(ErrorCode.UNAVAILABLE_MEETING_TIME);
         }
     }
 
-    private void validateMaximumCreatableMeetings(Long userId, LocalDate meetingDate) {
-        Long meetingCount = meetingRepository.countMeetingWithinDate(userId, meetingDate);
-        if (meetingCount > 1) {
-            throw new ForbiddenException(ErrorCode.INVALID_CREATE_MEETING);
-        }
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     private Meeting createMeeting(User user, CreateMeetingRequestDto createMeetingRequestDto) {
