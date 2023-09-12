@@ -20,8 +20,7 @@ public class BaggleApplication {
     }
 
     @PostConstruct
-    public void started(){
+    public void started() {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
-
     }
 }
