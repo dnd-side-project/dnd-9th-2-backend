@@ -12,7 +12,7 @@ public class UpdateMeetingInfoResponseDto {
     private Long meetingId;
     private String title;
     private String place;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-ddTHH:mm:ss", timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime dateTime;
     private String memo;
 
