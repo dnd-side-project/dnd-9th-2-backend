@@ -11,6 +11,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.baggle.domain.meeting.domain.Participation.createParticipation;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -43,7 +45,7 @@ public class Meeting extends BaseTimeEntity {
                 .memo(memo)
                 .meetingStatus(MeetingStatus.SCHEDULED)
                 .build();
-        Participation participation = Participation.createParticipation();
+        Participation participation = createParticipation();
         participation.changeUser(user);
         participation.changeMeeting(meeting);
         return meeting;
