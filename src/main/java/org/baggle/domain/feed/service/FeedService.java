@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.baggle.global.error.exception.ErrorCode.*;
 
@@ -103,7 +104,7 @@ public class FeedService {
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Participation participation, Long meetingId) {
         List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meetingId);
-        fcmTokens = fcmTokens.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).toList();
+        fcmTokens = fcmTokens.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).collect(Collectors.toList());
         deleteFcmTokenOfRequestParticipation(fcmTokens, participation);
         String title = fcmNotificationProvider.getEmergencyNotificationTitle();
         String body = fcmNotificationProvider.getEmergencyNotificationBody();
