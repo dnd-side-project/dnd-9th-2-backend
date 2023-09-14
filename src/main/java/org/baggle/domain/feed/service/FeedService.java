@@ -113,8 +113,6 @@ public class FeedService {
 
     private void deleteFcmTokenOfRequestParticipation(List<FcmToken> fcmTokens, Participation participation){
         FcmToken fcmToken = participation.getUser().getFcmToken();
-        System.out.println(fcmToken.getFcmToken());
-        fcmTokens.forEach(fcmToken1 -> System.out.println(fcmToken1.getFcmToken()));
         fcmTokens.remove(fcmToken);
     }
 
