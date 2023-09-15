@@ -34,4 +34,8 @@ public class Feed extends BaseTimeEntity {
                 .feedImageUrl(feedImageUrl)
                 .build();
     }
+
+    public void addReport(Report report){
+        this.reports.add(report);
+    }
 }

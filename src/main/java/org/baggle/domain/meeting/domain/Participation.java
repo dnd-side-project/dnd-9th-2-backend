@@ -79,4 +79,8 @@ public class Participation extends BaseTimeEntity {
     public void updateMeetingAuthorityToParticipation() {
         this.meetingAuthority = MeetingAuthority.PARTICIPATION;
     }
+
+    public void addReport(Report report){
+        this.reports.add(report);
+    }
 }
