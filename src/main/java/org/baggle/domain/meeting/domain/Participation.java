@@ -80,7 +80,7 @@ public class Participation extends BaseTimeEntity {
         this.meetingAuthority = MeetingAuthority.PARTICIPATION;
     }
 
-    public void addReport(Report report){
+    public void addReport(Report report) {
         this.reports.add(report);
     }
 }

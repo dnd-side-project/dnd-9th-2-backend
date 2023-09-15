@@ -19,7 +19,7 @@ public class ReportApiController {
     private final ReportService reportService;
 
     @PostMapping
-    public ResponseEntity<BaseResponse<?>> createReport(@RequestBody CreateReportRequestDto requestDto){
+    public ResponseEntity<BaseResponse<?>> createReport(@RequestBody CreateReportRequestDto requestDto) {
         reportService.createReport(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(BaseResponse.of(SuccessCode.CREATED, null));

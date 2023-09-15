@@ -35,7 +35,7 @@ public class Feed extends BaseTimeEntity {
                 .build();
     }
 
-    public void addReport(Report report){
+    public void addReport(Report report) {
         this.reports.add(report);
     }
 }
