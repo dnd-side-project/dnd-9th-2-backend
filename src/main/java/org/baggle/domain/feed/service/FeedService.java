@@ -50,9 +50,9 @@ public class FeedService {
         Participation participation = getParticipation(requestDto.getMemberId());
         duplicationParticipation(participation);
         validateCertificationTime(participation.getMeeting());
-        String imgUrl = s3Provider.uploadFile(feedImage, ImageType.FEED.getImageType());
+        String imgUrl = uploadImageToS3(feedImage);
         Feed feed = Feed.createParticipationWithFeedImg(participation, imgUrl);
-        feedRepository.save(feed);
+        saveFeed(feed);
         return FeedUploadResponseDto.of(feed.getId(), feed.getFeedImageUrl());
     }
 
@@ -63,6 +63,14 @@ public class FeedService {
         broadcastNotification(participation, participation.getMeeting());
         startEmergencyNotificationEvent(participation, authorizationTime);
         return FeedNotificationResponseDto.of(participation.getMeeting(), authorizationTime);
+    }
+
+    private String uploadImageToS3(MultipartFile feedImage) {
+        return s3Provider.uploadFile(feedImage, ImageType.FEED.getImageType());
+    }
+
+    private void saveFeed(Feed feed) {
+        feedRepository.save(feed);
     }
 
     private Meeting getMeeting(Long meetingId) {
@@ -110,7 +118,7 @@ public class FeedService {
         return FcmNotificationRequestDto.of(fcmTokens, title, body);
     }
 
-    private void deleteFcmTokenOfRequestParticipation(List<FcmToken> fcmTokens, Participation participation){
+    private void deleteFcmTokenOfRequestParticipation(List<FcmToken> fcmTokens, Participation participation) {
         FcmToken fcmToken = participation.getUser().getFcmToken();
         fcmTokens.remove(fcmToken);
     }
