@@ -22,4 +22,17 @@ public class Report extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participation_id")
     private Participation participation;
+    @Enumerated(value = EnumType.STRING)
+    private ReportType reportType;
+
+    public static Report createReport(Feed feed, Participation participation, ReportType reportType) {
+        Report createdReport = Report.builder()
+                .feed(feed)
+                .participation(participation)
+                .reportType(reportType)
+                .build();
+        feed.addReport(createdReport);
+        participation.addReport(createdReport);
+        return createdReport;
+    }
 }
