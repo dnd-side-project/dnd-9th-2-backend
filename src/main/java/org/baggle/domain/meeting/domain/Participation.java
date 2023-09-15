@@ -3,8 +3,12 @@ package org.baggle.domain.meeting.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.baggle.domain.feed.domain.Feed;
+import org.baggle.domain.report.domain.Report;
 import org.baggle.domain.user.domain.User;
 import org.baggle.global.common.BaseTimeEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -24,8 +28,9 @@ public class Participation extends BaseTimeEntity {
     private Meeting meeting;
     @OneToOne(mappedBy = "participation", fetch = FetchType.LAZY)
     private Feed feed;
-    @OneToOne(mappedBy = "participation", fetch = FetchType.LAZY)
-    private Report report;
+    @OneToMany(mappedBy = "participation", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Report> reports = new ArrayList<>();
     @Enumerated(value = EnumType.STRING)
     private MeetingAuthority meetingAuthority;
     @Enumerated(value = EnumType.STRING)
