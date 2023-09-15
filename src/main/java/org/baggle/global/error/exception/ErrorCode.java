@@ -22,6 +22,7 @@ public enum ErrorCode {
     INVALID_MEETING_PARTICIPATION(HttpStatus.BAD_REQUEST, "잘못된 모임 참가자 입니다."),
     UNAVAILABLE_MEETING_TIME(HttpStatus.BAD_REQUEST, "모임 1시간 전후 일정이 존재합니다."),
     INVALID_PERIOD_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 기간 타입입니다."),
+    INVALID_REPORT_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 신고 유형입니다."),
 
     /**
      * 401 Unauthorized
@@ -60,6 +61,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
     MEETING_COUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "모임의 총개수를 확인할 수 없습니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "리프레쉬 토큰을 찾을 수 없습니다."),
+    FEED_NOT_FOUND(HttpStatus.NOT_FOUND, "피드를 찾을 수 없습니다."),
 
     /**
      * 405 Method Not Allowed
