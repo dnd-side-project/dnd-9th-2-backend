@@ -1,0 +1,1 @@
+ALTER TABLE report ADD COLUMN report_type VARCHAR(255) CHECK (report_type IN ('SEXUALLY', 'VIOLENT', 'UNPLEASANT'));
