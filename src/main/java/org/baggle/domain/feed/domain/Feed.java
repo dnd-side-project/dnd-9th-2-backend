@@ -28,7 +28,7 @@ public class Feed extends BaseTimeEntity {
     @Builder.Default
     private List<Report> reports = new ArrayList<>();
 
-    public static Feed createParticipationWithFeedImg(Participation participation, String feedImageUrl) {
+    public static Feed createFeed(Participation participation, String feedImageUrl) {
         return Feed.builder()
                 .participation(participation)
                 .feedImageUrl(feedImageUrl)

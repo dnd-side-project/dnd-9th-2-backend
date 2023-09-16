@@ -51,7 +51,7 @@ public class FeedService {
         duplicationParticipation(participation);
         validateCertificationTime(participation.getMeeting());
         String imgUrl = uploadImageToS3(feedImage);
-        Feed feed = Feed.createParticipationWithFeedImg(participation, imgUrl);
+        Feed feed = Feed.createFeed(participation, imgUrl);
         saveFeed(feed);
         return FeedUploadResponseDto.of(feed.getId(), feed.getFeedImageUrl());
     }
