@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.baggle.global.error.exception.ErrorCode.FEED_NOT_FOUND;
 import static org.baggle.global.error.exception.ErrorCode.PARTICIPATION_NOT_FOUND;
+import static org.baggle.domain.report.domain.ReportType.getEnumReportTypeFromStringReportType;
 
 @RequiredArgsConstructor
 @Transactional
@@ -25,7 +26,7 @@ public class ReportService {
     private final ReportRepository reportRepository;
 
     public void createReport(CreateReportRequestDto requestDto) {
-        ReportType enumReportType = ReportType.getEnumReportTypeFromStringReportType(requestDto.getReportType());
+        ReportType enumReportType = getEnumReportTypeFromStringReportType(requestDto.getReportType());
         Feed findFeed = getFeedWithId(requestDto.getFeedId());
         Participation findParticipation = getParticipationWithId(requestDto.getParticipationId());
         Report createdReport = Report.createReport(findFeed, findParticipation, enumReportType);
