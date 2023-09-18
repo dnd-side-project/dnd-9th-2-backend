@@ -26,7 +26,7 @@ jobs:
           cd ./firebase
           echo "$FIREBASE_SDK" > ./ssang-1a9ab-firebase-adminsdk-7nen2-2c1210a093.json
         env:
-          APPLICATION: ${{ secrets.APPLICATION_PROD }}
+          APPLICATION_PROD: ${{ secrets.APPLICATION_PROD }}
           FIREBASE_SDK: ${{ secrets.FIREBASE_SDK }}
 
       - name: 🍃 gradle build 를 위한 권한을 부여합니다.
