@@ -74,7 +74,7 @@ public class MeetingDetailService {
                 .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
     }
 
-    private void deleteMeeting(Long meetingId) {
+    public void deleteMeeting(Long meetingId) {
         meetingRepository.deleteById(meetingId);
     }
 
