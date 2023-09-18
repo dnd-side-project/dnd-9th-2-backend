@@ -1,36 +1,61 @@
-name: Baggle Development Server CD
+name: Baggle Production Server CI/CD
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 jobs:
-  build:
+  build-and-deploy:
 
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
+      - name: 🍃 JDK 17로 설정합니다.
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 🍃 application.yml 파일을 생성합니다.
+        run: |
+          cd ./src/main/resources
+          touch ./application.yml
+          echo "$APPLICATION_PROD" > ./application.yml
+          mkdir firebase
+          cd ./firebase
+          echo "$FIREBASE_SDK" > ./ssang-1a9ab-firebase-adminsdk-7nen2-2c1210a093.json
+        env:
+          APPLICATION: ${{ secrets.APPLICATION_PROD }}
+          FIREBASE_SDK: ${{ secrets.FIREBASE_SDK }}
+
+      - name: 🍃 gradle build 를 위한 권한을 부여합니다.
+        run: chmod +x gradlew
+
+      - name: 🍃 gradle build 합니다.
+        run: ./gradlew build -x test
+
       - name: 🍃 docker image build 후 docker hub 에 push 합니다.
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -t ${{ secrets.DOCKER_REPOSITORY }}/${{ secrets.DOCKER_IMAGE }} .
           docker push ${{ secrets.DOCKER_REPOSITORY }}/${{ secrets.DOCKER_IMAGE }}
 
-      - name: 🍃 deploy.sh 파일을 EC2 development server 로 전달합니다.
+      - name: 🍃 deploy.sh 파일을 EC2 production server 로 전달합니다.
         uses: appleboy/scp-action@master
         with:
           username: ubuntu
-          host: ${{ secrets.EC2_DEV_HOST }}
+          host: ${{ secrets.EC2_PROD_HOST }}
           key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT }}
           source: "./scripts/deploy.sh"
           target: "/home/ubuntu/"
 
-      - name: 🍃 docker-compose.yml 파일을 EC2 development server 로 전달합니다.
+      - name: 🍃 docker-compose.yml 파일을 EC2 production server 로 전달합니다.
         uses: appleboy/scp-action@master
         with:
           username: ubuntu
-          host: ${{ secrets.EC2_DEV_HOST }}
+          host: ${{ secrets.EC2_PROD_HOST }}
           key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT }}
           source: "./docker-compose.yml"
@@ -40,7 +65,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           username: ubuntu
-          host: ${{ secrets.EC2_DEV_HOST }}
+          host: ${{ secrets.EC2_PROD_HOST }}
           key: ${{ secrets.EC2_KEY }}
           script: |
             sudo docker pull ${{ secrets.DOCKER_REPOSITORY }}/${{ secrets.DOCKER_IMAGE }}
