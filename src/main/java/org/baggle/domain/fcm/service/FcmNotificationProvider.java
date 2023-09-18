@@ -52,4 +52,8 @@ public class FcmNotificationProvider {
     public String getDeleteNotificationBody(String name){
         return messageSource.getMessage("delete.notification.body", new String[]{name}, Locale.KOREA);
     }
+
+    public String getDeleteMeetingNotificationBody(){
+        return messageSource.getMessage("delete.meeting.notification.body", new String[]{}, Locale.KOREA);
+    }
 }

@@ -34,29 +34,50 @@ public class NotificationScheduler {
     public void notificationScheduleTask() {
         List<Meeting> notificationMeeting = meetingDetailService.findMeetingsInRange(3540, 3600, MeetingStatus.SCHEDULED);
         for (Meeting m : notificationMeeting) {
-            m.updateMeetingStatusInto(MeetingStatus.CONFIRMATION);
-            sendNotificationByButtonAuthority(m, ButtonAuthority.OWNER);
-            sendNotificationByButtonAuthority(m, ButtonAuthority.NON_OWNER);
+            updateMeetingStatusIntoConfirmation(m);
+            broadcastNotification(m);
             fcmNotificationService.createFcmNotification(m.getId());
             log.info("meeting information - date {}, time {}", m.getDate(), m.getTime());
         }
     }
 
-    private List<FcmToken> findFcmTokensByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
-        List<FcmToken> fcmTokenList = fcmNotificationService.findFcmTokensByButtonAuthority(meeting, buttonAuthority);
-        return fcmTokenList.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).toList();
+    private void broadcastNotification(Meeting meeting) {
+        if (meeting.getParticipations().size() == 1) {
+            sendNotificationForDeletedMeeting(meeting);
+        } else {
+            sendNotificationByButtonAuthority(meeting, ButtonAuthority.OWNER);
+            sendNotificationByButtonAuthority(meeting, ButtonAuthority.NON_OWNER);
+        }
     }
 
-    private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting, ButtonAuthority buttonAuthority) {
+    private void updateMeetingStatusIntoConfirmation(Meeting meeting) {
+        if (meeting.getParticipations().size() != 1)
+            meeting.updateMeetingStatusInto(MeetingStatus.CONFIRMATION);
+    }
+
+    private void sendNotificationForDeletedMeeting(Meeting meeting) {
+        FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting);
+        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+        meetingDetailService.deleteMeeting(meeting.getId());
+    }
+
+    private void sendNotificationByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
+        FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDtoWithButtonAuthority(meeting, buttonAuthority);
+        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+    }
+
+    private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting) {
+        List<FcmToken> fcmTokens = findFcmTokensByButtonAuthority(meeting, ButtonAuthority.OWNER);
+        String title = fcmNotificationProvider.getDeleteNotificationTitle();
+        String body = fcmNotificationProvider.getDeleteMeetingNotificationBody();
+        return FcmNotificationRequestDto.of(fcmTokens, title, body);
+    }
+
+    private FcmNotificationRequestDto createFcmNotificationRequestDtoWithButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
         List<FcmToken> fcmTokens = findFcmTokensByButtonAuthority(meeting, buttonAuthority);
         String title = getNotificationTitleWithButtonAuthority(buttonAuthority);
         String body = getNotificationBodyWithButtonAuthority(buttonAuthority);
         return FcmNotificationRequestDto.of(fcmTokens, title, body);
-    }
-
-    private void sendNotificationByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
-        FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting, buttonAuthority);
-        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
     }
 
     private String getNotificationTitleWithButtonAuthority(ButtonAuthority buttonAuthority) {
@@ -70,5 +91,11 @@ public class NotificationScheduler {
             return fcmNotificationProvider.getButtonOwnerNotificationBody();
         return fcmNotificationProvider.getConfirmationNotificationBody();
     }
+
+    private List<FcmToken> findFcmTokensByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
+        List<FcmToken> fcmTokenList = fcmNotificationService.findFcmTokensByButtonAuthority(meeting, buttonAuthority);
+        return fcmTokenList.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).toList();
+    }
+
 
 }
