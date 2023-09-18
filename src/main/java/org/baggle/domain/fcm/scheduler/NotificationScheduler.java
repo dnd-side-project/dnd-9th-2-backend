@@ -41,21 +41,21 @@ public class NotificationScheduler {
         }
     }
 
-    private void broadcastNotification(Meeting meeting){
-        if(meeting.getParticipations().size() == 1){
+    private void broadcastNotification(Meeting meeting) {
+        if (meeting.getParticipations().size() == 1) {
             sendNotificationForDeletedMeeting(meeting);
-        }else{
+        } else {
             sendNotificationByButtonAuthority(meeting, ButtonAuthority.OWNER);
             sendNotificationByButtonAuthority(meeting, ButtonAuthority.NON_OWNER);
         }
     }
 
-    private void updateMeetingStatusIntoConfirmation(Meeting meeting){
-        if(meeting.getParticipations().size() != 1)
+    private void updateMeetingStatusIntoConfirmation(Meeting meeting) {
+        if (meeting.getParticipations().size() != 1)
             meeting.updateMeetingStatusInto(MeetingStatus.CONFIRMATION);
     }
 
-    private void sendNotificationForDeletedMeeting(Meeting meeting){
+    private void sendNotificationForDeletedMeeting(Meeting meeting) {
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting);
         fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
         meetingDetailService.deleteMeeting(meeting.getId());
@@ -66,7 +66,7 @@ public class NotificationScheduler {
         fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
     }
 
-    private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting){
+    private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting) {
         List<FcmToken> fcmTokens = findFcmTokensByButtonAuthority(meeting, ButtonAuthority.OWNER);
         String title = fcmNotificationProvider.getDeleteNotificationTitle();
         String body = fcmNotificationProvider.getDeleteMeetingNotificationBody();
