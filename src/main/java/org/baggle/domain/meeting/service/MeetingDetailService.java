@@ -8,6 +8,7 @@ import org.baggle.domain.fcm.repository.FcmRepository;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
 import org.baggle.domain.fcm.service.FcmNotificationProvider;
 import org.baggle.domain.fcm.service.FcmNotificationService;
+import org.baggle.domain.feed.domain.Feed;
 import org.baggle.domain.meeting.domain.*;
 import org.baggle.domain.meeting.dto.request.UpdateMeetingInfoRequestDto;
 import org.baggle.domain.meeting.dto.response.MeetingDetailResponseDto;
@@ -15,6 +16,7 @@ import org.baggle.domain.meeting.dto.response.ParticipationDetailResponseDto;
 import org.baggle.domain.meeting.dto.response.UpdateMeetingInfoResponseDto;
 import org.baggle.domain.meeting.repository.MeetingRepository;
 import org.baggle.domain.meeting.repository.ParticipationRepository;
+import org.baggle.domain.report.domain.Report;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.baggle.global.error.exception.ForbiddenException;
 import org.baggle.global.error.exception.InvalidValueException;
@@ -41,12 +43,12 @@ public class MeetingDetailService {
     private final FcmNotificationProvider fcmNotificationProvider;
     private final FcmNotificationService fcmNotificationService;
 
-    public MeetingDetailResponseDto findMeetingDetail(Long userId, Long requestId) {
-        Meeting meeting = getMeeting(requestId);
-        validateParticipation(meeting, userId);
-        FcmTimer certificationTime = getFcmTimer(requestId);
+    public MeetingDetailResponseDto findMeetingDetail(Long userId, Long meetingId) {
+        Meeting meeting = getMeeting(meetingId);
+        FcmTimer certificationTime = getFcmTimer(meetingId);
         List<Participation> participationList = sortParticipationAlongAuthorization(meeting);
-        List<ParticipationDetailResponseDto> participationDetails = ParticipationDetailResponseDto.listOf(participationList);
+        Participation requestParticipation = getRequestParticipationWithUserId(participationList, userId);
+        List<ParticipationDetailResponseDto> participationDetails = createParticipationDetailResDtoList(participationList, requestParticipation);
         return MeetingDetailResponseDto.of(meeting, convertToLocalDateTime(meeting.getDate(), meeting.getTime()),
                 certificationTime.getStartTime(), participationDetails);
     }
@@ -57,7 +59,8 @@ public class MeetingDetailService {
         validateMeetingStatus(meeting);
         validateMeetingDateTime(meeting, requestDto.getDateTime());
         meeting.updateMeetingInfo(requestDto.getTitle(), requestDto.getPlace(), requestDto.getDateTime(), requestDto.getMemo());
-        return UpdateMeetingInfoResponseDto.of(meeting.getId(), meeting.getTitle(), meeting.getPlace(), LocalDateTime.of(meeting.getDate(), meeting.getTime()), meeting.getMemo());
+        return UpdateMeetingInfoResponseDto.of(meeting.getId(), meeting.getTitle(), meeting.getPlace(),
+                LocalDateTime.of(meeting.getDate(), meeting.getTime()), meeting.getMemo());
     }
 
     public void deleteMeetingInfo(Long userId, Long meetingId) {
@@ -67,6 +70,28 @@ public class MeetingDetailService {
         validateMeetingStatus(meeting);
         broadcastNotification(meeting);
         deleteMeeting(meeting.getId());
+    }
+
+    private List<ParticipationDetailResponseDto> createParticipationDetailResDtoList(List<Participation> participationList,
+                                                                                     Participation requestParticipation) {
+        return participationList.stream()
+                .map(participation ->
+                        ParticipationDetailResponseDto.of(participation,
+                                isReportedFeed(requestParticipation.getReports(), participation.getFeed())))
+                .toList();
+    }
+
+    private boolean isReportedFeed(List<Report> reportList, Feed feed) {
+        if(Objects.isNull(feed)) return false;
+        return reportList.stream()
+                .anyMatch(report -> Objects.equals(report.getFeed().getId(), feed.getId()));
+    }
+
+    private Participation getRequestParticipationWithUserId(List<Participation> participationList, Long userId) {
+        return participationList.stream()
+                .filter(participation -> Objects.equals(participation.getUser().getId(), userId))
+                .findAny()
+                .orElseThrow(() -> new InvalidValueException(INVALID_MEETING_PARTICIPATION));
     }
 
     private Meeting getMeeting(Long meetingId) {
@@ -113,7 +138,7 @@ public class MeetingDetailService {
 
     private void validateParticipation(Meeting meeting, Long userId) {
         boolean isValidParticipation = meeting.getParticipations().stream()
-                .anyMatch(participation -> participation.getUser().getId() == userId);
+                .anyMatch(participation -> Objects.equals(participation.getUser().getId(), userId));
         if (!isValidParticipation)
             throw new InvalidValueException(INVALID_MEETING_PARTICIPATION);
     }
