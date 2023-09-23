@@ -82,7 +82,7 @@ public class MeetingDetailService {
     }
 
     private boolean isReportedFeed(List<Report> reportList, Feed feed) {
-        if(Objects.isNull(feed)) return false;
+        if (Objects.isNull(feed)) return false;
         return reportList.stream()
                 .anyMatch(report -> Objects.equals(report.getFeed().getId(), feed.getId()));
     }
