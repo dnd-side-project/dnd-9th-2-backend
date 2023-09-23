@@ -8,7 +8,6 @@ import org.baggle.domain.meeting.domain.MeetingAuthority;
 import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.domain.user.domain.User;
 
-import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -20,36 +19,26 @@ public class ParticipationDetailResponseDto {
     private Boolean buttonAuthority;
     private Long feedId;
     private String feedImageUrl;
+    private boolean report;
 
     @Builder
-    public ParticipationDetailResponseDto(Long memberId, String nickname, String profileImageUrl, MeetingAuthority meetingAuthority, ButtonAuthority buttonAuthority, Feed feed) {
-        this.memberId = memberId;
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
-        this.meetingAuthority = (meetingAuthority == MeetingAuthority.HOST) ? Boolean.TRUE : Boolean.FALSE;
-        this.buttonAuthority = (buttonAuthority == ButtonAuthority.OWNER) ? Boolean.TRUE : Boolean.FALSE;
+    public ParticipationDetailResponseDto(User user, Participation participation, Feed feed, boolean report) {
+        this.memberId = participation.getId();
+        this.nickname = user.getNickname();
+        this.profileImageUrl = user.getProfileImageUrl();
+        this.meetingAuthority = (participation.getMeetingAuthority() == MeetingAuthority.HOST) ? Boolean.TRUE : Boolean.FALSE;
+        this.buttonAuthority = (participation.getButtonAuthority() == ButtonAuthority.OWNER) ? Boolean.TRUE : Boolean.FALSE;
         this.feedId = Objects.isNull(feed) ? null : feed.getId();
         this.feedImageUrl = Objects.isNull(feed) ? "" : feed.getFeedImageUrl();
+        this.report = report;
     }
 
-    public static ParticipationDetailResponseDto of(Participation participation, User user, Feed feed) {
+    public static ParticipationDetailResponseDto of(Participation participation, boolean report) {
         return ParticipationDetailResponseDto.builder()
-                .memberId(participation.getId())
-                .nickname(user.getNickname())
-                .profileImageUrl(user.getProfileImageUrl())
-                .meetingAuthority(participation.getMeetingAuthority())
-                .buttonAuthority(participation.getButtonAuthority())
-                .feed(feed)
+                .user(participation.getUser())
+                .participation(participation)
+                .feed(participation.getFeed())
+                .report(report)
                 .build();
-    }
-
-    public static List<ParticipationDetailResponseDto> listOf(List<Participation> participations) {
-        return participations.stream()
-                .map(participation ->
-                        ParticipationDetailResponseDto.of(
-                                participation,
-                                participation.getUser(),
-                                participation.getFeed()))
-                .toList();
     }
 }
