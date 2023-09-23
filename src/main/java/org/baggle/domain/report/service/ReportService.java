@@ -11,7 +11,6 @@ import org.baggle.domain.report.dto.request.CreateReportRequestDto;
 import org.baggle.domain.report.repository.ReportRepository;
 import org.baggle.global.error.exception.ConflictException;
 import org.baggle.global.error.exception.EntityNotFoundException;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +34,8 @@ public class ReportService {
         saveReport(createdReport);
     }
 
-    private void duplicateReport(Feed feed, Participation participation){
-        if(reportRepository.existsReportByFeedIdAndParticipationId(feed.getId(), participation.getId()))
+    private void duplicateReport(Feed feed, Participation participation) {
+        if (reportRepository.existsReportByFeedIdAndParticipationId(feed.getId(), participation.getId()))
             throw new ConflictException(DUPLICATE_REPORT);
     }
 
