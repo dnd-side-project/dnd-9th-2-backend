@@ -29,12 +29,12 @@ public class ReportService {
         ReportType enumReportType = getEnumReportTypeFromStringReportType(requestDto.getReportType());
         Feed findFeed = getFeedWithId(requestDto.getFeedId());
         Participation findParticipation = getParticipationWithId(requestDto.getParticipationId());
-        duplicateReport(findFeed, findParticipation);
+        validateDuplicateReport(findFeed, findParticipation);
         Report createdReport = Report.createReport(findFeed, findParticipation, enumReportType);
         saveReport(createdReport);
     }
 
-    private void duplicateReport(Feed feed, Participation participation) {
+    private void validateDuplicateReport(Feed feed, Participation participation) {
         if (reportRepository.existsReportByFeedIdAndParticipationId(feed.getId(), participation.getId()))
             throw new ConflictException(DUPLICATE_REPORT);
     }
