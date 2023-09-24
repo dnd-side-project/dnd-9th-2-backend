@@ -76,6 +76,7 @@ public enum ErrorCode {
     DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다."),
     DUPLICATE_PARTICIPATION(HttpStatus.CONFLICT, "이미 존재하는 참가자입니다."),
     DUPLICATE_FEED(HttpStatus.CONFLICT, "이미 피드인증을 완료했습니다."),
+    DUPLICATE_REPORT(HttpStatus.CONFLICT, "이미 등록된 신고입니다."),
 
     /**
      * 500 Internal Server Error

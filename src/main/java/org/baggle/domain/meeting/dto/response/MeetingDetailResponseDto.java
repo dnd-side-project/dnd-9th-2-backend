@@ -8,6 +8,7 @@ import org.baggle.domain.meeting.domain.Meeting;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Builder
 @Getter
 public class MeetingDetailResponseDto {
     private Long meetingId;
@@ -21,19 +22,8 @@ public class MeetingDetailResponseDto {
     private LocalDateTime certificationTime;
     private List<ParticipationDetailResponseDto> members;
 
-    @Builder
-    public MeetingDetailResponseDto(Long meetingId, String title, String place, String memo, String status, LocalDateTime meetingTime, LocalDateTime certificationTime, List<ParticipationDetailResponseDto> members) {
-        this.meetingId = meetingId;
-        this.title = title;
-        this.place = place;
-        this.memo = memo;
-        this.status = status;
-        this.meetingTime = meetingTime;
-        this.certificationTime = certificationTime;
-        this.members = members;
-    }
-
-    public static MeetingDetailResponseDto of(Meeting meeting, LocalDateTime meetingTime, LocalDateTime certificationTime, List<ParticipationDetailResponseDto> participationDetailResponseDto) {
+    public static MeetingDetailResponseDto of(Meeting meeting, LocalDateTime meetingTime, LocalDateTime certificationTime,
+                                              List<ParticipationDetailResponseDto> participationDetailResponseDto) {
         return MeetingDetailResponseDto.builder()
                 .meetingId(meeting.getId())
                 .title(meeting.getTitle())

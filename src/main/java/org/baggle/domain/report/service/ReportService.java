@@ -9,13 +9,13 @@ import org.baggle.domain.report.domain.Report;
 import org.baggle.domain.report.domain.ReportType;
 import org.baggle.domain.report.dto.request.CreateReportRequestDto;
 import org.baggle.domain.report.repository.ReportRepository;
+import org.baggle.global.error.exception.ConflictException;
 import org.baggle.global.error.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.baggle.global.error.exception.ErrorCode.FEED_NOT_FOUND;
-import static org.baggle.global.error.exception.ErrorCode.PARTICIPATION_NOT_FOUND;
 import static org.baggle.domain.report.domain.ReportType.getEnumReportTypeFromStringReportType;
+import static org.baggle.global.error.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Transactional
@@ -29,8 +29,14 @@ public class ReportService {
         ReportType enumReportType = getEnumReportTypeFromStringReportType(requestDto.getReportType());
         Feed findFeed = getFeedWithId(requestDto.getFeedId());
         Participation findParticipation = getParticipationWithId(requestDto.getParticipationId());
+        validateDuplicateReport(findFeed, findParticipation);
         Report createdReport = Report.createReport(findFeed, findParticipation, enumReportType);
         saveReport(createdReport);
+    }
+
+    private void validateDuplicateReport(Feed feed, Participation participation) {
+        if (reportRepository.existsReportByFeedIdAndParticipationId(feed.getId(), participation.getId()))
+            throw new ConflictException(DUPLICATE_REPORT);
     }
 
     private void saveReport(Report report) {

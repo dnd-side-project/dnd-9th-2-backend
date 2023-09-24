@@ -33,22 +33,22 @@ public class ParticipationService {
 
     public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long requestId) {
         Meeting meeting = getMeeting(requestId);
-//        validateMeetingStatus(meeting);
-//        validateMeetingTime(userId, meeting);
-//        duplicateParticipation(meeting.getParticipations(), userId);
-//        validateMeetingCapacity(meeting);
+        validateMeetingStatus(meeting);
+        validateMeetingTime(userId, meeting);
+        duplicateParticipation(meeting.getParticipations(), userId);
+        validateMeetingCapacity(meeting);
         return ParticipationAvailabilityResponseDto.of(meeting);
     }
 
     public void createParticipation(Long userId, ParticipationRequestDto requestDto) {
         Meeting meeting = getMeeting(requestDto.getMeetingId());
         User user = getUser(userId);
-//        duplicateParticipation(meeting.getParticipations(), userId);
-//        validateMeetingStatus(meeting);
-//        validateMeetingCapacity(meeting);
-//        validateMeetingTime(userId, meeting);
+        duplicateParticipation(meeting.getParticipations(), userId);
+        validateMeetingStatus(meeting);
+        validateMeetingCapacity(meeting);
+        validateMeetingTime(userId, meeting);
         Participation participation = createParticipationWithRandomButtonAuthority(user, meeting);
-        participationRepository.save(participation);
+        saveParticipation(participation);
     }
 
     public void delegateMeetingHost(Long fromMemberId, Long toMemberId) {
@@ -62,12 +62,16 @@ public class ParticipationService {
         updateButtonAuthorityWithRandomNumber(meeting);
     }
 
-    public void withdrawMember(Long memberId){
+    public void withdrawMember(Long memberId) {
         Participation participation = getParticipation(memberId);
         Meeting meeting = getMeetingWithParticipation(participation);
         validateMeetingStatus(meeting);
         withdrawBeforeMeetingConfirmation(participation, meeting);
         updateButtonAuthorityWithRandomNumber(meeting);
+    }
+
+    private void saveParticipation(Participation participation) {
+        participationRepository.save(participation);
     }
 
     private Meeting getMeeting(Long meetingId) {
