@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class CreateReportRequestDto {
-    private Long participationId;
+    private Long memberId;
     private Long feedId;
     private String reportType;
 }
