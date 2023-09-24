@@ -1,0 +1,2 @@
+ALTER TABLE fcm DROP COLUMN fcm_token;
+ALTER TABLE fcm ADD COLUMN fcm_token VARCHAR(255);
