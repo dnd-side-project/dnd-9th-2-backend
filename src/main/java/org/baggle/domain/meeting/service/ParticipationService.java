@@ -62,7 +62,7 @@ public class ParticipationService {
         updateButtonAuthorityWithRandomNumber(meeting);
     }
 
-    public void withdrawMember(Long memberId){
+    public void withdrawMember(Long memberId) {
         Participation participation = getParticipation(memberId);
         Meeting meeting = getMeetingWithParticipation(participation);
         validateMeetingStatus(meeting);
@@ -70,7 +70,7 @@ public class ParticipationService {
         updateButtonAuthorityWithRandomNumber(meeting);
     }
 
-    private void saveParticipation(Participation participation){
+    private void saveParticipation(Participation participation) {
         participationRepository.save(participation);
     }
 
