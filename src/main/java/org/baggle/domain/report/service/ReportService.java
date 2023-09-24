@@ -28,7 +28,7 @@ public class ReportService {
     public void createReport(CreateReportRequestDto requestDto) {
         ReportType enumReportType = getEnumReportTypeFromStringReportType(requestDto.getReportType());
         Feed findFeed = getFeedWithId(requestDto.getFeedId());
-        Participation findParticipation = getParticipationWithId(requestDto.getParticipationId());
+        Participation findParticipation = getParticipationWithId(requestDto.getMemberId());
         validateDuplicateReport(findFeed, findParticipation);
         Report createdReport = Report.createReport(findFeed, findParticipation, enumReportType);
         saveReport(createdReport);
