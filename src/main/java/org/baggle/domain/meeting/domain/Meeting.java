@@ -14,8 +14,8 @@ import java.util.List;
 import static org.baggle.domain.meeting.domain.Participation.createParticipation;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PRIVATE)
 @Getter
 @Entity
 public class Meeting extends BaseTimeEntity {

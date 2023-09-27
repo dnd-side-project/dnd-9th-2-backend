@@ -103,5 +103,4 @@ public class ExpirationListener implements MessageListener {
             return fcmNotificationProvider.getEmergencyNotificationBody();
         return fcmNotificationProvider.getTerminationNotificationBody();
     }
-
 }

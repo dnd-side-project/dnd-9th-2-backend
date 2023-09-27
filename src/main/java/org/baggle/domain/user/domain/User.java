@@ -12,8 +12,8 @@ import java.util.List;
 import static org.baggle.domain.fcm.domain.FcmToken.createFcmToken;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PRIVATE)
 @Getter
 @Table(name = "users")
 @Entity

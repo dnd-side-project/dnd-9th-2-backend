@@ -7,7 +7,7 @@ import lombok.Getter;
 import org.baggle.global.error.exception.ErrorCode;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 @Getter
 public class ErrorBaseResponse {
     private int status;

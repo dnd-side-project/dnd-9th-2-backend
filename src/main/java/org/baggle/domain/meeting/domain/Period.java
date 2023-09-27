@@ -1,5 +1,6 @@
 package org.baggle.domain.meeting.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.baggle.global.error.exception.ErrorCode;
@@ -7,7 +8,7 @@ import org.baggle.global.error.exception.InvalidValueException;
 
 import java.util.Arrays;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public enum Period {
     SCHEDULED("scheduled"),
