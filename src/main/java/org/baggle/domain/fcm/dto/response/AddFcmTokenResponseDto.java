@@ -4,14 +4,10 @@ import lombok.Builder;
 import lombok.Getter;
 import org.baggle.domain.fcm.domain.FcmToken;
 
+@Builder
 @Getter
 public class AddFcmTokenResponseDto {
     private String fcmToken;
-
-    @Builder
-    public AddFcmTokenResponseDto(String fcmToken) {
-        this.fcmToken = fcmToken;
-    }
 
     public static AddFcmTokenResponseDto of(FcmToken fcmToken) {
         return AddFcmTokenResponseDto.builder()
