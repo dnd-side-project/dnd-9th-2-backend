@@ -7,8 +7,8 @@ import org.baggle.domain.meeting.domain.Participation;
 import org.baggle.global.common.BaseTimeEntity;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PRIVATE)
 @Getter
 @Entity
 public class Report extends BaseTimeEntity {
