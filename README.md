@@ -10,6 +10,19 @@
 
 <img width="1920" alt="5" src="https://github.com/dnd-side-project/dnd-9th-2-backend/assets/81796317/b74359c3-0a97-4c5c-9980-4928075c2ca5">
 
+<div align=center>
+  
+### 이벤트를 통해 약속을 재밌게 만들어주는 약속 관리 서비스, Baggle 🫧
+
+</div>
+
+<div align=center>
+  
+<a href="https://apps.apple.com/us/app/baggle/id6461166641" style="display: inline-block; overflow: hidden; border-radius: 13px; width: 250px; height: 83px;">
+<img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-US?size=250x83&amp" alt="Download on the App Store" style="border-radius: 13px; width: 250px; height: 83px;">
+</a>
+
+</div>
 
 <br>
 
