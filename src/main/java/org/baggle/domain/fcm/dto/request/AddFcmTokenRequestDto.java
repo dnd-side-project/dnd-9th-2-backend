@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.user.domain.User;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class AddFcmTokenRequestDto {

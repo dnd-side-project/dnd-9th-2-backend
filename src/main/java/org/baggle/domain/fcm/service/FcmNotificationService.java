@@ -58,7 +58,6 @@ public class FcmNotificationService {
         return Notification.builder()
                 .setTitle(title)
                 .setBody(body)
-                // .setImage(fcmNotificationRequestDto.getImg())
                 .build();
     }
 
