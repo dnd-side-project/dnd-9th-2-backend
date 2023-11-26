@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.baggle.domain.fcm.domain.FcmTimer;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
+import org.baggle.domain.fcm.provider.FcmNotificationProvider;
 import org.baggle.domain.fcm.repository.FcmRepository;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
-import org.baggle.domain.fcm.service.FcmNotificationProvider;
+import org.baggle.domain.fcm.provider.FcmMessageSourceProvider;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.feed.domain.Feed;
 import org.baggle.domain.meeting.domain.*;
@@ -40,8 +41,8 @@ public class MeetingDetailService {
     private final ParticipationRepository participationRepository;
     private final FcmTimerRepository fcmTimerRepository;
     private final FcmRepository fcmRepository;
+    private final FcmMessageSourceProvider fcmMessageSourceProvider;
     private final FcmNotificationProvider fcmNotificationProvider;
-    private final FcmNotificationService fcmNotificationService;
 
     public MeetingDetailResponseDto findMeetingDetail(Long userId, Long meetingId) {
         Meeting meeting = getMeeting(meetingId);
@@ -175,14 +176,14 @@ public class MeetingDetailService {
 
     private void broadcastNotification(Meeting meeting) {
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting);
-        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+        fcmNotificationProvider.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
     }
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting) {
         List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meeting.getId());
         fcmTokens = fcmTokens.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).toList();
-        String title = fcmNotificationProvider.getDeleteNotificationTitle();
-        String body = fcmNotificationProvider.getDeleteNotificationBody(meeting.getTitle());
+        String title = fcmMessageSourceProvider.getDeleteNotificationTitle();
+        String body = fcmMessageSourceProvider.getDeleteNotificationBody(meeting.getTitle());
         return FcmNotificationRequestDto.of(fcmTokens, title, body);
     }
 }
