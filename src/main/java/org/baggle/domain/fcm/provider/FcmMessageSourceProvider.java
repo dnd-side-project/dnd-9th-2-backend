@@ -1,4 +1,4 @@
-package org.baggle.domain.fcm.service;
+package org.baggle.domain.fcm.provider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,10 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
-public class FcmNotificationProvider {
+public class FcmMessageSourceProvider {
     private final MessageSource messageSource;
 
     public String getEmergencyNotificationTitle() {
