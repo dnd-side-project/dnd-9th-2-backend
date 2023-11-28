@@ -176,7 +176,7 @@ public class MeetingDetailService {
 
     private void broadcastNotification(Meeting meeting) {
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting);
-        fcmNotificationProvider.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+        fcmNotificationProvider.broadcastFcmNotification(fcmNotificationRequestDto, meeting.getId());
     }
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting) {

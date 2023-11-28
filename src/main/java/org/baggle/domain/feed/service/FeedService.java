@@ -112,7 +112,7 @@ public class FeedService {
 
     private void broadcastNotification(Participation requestParticipation, Meeting meeting) {
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(requestParticipation, meeting.getId());
-        fcmNotificationProvider.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+        fcmNotificationProvider.broadcastFcmNotification(fcmNotificationRequestDto, meeting.getId());
     }
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Participation participation, Long meetingId) {

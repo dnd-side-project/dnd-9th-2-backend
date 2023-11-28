@@ -59,13 +59,13 @@ public class NotificationScheduler {
 
     private void sendNotificationForDeletedMeeting(Meeting meeting) {
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting);
-        fcmNotificationProvider.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+        fcmNotificationProvider.broadcastFcmNotification(fcmNotificationRequestDto, meeting.getId());
         meetingDetailService.deleteMeeting(meeting.getId());
     }
 
     private void sendNotificationByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDtoWithButtonAuthority(meeting, buttonAuthority);
-        fcmNotificationProvider.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+        fcmNotificationProvider.broadcastFcmNotification(fcmNotificationRequestDto, meeting.getId());
     }
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting) {

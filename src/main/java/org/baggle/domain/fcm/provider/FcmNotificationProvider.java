@@ -11,6 +11,8 @@ import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
 import org.baggle.global.error.exception.InvalidValueException;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 import static org.baggle.global.error.exception.ErrorCode.INVALID_FCM_UPLOAD;
 
 @Slf4j
@@ -19,12 +21,9 @@ import static org.baggle.global.error.exception.ErrorCode.INVALID_FCM_UPLOAD;
 public class FcmNotificationProvider {
     private final FirebaseMessaging firebaseMessaging;
 
-    public void sendNotificationByToken(FcmNotificationRequestDto fcmNotificationRequestDto, Long meetingId) {
-        for (FcmToken fcmToken : fcmNotificationRequestDto.getTargetTokenList()) {
-            Notification notification = createNotification(fcmNotificationRequestDto.getTitle(), fcmNotificationRequestDto.getBody());
-            Message message = createMessage(notification, fcmToken, meetingId);
-            sendNotification(message);
-        }
+    public void broadcastFcmNotification(FcmNotificationRequestDto fcmNotificationRequestDto, Long meetingId) {
+        List<FcmToken> fcmTokenList = fcmNotificationRequestDto.getTargetTokenList();
+        fcmTokenList.forEach(fcmToken -> sendNotification(fcmToken, fcmNotificationRequestDto, meetingId));
     }
 
     private Notification createNotification(String title, String body) {
@@ -42,8 +41,10 @@ public class FcmNotificationProvider {
                 .build();
     }
 
-    private void sendNotification(Message message) {
+    private void sendNotification(FcmToken fcmToken, FcmNotificationRequestDto fcmNotificationRequestDto, Long meetingId) {
         try {
+            Notification notification = createNotification(fcmNotificationRequestDto.getTitle(), fcmNotificationRequestDto.getBody());
+            Message message = createMessage(notification, fcmToken, meetingId);
             firebaseMessaging.send(message);
         } catch (FirebaseMessagingException e) {
             log.error("Failed to send Notification", e);

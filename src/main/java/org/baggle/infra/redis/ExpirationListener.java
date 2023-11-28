@@ -44,7 +44,7 @@ public class ExpirationListener implements MessageListener {
         createEmergencyTimerWithRedisDataAndMeetingId(parts[0], Long.parseLong(parts[1]));
         updateMeetingStatus(Long.parseLong(parts[1]), parts[0]);
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(parts[0], Long.parseLong(parts[1]));
-        fcmNotificationProvider.sendNotificationByToken(fcmNotificationRequestDto, Long.parseLong(parts[1]));
+        fcmNotificationProvider.broadcastFcmNotification(fcmNotificationRequestDto, Long.parseLong(parts[1]));
         log.info("########## onMessage message " + message.toString());
     }
 
