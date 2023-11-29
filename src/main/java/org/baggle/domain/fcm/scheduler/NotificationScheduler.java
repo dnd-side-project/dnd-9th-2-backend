@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
-import org.baggle.domain.fcm.service.FcmNotificationProvider;
+import org.baggle.domain.fcm.provider.FcmMessageSourceProvider;
+import org.baggle.domain.fcm.provider.FcmNotificationProvider;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.meeting.domain.ButtonAuthority;
 import org.baggle.domain.meeting.domain.Meeting;
@@ -28,6 +29,7 @@ public class NotificationScheduler {
     private final MeetingDetailService meetingDetailService;
     private final FcmNotificationService fcmNotificationService;
     private final FcmNotificationProvider fcmNotificationProvider;
+    private final FcmMessageSourceProvider fcmMessageSourceProvider;
 
     @Transactional
     @Scheduled(cron = "0 * * * * *")
@@ -57,19 +59,19 @@ public class NotificationScheduler {
 
     private void sendNotificationForDeletedMeeting(Meeting meeting) {
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(meeting);
-        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+        fcmNotificationProvider.broadcastFcmNotification(fcmNotificationRequestDto, meeting.getId());
         meetingDetailService.deleteMeeting(meeting.getId());
     }
 
     private void sendNotificationByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDtoWithButtonAuthority(meeting, buttonAuthority);
-        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+        fcmNotificationProvider.broadcastFcmNotification(fcmNotificationRequestDto, meeting.getId());
     }
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Meeting meeting) {
         List<FcmToken> fcmTokens = findFcmTokensByButtonAuthority(meeting, ButtonAuthority.OWNER);
-        String title = fcmNotificationProvider.getDeleteNotificationTitle();
-        String body = fcmNotificationProvider.getDeleteMeetingNotificationBody();
+        String title = fcmMessageSourceProvider.getDeleteNotificationTitle();
+        String body = fcmMessageSourceProvider.getDeleteMeetingNotificationBody();
         return FcmNotificationRequestDto.of(fcmTokens, title, body);
     }
 
@@ -82,20 +84,18 @@ public class NotificationScheduler {
 
     private String getNotificationTitleWithButtonAuthority(ButtonAuthority buttonAuthority) {
         if (buttonAuthority == ButtonAuthority.OWNER)
-            return fcmNotificationProvider.getButtonOwnerNotificationTitle();
-        return fcmNotificationProvider.getConfirmationNotificationTitle();
+            return fcmMessageSourceProvider.getButtonOwnerNotificationTitle();
+        return fcmMessageSourceProvider.getConfirmationNotificationTitle();
     }
 
     private String getNotificationBodyWithButtonAuthority(ButtonAuthority buttonAuthority) {
         if (buttonAuthority == ButtonAuthority.OWNER)
-            return fcmNotificationProvider.getButtonOwnerNotificationBody();
-        return fcmNotificationProvider.getConfirmationNotificationBody();
+            return fcmMessageSourceProvider.getButtonOwnerNotificationBody();
+        return fcmMessageSourceProvider.getConfirmationNotificationBody();
     }
 
     private List<FcmToken> findFcmTokensByButtonAuthority(Meeting meeting, ButtonAuthority buttonAuthority) {
         List<FcmToken> fcmTokenList = fcmNotificationService.findFcmTokensByButtonAuthority(meeting, buttonAuthority);
         return fcmTokenList.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).toList();
     }
-
-
 }

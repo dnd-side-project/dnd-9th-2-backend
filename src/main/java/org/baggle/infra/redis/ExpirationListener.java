@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
-import org.baggle.domain.fcm.service.FcmNotificationProvider;
+import org.baggle.domain.fcm.provider.FcmMessageSourceProvider;
+import org.baggle.domain.fcm.provider.FcmNotificationProvider;
 import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.fcm.service.FcmService;
 import org.baggle.domain.meeting.domain.Meeting;
@@ -26,10 +27,11 @@ import java.util.Objects;
 @Transactional
 @Component
 public class ExpirationListener implements MessageListener {
+    private final FcmNotificationProvider fcmNotificationProvider;
     private final FcmNotificationService fcmNotificationService;
     private final FcmService fcmService;
     private final MeetingRepository meetingRepository;
-    private final FcmNotificationProvider fcmNotificationProvider;
+    private final FcmMessageSourceProvider fcmMessageSourceProvider;
 
     /**
      * cache가 만료되었을 때 실행되는 메서드입니다.
@@ -42,7 +44,7 @@ public class ExpirationListener implements MessageListener {
         createEmergencyTimerWithRedisDataAndMeetingId(parts[0], Long.parseLong(parts[1]));
         updateMeetingStatus(Long.parseLong(parts[1]), parts[0]);
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(parts[0], Long.parseLong(parts[1]));
-        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, Long.parseLong(parts[1]));
+        fcmNotificationProvider.broadcastFcmNotification(fcmNotificationRequestDto, Long.parseLong(parts[1]));
         log.info("########## onMessage message " + message.toString());
     }
 
@@ -94,13 +96,13 @@ public class ExpirationListener implements MessageListener {
 
     private String getNotificationTitle(String dateType) {
         if (getRedisDataType(dateType) == RedisDataType.FCM_NOTIFICATION)
-            return fcmNotificationProvider.getEmergencyNotificationTitle();
-        return fcmNotificationProvider.getTerminationNotificationTitle();
+            return fcmMessageSourceProvider.getEmergencyNotificationTitle();
+        return fcmMessageSourceProvider.getTerminationNotificationTitle();
     }
 
     private String getNotificationBody(String dateType) {
         if (getRedisDataType(dateType) == RedisDataType.FCM_NOTIFICATION)
-            return fcmNotificationProvider.getEmergencyNotificationBody();
-        return fcmNotificationProvider.getTerminationNotificationBody();
+            return fcmMessageSourceProvider.getEmergencyNotificationBody();
+        return fcmMessageSourceProvider.getTerminationNotificationBody();
     }
 }

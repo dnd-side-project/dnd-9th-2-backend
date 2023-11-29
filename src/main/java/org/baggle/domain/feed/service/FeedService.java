@@ -1,11 +1,14 @@
 package org.baggle.domain.feed.service;
 
 import lombok.RequiredArgsConstructor;
+import org.baggle.domain.fcm.domain.FcmTimer;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
+import org.baggle.domain.fcm.provider.FcmNotificationProvider;
+import org.baggle.domain.fcm.repository.FcmNotificationRepository;
 import org.baggle.domain.fcm.repository.FcmRepository;
-import org.baggle.domain.fcm.service.FcmNotificationProvider;
-import org.baggle.domain.fcm.service.FcmNotificationService;
+import org.baggle.domain.fcm.repository.FcmTimerRepository;
+import org.baggle.domain.fcm.provider.FcmMessageSourceProvider;
 import org.baggle.domain.feed.domain.Feed;
 import org.baggle.domain.feed.dto.request.FeedUploadRequestDto;
 import org.baggle.domain.feed.dto.response.FeedNotificationResponseDto;
@@ -42,9 +45,11 @@ public class FeedService {
     private final ParticipationRepository participationRepository;
     private final FeedRepository feedRepository;
     private final S3Provider s3Provider;
-    private final FcmNotificationService fcmNotificationService;
+    private final FcmNotificationRepository fcmNotificationRepository;
+    private final FcmTimerRepository fcmTimerRepository;
     private final FcmRepository fcmRepository;
     private final MeetingRepository meetingRepository;
+    private final FcmMessageSourceProvider fcmMessageSourceProvider;
     private final FcmNotificationProvider fcmNotificationProvider;
 
     public FeedUploadResponseDto feedUpload(FeedUploadRequestDto requestDto, MultipartFile feedImage) {
@@ -107,15 +112,15 @@ public class FeedService {
 
     private void broadcastNotification(Participation requestParticipation, Meeting meeting) {
         FcmNotificationRequestDto fcmNotificationRequestDto = createFcmNotificationRequestDto(requestParticipation, meeting.getId());
-        fcmNotificationService.sendNotificationByToken(fcmNotificationRequestDto, meeting.getId());
+        fcmNotificationProvider.broadcastFcmNotification(fcmNotificationRequestDto, meeting.getId());
     }
 
     private FcmNotificationRequestDto createFcmNotificationRequestDto(Participation participation, Long meetingId) {
         List<FcmToken> fcmTokens = fcmRepository.findByUserParticipationsMeetingId(meetingId);
         fcmTokens = fcmTokens.stream().filter(fcmToken -> !Objects.isNull(fcmToken.getFcmToken())).collect(Collectors.toList());
         deleteFcmTokenOfRequestParticipation(fcmTokens, participation);
-        String title = fcmNotificationProvider.getEmergencyNotificationTitle();
-        String body = fcmNotificationProvider.getEmergencyNotificationBody();
+        String title = fcmMessageSourceProvider.getEmergencyNotificationTitle();
+        String body = fcmMessageSourceProvider.getEmergencyNotificationBody();
         return FcmNotificationRequestDto.of(fcmTokens, title, body);
     }
 
@@ -125,9 +130,18 @@ public class FeedService {
     }
 
     private void startEmergencyNotificationEvent(Participation participation, LocalDateTime authorizationTime) {
-        fcmNotificationService.deleteFcmNotification(participation.getMeeting().getId());
-        fcmNotificationService.createFcmTimer(participation.getMeeting().getId(), authorizationTime);
+        deleteFcmNotification(participation.getMeeting().getId());
+        createFcmTimer(participation.getMeeting().getId(), authorizationTime);
         Meeting meeting = getMeeting(participation.getMeeting().getId());
         meeting.updateMeetingStatusInto(MeetingStatus.ONGOING);
+    }
+
+    public void createFcmTimer(Long key, LocalDateTime startTime) {
+        FcmTimer fcmTimer = FcmTimer.createFcmTimer(key, startTime);
+        fcmTimerRepository.save(fcmTimer);
+    }
+
+    public void deleteFcmNotification(Long key) {
+        fcmNotificationRepository.deleteById(key);
     }
 }
