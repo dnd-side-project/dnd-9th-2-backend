@@ -20,10 +20,11 @@ import static org.baggle.global.error.exception.ErrorCode.INVALID_FCM_UPLOAD;
 @Component
 public class FcmNotificationProvider {
     private final FirebaseMessaging firebaseMessaging;
+    private final static String MESSAGE_DATA_TYPE = "meetingId";
 
     public void broadcastFcmNotification(FcmNotificationRequestDto fcmNotificationRequestDto, Long meetingId) {
         List<FcmToken> fcmTokenList = fcmNotificationRequestDto.getTargetTokenList();
-        fcmTokenList.forEach(fcmToken -> sendNotification(fcmToken, fcmNotificationRequestDto, meetingId));
+        fcmTokenList.forEach(fcmToken -> sendFcmNotification(fcmToken, fcmNotificationRequestDto, meetingId));
     }
 
     private Notification createNotification(String title, String body) {
@@ -36,12 +37,12 @@ public class FcmNotificationProvider {
     private Message createMessage(Notification notification, FcmToken fcmToken, Long meetingId) {
         return Message.builder()
                 .setToken(fcmToken.getFcmToken())
-                .putData("meetingId", meetingId.toString())
+                .putData(MESSAGE_DATA_TYPE, meetingId.toString())
                 .setNotification(notification)
                 .build();
     }
 
-    private void sendNotification(FcmToken fcmToken, FcmNotificationRequestDto fcmNotificationRequestDto, Long meetingId) {
+    private void sendFcmNotification(FcmToken fcmToken, FcmNotificationRequestDto fcmNotificationRequestDto, Long meetingId) {
         try {
             Notification notification = createNotification(fcmNotificationRequestDto.getTitle(), fcmNotificationRequestDto.getBody());
             Message message = createMessage(notification, fcmToken, meetingId);
