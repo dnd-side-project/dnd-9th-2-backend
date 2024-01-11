@@ -15,6 +15,7 @@ import org.baggle.global.error.exception.InvalidValueException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -26,7 +27,6 @@ import static org.baggle.global.error.exception.ErrorCode.*;
 @Transactional
 @Service
 public class ParticipationService {
-    private final MeetingDetailService meetingDetailService;
     private final UserRepository userRepository;
     private final MeetingRepository meetingRepository;
     private final ParticipationRepository participationRepository;
@@ -114,8 +114,21 @@ public class ParticipationService {
     }
 
     private void validateMeetingTime(Long userId, Meeting meeting) {
-        meetingDetailService.isMeetingInDeadline(meeting.getId(), userId,
-                convertToLocalDateTime(meeting.getDate(), meeting.getTime()));
+        List<Meeting> meetings = findMeetingsInRangeForUser(userId, convertToLocalDateTime(meeting.getDate(), meeting.getTime()), -60, 60)
+                .stream()
+                .filter(m -> !Objects.equals(m.getId(), meeting.getId()))
+                .toList();
+        if (!meetings.isEmpty())
+            throw new InvalidValueException(UNAVAILABLE_MEETING_TIME);
+    }
+
+    private List<Meeting> findMeetingsInRangeForUser(Long userId, LocalDateTime localDateTime, int from, int to) {
+        LocalDateTime fromDateTime = localDateTime.plusMinutes(from);
+        LocalDateTime toDateTime = localDateTime.plusMinutes(to);
+        return meetingRepository.findMeetingsWithinTimeRange(
+                userId,
+                fromDateTime,
+                toDateTime);
     }
 
     private void duplicateParticipation(List<Participation> participations, Long userId) {

@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.baggle.domain.fcm.domain.FcmTimer;
 import org.baggle.domain.fcm.domain.FcmToken;
 import org.baggle.domain.fcm.dto.request.FcmNotificationRequestDto;
+import org.baggle.domain.fcm.provider.FcmMessageSourceProvider;
 import org.baggle.domain.fcm.provider.FcmNotificationProvider;
 import org.baggle.domain.fcm.repository.FcmRepository;
 import org.baggle.domain.fcm.repository.FcmTimerRepository;
-import org.baggle.domain.fcm.provider.FcmMessageSourceProvider;
-import org.baggle.domain.fcm.service.FcmNotificationService;
 import org.baggle.domain.feed.domain.Feed;
 import org.baggle.domain.meeting.domain.*;
 import org.baggle.domain.meeting.dto.request.UpdateMeetingInfoRequestDto;
@@ -128,15 +127,6 @@ public class MeetingDetailService {
                 .toList();
     }
 
-    private List<Meeting> findMeetingsInRangeForUser(Long userId, LocalDateTime localDateTime, int from, int to) {
-        LocalDateTime fromDateTime = localDateTime.plusMinutes(from);
-        LocalDateTime toDateTime = localDateTime.plusMinutes(to);
-        return meetingRepository.findMeetingsWithinTimeRange(
-                userId,
-                fromDateTime,
-                toDateTime);
-    }
-
     private void validateParticipation(Meeting meeting, Long userId) {
         boolean isValidParticipation = meeting.getParticipations().stream()
                 .anyMatch(participation -> Objects.equals(participation.getUser().getId(), userId));
@@ -165,13 +155,22 @@ public class MeetingDetailService {
                 isMeetingInDeadline(meeting.getId(), participation.getUser().getId(), requestDateTime));
     }
 
-    public void isMeetingInDeadline(Long meetingId, Long userId, LocalDateTime meetingTime) {
+    private void isMeetingInDeadline(Long meetingId, Long userId, LocalDateTime meetingTime) {
         List<Meeting> meetings = findMeetingsInRangeForUser(userId, meetingTime, -60, 60)
                 .stream()
                 .filter(m -> m.getId() != meetingId)
                 .toList();
         if (!meetings.isEmpty())
             throw new InvalidValueException(UNAVAILABLE_MEETING_TIME);
+    }
+
+    private List<Meeting> findMeetingsInRangeForUser(Long userId, LocalDateTime localDateTime, int from, int to) {
+        LocalDateTime fromDateTime = localDateTime.plusMinutes(from);
+        LocalDateTime toDateTime = localDateTime.plusMinutes(to);
+        return meetingRepository.findMeetingsWithinTimeRange(
+                userId,
+                fromDateTime,
+                toDateTime);
     }
 
     private void broadcastNotification(Meeting meeting) {
