@@ -47,7 +47,7 @@ public class MeetingDetailService {
         Meeting meeting = getMeeting(meetingId);
         FcmTimer certificationTime = getFcmTimer(meetingId);
         List<Participation> participationList = sortParticipationAlongAuthorization(meeting);
-        Participation requestParticipation = getRequestParticipationWithUserId(participationList, userId);
+        Participation requestParticipation = getParticipationForUserId(participationList, userId);
         List<ParticipationDetailResponseDto> participationDetails = createParticipationDetailResDtoList(participationList, requestParticipation);
         return MeetingDetailResponseDto.of(meeting, convertToLocalDateTime(meeting.getDate(), meeting.getTime()),
                 certificationTime.getStartTime(), participationDetails);
@@ -87,7 +87,7 @@ public class MeetingDetailService {
                 .anyMatch(report -> Objects.equals(report.getFeed().getId(), feed.getId()));
     }
 
-    private Participation getRequestParticipationWithUserId(List<Participation> participationList, Long userId) {
+    private Participation getParticipationForUserId(List<Participation> participationList, Long userId) {
         return participationList.stream()
                 .filter(participation -> Objects.equals(participation.getUser().getId(), userId))
                 .findAny()
