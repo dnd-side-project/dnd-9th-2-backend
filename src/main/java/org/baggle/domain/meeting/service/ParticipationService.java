@@ -32,7 +32,7 @@ public class ParticipationService {
     private final ParticipationRepository participationRepository;
 
     public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long requestId) {
-        Meeting meeting = getMeeting(requestId);
+        Meeting meeting = findMeetingOrThrow(requestId);
         validateMeetingStatus(meeting);
         validateMeetingTime(userId, meeting);
         validateDuplicateParticipation(meeting, userId);
@@ -41,8 +41,8 @@ public class ParticipationService {
     }
 
     public void createParticipation(Long userId, ParticipationRequestDto requestDto) {
-        Meeting meeting = getMeeting(requestDto.getMeetingId());
-        User user = getUser(userId);
+        Meeting meeting = findMeetingOrThrow(requestDto.getMeetingId());
+        User user = findUserOrThrow(userId);
         validateDuplicateParticipation(meeting, userId);
         validateMeetingStatus(meeting);
         validateMeetingCapacity(meeting);
@@ -52,50 +52,20 @@ public class ParticipationService {
     }
 
     public void delegateMeetingHost(Long fromMemberId, Long toMemberId) {
-        Participation fromParticipation = getParticipation(fromMemberId);
-        Participation toParticipation = getParticipation(toMemberId);
-        Meeting meeting = getMeetingWithParticipation(fromParticipation);
+        Participation fromParticipation = findParticipationOrThrow(fromMemberId);
+        Participation toParticipation = findParticipationOrThrow(toMemberId);
         validateMeetingHost(fromParticipation);
-        validateMeetingStatus(meeting);
+        validateMeetingStatus(fromParticipation.getMeeting());
         delegateMeetingHostToOtherParticipation(fromParticipation, toParticipation);
-        withdrawBeforeMeetingConfirmation(fromParticipation, meeting);
-        updateButtonAuthorityWithRandomNumber(meeting);
+        withdrawBeforeMeetingConfirmation(fromParticipation, fromParticipation.getMeeting());
+        updateButtonAuthorityWithRandomNumber(fromParticipation.getMeeting());
     }
 
     public void withdrawMember(Long memberId) {
-        Participation participation = getParticipation(memberId);
-        Meeting meeting = getMeetingWithParticipation(participation);
-        validateMeetingStatus(meeting);
-        withdrawBeforeMeetingConfirmation(participation, meeting);
-        updateButtonAuthorityWithRandomNumber(meeting);
-    }
-
-    private void saveParticipation(Participation participation) {
-        participationRepository.save(participation);
-    }
-
-    private Meeting getMeeting(Long meetingId) {
-        return meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-    }
-
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
-    }
-
-    private Meeting getMeetingWithParticipation(Participation participation) {
-        return participation.getMeeting();
-    }
-
-    private Participation getParticipation(Long participationId) {
-        return participationRepository.findById(participationId)
-                .orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
-    }
-
-    private void validateMeetingHost(Participation participation) {
-        if (participation.getMeetingAuthority() != MeetingAuthority.HOST)
-            throw new ForbiddenException(INVALID_MEETING_AUTHORITY);
+        Participation participation = findParticipationOrThrow(memberId);
+        validateMeetingStatus(participation.getMeeting());
+        withdrawBeforeMeetingConfirmation(participation, participation.getMeeting());
+        updateButtonAuthorityWithRandomNumber(participation.getMeeting());
     }
 
     private void delegateMeetingHostToOtherParticipation(Participation fromParticipation, Participation toParticipation) {
@@ -103,9 +73,27 @@ public class ParticipationService {
         toParticipation.updateMeetingAuthorityToHost();
     }
 
+    private Participation createParticipationWithRandomButtonAuthority(User user, Meeting meeting) {
+        Participation participation = Participation.createParticipationWithMeeting(user, meeting);
+        updateButtonAuthorityWithRandomNumber(meeting);
+        return participation;
+    }
+
+    private void updateButtonAuthorityWithRandomNumber(Meeting meeting) {
+        int randomNumber = new Random().nextInt(meeting.getParticipations().size());
+        meeting.initButtonAuthorityOfParticipationList();
+        Participation randomNumberParticipation = meeting.getRandomNumberParticipation(randomNumber);
+        randomNumberParticipation.updateButtonAuthority(ButtonAuthority.OWNER);
+    }
+
     private void withdrawBeforeMeetingConfirmation(Participation participation, Meeting meeting) {
         meeting.withdrawParticipation(participation);
         participationRepository.delete(participation);
+    }
+
+    private void validateMeetingHost(Participation participation) {
+        if (participation.getMeetingAuthority() != MeetingAuthority.HOST)
+            throw new ForbiddenException(INVALID_MEETING_AUTHORITY);
     }
 
     private void validateMeetingStatus(Meeting meeting) {
@@ -125,10 +113,7 @@ public class ParticipationService {
     private List<Meeting> findMeetingsInRangeForUser(Long userId, LocalDateTime localDateTime, int from, int to) {
         LocalDateTime fromDateTime = localDateTime.plusMinutes(from);
         LocalDateTime toDateTime = localDateTime.plusMinutes(to);
-        return meetingRepository.findMeetingsWithinTimeRange(
-                userId,
-                fromDateTime,
-                toDateTime);
+        return meetingRepository.findMeetingsWithinTimeRange(userId, fromDateTime, toDateTime);
     }
 
     private void validateDuplicateParticipation(Meeting meetingId, Long userId) {
@@ -141,16 +126,22 @@ public class ParticipationService {
             throw new ForbiddenException(INVALID_MEETING_CAPACITY);
     }
 
-    private Participation createParticipationWithRandomButtonAuthority(User user, Meeting meeting) {
-        Participation participation = Participation.createParticipationWithMeeting(user, meeting);
-        updateButtonAuthorityWithRandomNumber(meeting);
-        return participation;
+    private void saveParticipation(Participation participation) {
+        participationRepository.save(participation);
     }
 
-    private void updateButtonAuthorityWithRandomNumber(Meeting meeting) {
-        int randomNumber = new Random().nextInt(meeting.getParticipations().size());
-        meeting.initButtonAuthorityOfParticipationList();
-        Participation randomNumberParticipation = meeting.getRandomNumberParticipation(randomNumber);
-        randomNumberParticipation.updateButtonAuthority(ButtonAuthority.OWNER);
+    private Meeting findMeetingOrThrow(Long meetingId) {
+        return meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
+    }
+
+    private User findUserOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+    }
+
+    private Participation findParticipationOrThrow(Long participationId) {
+        return participationRepository.findById(participationId)
+                .orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
     }
 }
