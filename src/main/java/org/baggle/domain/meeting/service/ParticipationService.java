@@ -57,14 +57,14 @@ public class ParticipationService {
         validateMeetingHost(fromParticipation);
         validateMeetingStatus(fromParticipation.getMeeting());
         delegateMeetingHostToOtherParticipation(fromParticipation, toParticipation);
-        withdrawBeforeMeetingConfirmation(fromParticipation, fromParticipation.getMeeting());
+        deleteParticipation(fromParticipation, fromParticipation.getMeeting());
         updateButtonAuthorityWithRandomNumber(fromParticipation.getMeeting());
     }
 
     public void withdrawMember(Long memberId) {
         Participation participation = findParticipationOrThrow(memberId);
         validateMeetingStatus(participation.getMeeting());
-        withdrawBeforeMeetingConfirmation(participation, participation.getMeeting());
+        deleteParticipation(participation, participation.getMeeting());
         updateButtonAuthorityWithRandomNumber(participation.getMeeting());
     }
 
@@ -84,11 +84,6 @@ public class ParticipationService {
         meeting.initButtonAuthorityOfParticipationList();
         Participation randomNumberParticipation = meeting.getRandomNumberParticipation(randomNumber);
         randomNumberParticipation.updateButtonAuthority(ButtonAuthority.OWNER);
-    }
-
-    private void withdrawBeforeMeetingConfirmation(Participation participation, Meeting meeting) {
-        meeting.withdrawParticipation(participation);
-        participationRepository.delete(participation);
     }
 
     private void validateMeetingHost(Participation participation) {
@@ -126,10 +121,6 @@ public class ParticipationService {
             throw new ForbiddenException(INVALID_MEETING_CAPACITY);
     }
 
-    private void saveParticipation(Participation participation) {
-        participationRepository.save(participation);
-    }
-
     private Meeting findMeetingOrThrow(Long meetingId) {
         return meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
@@ -143,5 +134,14 @@ public class ParticipationService {
     private Participation findParticipationOrThrow(Long participationId) {
         return participationRepository.findById(participationId)
                 .orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
+    }
+
+    private void saveParticipation(Participation participation) {
+        participationRepository.save(participation);
+    }
+
+    private void deleteParticipation(Participation participation, Meeting meeting) {
+        meeting.withdrawParticipation(participation);
+        participationRepository.delete(participation);
     }
 }
