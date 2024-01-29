@@ -35,7 +35,7 @@ public class ParticipationService {
         Meeting meeting = getMeeting(requestId);
         validateMeetingStatus(meeting);
         validateMeetingTime(userId, meeting);
-        duplicateParticipation(meeting.getParticipations(), userId);
+        validateDuplicateParticipation(meeting, userId);
         validateMeetingCapacity(meeting);
         return ParticipationAvailabilityResponseDto.of(meeting);
     }
@@ -43,7 +43,7 @@ public class ParticipationService {
     public void createParticipation(Long userId, ParticipationRequestDto requestDto) {
         Meeting meeting = getMeeting(requestDto.getMeetingId());
         User user = getUser(userId);
-        duplicateParticipation(meeting.getParticipations(), userId);
+        validateDuplicateParticipation(meeting, userId);
         validateMeetingStatus(meeting);
         validateMeetingCapacity(meeting);
         validateMeetingTime(userId, meeting);
@@ -131,11 +131,8 @@ public class ParticipationService {
                 toDateTime);
     }
 
-    private void duplicateParticipation(List<Participation> participations, Long userId) {
-        boolean isDuplicate = participations.stream()
-                .anyMatch(participation ->
-                        Objects.equals(participation.getUser().getId(), userId));
-        if (isDuplicate)
+    private void validateDuplicateParticipation(Meeting meetingId, Long userId) {
+        if (participationRepository.existsByMeetingIdAndUserId(meetingId.getId(), userId))
             throw new ConflictException(DUPLICATE_PARTICIPATION);
     }
 
