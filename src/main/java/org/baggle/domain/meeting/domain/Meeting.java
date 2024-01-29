@@ -74,8 +74,4 @@ public class Meeting extends BaseTimeEntity {
     public Participation getRandomNumberParticipation(int randomNumber) {
         return getParticipations().get(randomNumber);
     }
-
-    public void withdrawParticipation(Participation participation) {
-        this.participations.remove(participation);
-    }
 }
