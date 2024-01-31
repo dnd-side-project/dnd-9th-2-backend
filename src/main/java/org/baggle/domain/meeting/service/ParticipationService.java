@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 import static org.baggle.global.common.TimeConverter.convertToLocalDateTime;
@@ -31,8 +29,8 @@ public class ParticipationService {
     private final MeetingRepository meetingRepository;
     private final ParticipationRepository participationRepository;
 
-    public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long requestId) {
-        Meeting meeting = findMeetingOrThrow(requestId);
+    public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long meetingId) {
+        Meeting meeting = findMeetingOrThrow(meetingId);
         validateMeetingStatus(meeting);
         validateMeetingTime(userId, meeting);
         validateDuplicateParticipation(meeting, userId);
@@ -97,18 +95,11 @@ public class ParticipationService {
     }
 
     private void validateMeetingTime(Long userId, Meeting meeting) {
-        List<Meeting> meetings = findMeetingsInRangeForUser(userId, convertToLocalDateTime(meeting.getDate(), meeting.getTime()), -60, 60)
-                .stream()
-                .filter(m -> !Objects.equals(m.getId(), meeting.getId()))
-                .toList();
-        if (!meetings.isEmpty())
+        LocalDateTime localDateTime = convertToLocalDateTime(meeting.getDate(), meeting.getTime());
+        LocalDateTime fromDateTime = localDateTime.plusMinutes(-60);
+        LocalDateTime toDateTime = localDateTime.plusMinutes(60);
+        if (meetingRepository.existMeetingWithInTimeRange(userId, meeting.getId(), fromDateTime, toDateTime))
             throw new InvalidValueException(UNAVAILABLE_MEETING_TIME);
-    }
-
-    private List<Meeting> findMeetingsInRangeForUser(Long userId, LocalDateTime localDateTime, int from, int to) {
-        LocalDateTime fromDateTime = localDateTime.plusMinutes(from);
-        LocalDateTime toDateTime = localDateTime.plusMinutes(to);
-        return meetingRepository.findMeetingsWithinTimeRange(userId, fromDateTime, toDateTime);
     }
 
     private void validateDuplicateParticipation(Meeting meetingId, Long userId) {
