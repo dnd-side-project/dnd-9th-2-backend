@@ -1,5 +1,6 @@
 package org.baggle;
 
+import org.baggle.global.config.jwt.JwtProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -10,7 +11,6 @@ import java.util.TimeZone;
 @EnableScheduling
 @SpringBootApplication
 public class BaggleApplication {
-    // aws sdk 연동
     static {
         System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true");
     }
