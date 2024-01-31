@@ -17,7 +17,9 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
             "FROM Meeting m " +
             "WHERE m.meetingStatus = :meetingStatus " +
             "AND STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s') BETWEEN :from AND :to ")
-    List<Meeting> findMeetingsWithinTimeRangeAlongMeetingStatus(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("meetingStatus") MeetingStatus meetingStatus);
+    List<Meeting> findMeetingsWithinTimeRangeAlongMeetingStatus(@Param("from") LocalDateTime from,
+                                                                @Param("to") LocalDateTime to,
+                                                                @Param("meetingStatus") MeetingStatus meetingStatus);
 
     @Query("SELECT m " +
             "FROM Meeting m " +
@@ -27,7 +29,23 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
             "ON p.user = u " +
             "WHERE STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s') BETWEEN :from AND :to " +
             "AND u.id = :userId")
-    List<Meeting> findMeetingsWithinTimeRange(@Param("userId") Long userId, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+    List<Meeting> findMeetingsWithinTimeRange(@Param("userId") Long userId,
+                                              @Param("from") LocalDateTime from,
+                                              @Param("to") LocalDateTime to);
+
+    @Query("SELECT CASE WHEN EXISTS (" +
+            "SELECT 1 " +
+            "FROM Meeting m " +
+            "JOIN Participation p ON m = p.meeting " +
+            "JOIN User u ON p.user = u " +
+            "WHERE STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s') BETWEEN :from AND :to " +
+            "AND u.id = :userId " +
+            "AND m.id = :meetingId" +
+            ") THEN TRUE ELSE FALSE END")
+    boolean existMeetingWithInTimeRange(@Param("userId") Long userId,
+                                        @Param("meetingId") Long meetingId,
+                                        @Param("from") LocalDateTime from,
+                                        @Param("to") LocalDateTime to);
 
     @Query("SELECT new org.baggle.domain.meeting.repository.MeetingCountQueryDto(SUM(CASE WHEN m.meetingStatus != :meetingStatus THEN 1 END), SUM(CASE WHEN m.meetingStatus = :meetingStatus THEN 1 END)) " +
             "FROM Meeting m " +
@@ -36,7 +54,8 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
             "JOIN User u " +
             "ON p.user = u " +
             "WHERE u.id = :userId")
-    Optional<MeetingCountQueryDto> countMeetings(@Param("meetingStatus") MeetingStatus meetingStatus, @Param("userId") Long userId);
+    Optional<MeetingCountQueryDto> countMeetings(@Param("meetingStatus") MeetingStatus meetingStatus,
+                                                 @Param("userId") Long userId);
 
     @Query("SELECT m " +
             "FROM Meeting m " +
@@ -47,7 +66,11 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
             "WHERE u.id = :userId " +
             "AND m.meetingStatus != :meetingStatus " +
             "ORDER BY DATEDIFF(m.date, CAST(STR_TO_DATE(:currDate, '%Y-%m-%d') AS DATE)), REPLACE(CAST(TIMEDIFF(STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s'), STR_TO_DATE(CONCAT(:currDate, ' ', :currTime), '%Y-%m-%d %H:%i:%s')) AS STRING), ':', '')")
-    Page<Meeting> findMeetingsWithoutMeetingStatus(@Param("userId") Long userId, @Param("meetingStatus") MeetingStatus meetingStatus, @Param("currDate") String currDate, @Param("currTime") String currTime, Pageable pageable);
+    Page<Meeting> findMeetingsWithoutMeetingStatus(@Param("userId") Long userId,
+                                                   @Param("meetingStatus") MeetingStatus meetingStatus,
+                                                   @Param("currDate") String currDate,
+                                                   @Param("currTime") String currTime,
+                                                   Pageable pageable);
 
     @Query("SELECT m " +
             "FROM Meeting m " +
@@ -58,5 +81,9 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
             "WHERE u.id = :userId " +
             "AND m.meetingStatus = :meetingStatus " +
             "ORDER BY DATEDIFF(CAST(STR_TO_DATE(:currDate, '%Y-%m-%d') AS DATE), m.date), REPLACE(CAST(TIMEDIFF(STR_TO_DATE(CONCAT(:currDate, ' ', :currTime), '%Y-%m-%d %H:%i:%s'), STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s')) AS STRING), ':', '')")
-    Page<Meeting> findMeetingsWithMeetingStatus(@Param("userId") Long userId, @Param("meetingStatus") MeetingStatus meetingStatus, @Param("currDate") String currDate, @Param("currTime") String currTime, Pageable pageable);
+    Page<Meeting> findMeetingsWithMeetingStatus(@Param("userId") Long userId,
+                                                @Param("meetingStatus") MeetingStatus meetingStatus,
+                                                @Param("currDate") String currDate,
+                                                @Param("currTime") String currTime,
+                                                Pageable pageable);
 }
