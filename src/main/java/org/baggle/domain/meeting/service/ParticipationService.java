@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Random;
 
+import static org.baggle.domain.meeting.service.RandomNumberGenerator.createRandomNumber;
 import static org.baggle.global.common.TimeConverter.convertToLocalDateTime;
 import static org.baggle.global.error.exception.ErrorCode.*;
 
@@ -25,6 +25,7 @@ import static org.baggle.global.error.exception.ErrorCode.*;
 @Transactional
 @Service
 public class ParticipationService {
+    private static final int MEETING_AVAILABILITY_CRITERIA = 60;
     private final UserRepository userRepository;
     private final MeetingRepository meetingRepository;
     private final ParticipationRepository participationRepository;
@@ -32,8 +33,8 @@ public class ParticipationService {
     public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long meetingId) {
         Meeting meeting = findMeetingOrThrow(meetingId);
         validateMeetingStatus(meeting);
-        validateMeetingTime(userId, meeting);
         validateDuplicateParticipation(meeting, userId);
+        validateMeetingTime(userId, meeting);
         validateMeetingCapacity(meeting);
         return ParticipationAvailabilityResponseDto.of(meeting);
     }
@@ -78,7 +79,7 @@ public class ParticipationService {
     }
 
     private void updateButtonAuthorityWithRandomNumber(Meeting meeting) {
-        int randomNumber = new Random().nextInt(meeting.getParticipations().size());
+        int randomNumber = createRandomNumber(meeting.getParticipations().size());
         meeting.initButtonAuthorityOfParticipationList();
         Participation randomNumberParticipation = meeting.getRandomNumberParticipation(randomNumber);
         randomNumberParticipation.updateButtonAuthority(ButtonAuthority.OWNER);
@@ -96,14 +97,14 @@ public class ParticipationService {
 
     private void validateMeetingTime(Long userId, Meeting meeting) {
         LocalDateTime localDateTime = convertToLocalDateTime(meeting.getDate(), meeting.getTime());
-        LocalDateTime fromDateTime = localDateTime.plusMinutes(-60);
-        LocalDateTime toDateTime = localDateTime.plusMinutes(60);
+        LocalDateTime fromDateTime = localDateTime.plusMinutes(-1 * MEETING_AVAILABILITY_CRITERIA);
+        LocalDateTime toDateTime = localDateTime.plusMinutes(MEETING_AVAILABILITY_CRITERIA);
         if (meetingRepository.existMeetingWithInTimeRange(userId, fromDateTime, toDateTime))
             throw new InvalidValueException(UNAVAILABLE_MEETING_TIME);
     }
 
-    private void validateDuplicateParticipation(Meeting meetingId, Long userId) {
-        if (participationRepository.existsByMeetingIdAndUserId(meetingId.getId(), userId))
+    private void validateDuplicateParticipation(Meeting meeting, Long userId) {
+        if (participationRepository.existsByMeetingIdAndUserId(meeting.getId(), userId))
             throw new ConflictException(DUPLICATE_PARTICIPATION);
     }
 
