@@ -1,6 +1,5 @@
 package org.baggle;
 
-import org.baggle.global.config.jwt.JwtProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
