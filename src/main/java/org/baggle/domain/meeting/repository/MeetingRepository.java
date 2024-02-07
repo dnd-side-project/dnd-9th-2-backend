@@ -40,10 +40,8 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
             "JOIN User u ON p.user = u " +
             "WHERE STR_TO_DATE(CONCAT(m.date, ' ', m.time), '%Y-%m-%d %H:%i:%s') BETWEEN :from AND :to " +
             "AND u.id = :userId " +
-            "AND m.id = :meetingId" +
             ") THEN TRUE ELSE FALSE END")
     boolean existMeetingWithInTimeRange(@Param("userId") Long userId,
-                                        @Param("meetingId") Long meetingId,
                                         @Param("from") LocalDateTime from,
                                         @Param("to") LocalDateTime to);
 

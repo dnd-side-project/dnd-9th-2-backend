@@ -98,7 +98,7 @@ public class ParticipationService {
         LocalDateTime localDateTime = convertToLocalDateTime(meeting.getDate(), meeting.getTime());
         LocalDateTime fromDateTime = localDateTime.plusMinutes(-60);
         LocalDateTime toDateTime = localDateTime.plusMinutes(60);
-        if (meetingRepository.existMeetingWithInTimeRange(userId, meeting.getId(), fromDateTime, toDateTime))
+        if (meetingRepository.existMeetingWithInTimeRange(userId, fromDateTime, toDateTime))
             throw new InvalidValueException(UNAVAILABLE_MEETING_TIME);
     }
 
