@@ -15,10 +15,9 @@ import org.baggle.global.error.exception.InvalidValueException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.time.LocalDateTime;
 
+import static org.baggle.domain.meeting.service.RandomNumberGenerator.createRandomNumber;
 import static org.baggle.global.common.TimeConverter.convertToLocalDateTime;
 import static org.baggle.global.error.exception.ErrorCode.*;
 
@@ -26,24 +25,24 @@ import static org.baggle.global.error.exception.ErrorCode.*;
 @Transactional
 @Service
 public class ParticipationService {
-    private final MeetingDetailService meetingDetailService;
+    private static final int MEETING_AVAILABILITY_CRITERIA = 60;
     private final UserRepository userRepository;
     private final MeetingRepository meetingRepository;
     private final ParticipationRepository participationRepository;
 
-    public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long requestId) {
-        Meeting meeting = getMeeting(requestId);
+    public ParticipationAvailabilityResponseDto findParticipationAvailability(Long userId, Long meetingId) {
+        Meeting meeting = findMeetingOrThrow(meetingId);
         validateMeetingStatus(meeting);
+        validateDuplicateParticipation(meeting, userId);
         validateMeetingTime(userId, meeting);
-        duplicateParticipation(meeting.getParticipations(), userId);
         validateMeetingCapacity(meeting);
         return ParticipationAvailabilityResponseDto.of(meeting);
     }
 
     public void createParticipation(Long userId, ParticipationRequestDto requestDto) {
-        Meeting meeting = getMeeting(requestDto.getMeetingId());
-        User user = getUser(userId);
-        duplicateParticipation(meeting.getParticipations(), userId);
+        Meeting meeting = findMeetingOrThrow(requestDto.getMeetingId());
+        User user = findUserOrThrow(userId);
+        validateDuplicateParticipation(meeting, userId);
         validateMeetingStatus(meeting);
         validateMeetingCapacity(meeting);
         validateMeetingTime(userId, meeting);
@@ -52,83 +51,25 @@ public class ParticipationService {
     }
 
     public void delegateMeetingHost(Long fromMemberId, Long toMemberId) {
-        Participation fromParticipation = getParticipation(fromMemberId);
-        Participation toParticipation = getParticipation(toMemberId);
-        Meeting meeting = getMeetingWithParticipation(fromParticipation);
+        Participation fromParticipation = findParticipationOrThrow(fromMemberId);
+        Participation toParticipation = findParticipationOrThrow(toMemberId);
         validateMeetingHost(fromParticipation);
-        validateMeetingStatus(meeting);
+        validateMeetingStatus(fromParticipation.getMeeting());
         delegateMeetingHostToOtherParticipation(fromParticipation, toParticipation);
-        withdrawBeforeMeetingConfirmation(fromParticipation, meeting);
-        updateButtonAuthorityWithRandomNumber(meeting);
+        deleteParticipation(fromParticipation, fromParticipation.getMeeting());
+        updateButtonAuthorityWithRandomNumber(fromParticipation.getMeeting());
     }
 
     public void withdrawMember(Long memberId) {
-        Participation participation = getParticipation(memberId);
-        Meeting meeting = getMeetingWithParticipation(participation);
-        validateMeetingStatus(meeting);
-        withdrawBeforeMeetingConfirmation(participation, meeting);
-        updateButtonAuthorityWithRandomNumber(meeting);
-    }
-
-    private void saveParticipation(Participation participation) {
-        participationRepository.save(participation);
-    }
-
-    private Meeting getMeeting(Long meetingId) {
-        return meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
-    }
-
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
-    }
-
-    private Meeting getMeetingWithParticipation(Participation participation) {
-        return participation.getMeeting();
-    }
-
-    private Participation getParticipation(Long participationId) {
-        return participationRepository.findById(participationId)
-                .orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
-    }
-
-    private void validateMeetingHost(Participation participation) {
-        if (participation.getMeetingAuthority() != MeetingAuthority.HOST)
-            throw new ForbiddenException(INVALID_MEETING_AUTHORITY);
+        Participation participation = findParticipationOrThrow(memberId);
+        validateMeetingStatus(participation.getMeeting());
+        deleteParticipation(participation, participation.getMeeting());
+        updateButtonAuthorityWithRandomNumber(participation.getMeeting());
     }
 
     private void delegateMeetingHostToOtherParticipation(Participation fromParticipation, Participation toParticipation) {
         fromParticipation.updateMeetingAuthorityToParticipation();
         toParticipation.updateMeetingAuthorityToHost();
-    }
-
-    private void withdrawBeforeMeetingConfirmation(Participation participation, Meeting meeting) {
-        meeting.withdrawParticipation(participation);
-        participationRepository.delete(participation);
-    }
-
-    private void validateMeetingStatus(Meeting meeting) {
-        if (meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
-            throw new InvalidValueException(INVALID_MEETING_TIME);
-    }
-
-    private void validateMeetingTime(Long userId, Meeting meeting) {
-        meetingDetailService.isMeetingInDeadline(meeting.getId(), userId,
-                convertToLocalDateTime(meeting.getDate(), meeting.getTime()));
-    }
-
-    private void duplicateParticipation(List<Participation> participations, Long userId) {
-        boolean isDuplicate = participations.stream()
-                .anyMatch(participation ->
-                        Objects.equals(participation.getUser().getId(), userId));
-        if (isDuplicate)
-            throw new ConflictException(DUPLICATE_PARTICIPATION);
-    }
-
-    private void validateMeetingCapacity(Meeting meeting) {
-        if (meeting.getParticipations().size() == 6)
-            throw new ForbiddenException(INVALID_MEETING_CAPACITY);
     }
 
     private Participation createParticipationWithRandomButtonAuthority(User user, Meeting meeting) {
@@ -138,9 +79,61 @@ public class ParticipationService {
     }
 
     private void updateButtonAuthorityWithRandomNumber(Meeting meeting) {
-        int randomNumber = new Random().nextInt(meeting.getParticipations().size());
+        int randomNumber = createRandomNumber(meeting.getParticipations().size());
         meeting.initButtonAuthorityOfParticipationList();
         Participation randomNumberParticipation = meeting.getRandomNumberParticipation(randomNumber);
         randomNumberParticipation.updateButtonAuthority(ButtonAuthority.OWNER);
+    }
+
+    private void validateMeetingHost(Participation participation) {
+        if (participation.getMeetingAuthority() != MeetingAuthority.HOST)
+            throw new ForbiddenException(INVALID_MEETING_AUTHORITY);
+    }
+
+    private void validateMeetingStatus(Meeting meeting) {
+        if (meeting.getMeetingStatus() != MeetingStatus.SCHEDULED)
+            throw new InvalidValueException(INVALID_MEETING_TIME);
+    }
+
+    private void validateMeetingTime(Long userId, Meeting meeting) {
+        LocalDateTime localDateTime = convertToLocalDateTime(meeting.getDate(), meeting.getTime());
+        LocalDateTime fromDateTime = localDateTime.plusMinutes(-1 * MEETING_AVAILABILITY_CRITERIA);
+        LocalDateTime toDateTime = localDateTime.plusMinutes(MEETING_AVAILABILITY_CRITERIA);
+        if (meetingRepository.existMeetingWithInTimeRange(userId, fromDateTime, toDateTime))
+            throw new InvalidValueException(UNAVAILABLE_MEETING_TIME);
+    }
+
+    private void validateDuplicateParticipation(Meeting meeting, Long userId) {
+        if (participationRepository.existsByMeetingIdAndUserId(meeting.getId(), userId))
+            throw new ConflictException(DUPLICATE_PARTICIPATION);
+    }
+
+    private void validateMeetingCapacity(Meeting meeting) {
+        if (meeting.getParticipations().size() == 6)
+            throw new ForbiddenException(INVALID_MEETING_CAPACITY);
+    }
+
+    private Meeting findMeetingOrThrow(Long meetingId) {
+        return meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new EntityNotFoundException(MEETING_NOT_FOUND));
+    }
+
+    private User findUserOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+    }
+
+    private Participation findParticipationOrThrow(Long participationId) {
+        return participationRepository.findById(participationId)
+                .orElseThrow(() -> new EntityNotFoundException(PARTICIPATION_NOT_FOUND));
+    }
+
+    private void saveParticipation(Participation participation) {
+        participationRepository.save(participation);
+    }
+
+    private void deleteParticipation(Participation participation, Meeting meeting) {
+        meeting.withdrawParticipation(participation);
+        participationRepository.delete(participation);
     }
 }
